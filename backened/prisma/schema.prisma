@@ -1,0 +1,672 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+// ========================================
+// ADMIN USERS (Dashboard Access)
+// ========================================
+
+enum UserRole {
+  SUPER_ADMIN
+  ADMIN
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+}
+
+model User {
+  id        String     @id @default(auto()) @map("_id") @db.ObjectId
+  email     String     @unique
+  firstName String
+  lastName  String
+  password  String // Hashed password for admin login
+  role      UserRole   @default(ADMIN)
+  status    UserStatus @default(ACTIVE)
+
+  // Profile Information
+  avatar String?
+  phone  String?
+
+  // Audit Fields
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime? // Soft delete
+  lastLoginAt DateTime?
+
+  @@map("users")
+}
+
+// ========================================
+// CUSTOMER MANAGEMENT (Store Customers)
+// ========================================
+
+enum CustomerRole {
+  GUEST
+  CUSTOMER
+}
+
+enum CustomerStatus {
+  ACTIVE
+  INACTIVE
+  VIP
+}
+
+// Customers who purchase products (can login with email/password)
+model Customer {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  // Basic Info
+  firstName String
+  lastName  String
+  email     String  @unique // Required & unique for customer accounts
+  password  String? // Hashed password - null for guest checkouts, set when customer creates account
+  phone     String?
+  avatar    String?
+
+  // Added by admin
+  tags  String[]
+  notes String?
+
+  // Customer Role & Status
+  role          CustomerRole   @default(GUEST)
+  isGuest       Boolean        @default(true) // true = guest checkout, false = registered account
+  emailVerified Boolean        @default(false)
+  status        CustomerStatus @default(ACTIVE)
+
+  // Address Information
+  address CustomerAddress?
+
+  // Analytics Fields (Denormalized for Performance)
+  totalOrders       Int       @default(0)
+  totalSpent        Float     @default(0)
+  averageOrderValue Float     @default(0)
+  lastOrderDate     DateTime?
+
+  // Relations
+  orders Order[]
+
+  // Audit Fields
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  deletedAt    DateTime?
+  sessions     Session[]
+  transactions Transaction[]
+  reviews      Review[]
+
+  @@index([isGuest])
+  @@index([status])
+  @@index([role])
+  @@index([totalSpent])
+  @@index([createdAt])
+  @@map("customers")
+}
+
+type CustomerAddress {
+  street     String
+  address2   String?
+  city       String
+  state      String?
+  country    String
+  postalCode String
+  phone      String?
+  apartment  String?
+  isDefault  Boolean?
+}
+
+// ========================================
+// SESSION & VISITOR TRACKING
+// ========================================
+
+enum SessionType {
+  ANONYMOUS // Not logged in
+  CUSTOMER // Logged in customer
+}
+
+// Track all visitors (logged in or anonymous)
+model Session {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  // Session Identification
+  sessionId String  @unique // UUID stored in cookie
+  // Persistent visitor identifier (client-side `visitor_id`), long-lived across sessions
+  visitorId String?
+
+  // User Association
+  customerId String?     @db.ObjectId
+  customer   Customer?   @relation(fields: [customerId], references: [id])
+  type       SessionType @default(ANONYMOUS)
+
+  // Session Data
+  ipAddress String
+  userAgent String
+  country   String?
+  city      String?
+  device    String? // mobile, desktop, tablet
+  browser   String?
+  os        String?
+
+  // Behavior Tracking
+  events SessionEvent[] // Track user actions
+
+  // Session Duration
+  startedAt  DateTime @default(now())
+  lastSeenAt DateTime @default(now())
+
+  // Conversion
+  converted Boolean @default(false) // Did they make a purchase?
+  orderId   String? @db.ObjectId
+  order     Order?  @relation(fields: [orderId], references: [id])
+
+  @@index([customerId])
+  @@index([visitorId])
+  @@index([type])
+  @@index([startedAt])
+  @@index([converted])
+  @@map("sessions")
+}
+
+// Track events within a session (pageviews, add to cart, etc.)
+model SessionEvent {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  sessionId String
+  session   Session @relation(fields: [sessionId], references: [sessionId], onDelete: Cascade)
+
+  // Event Data
+  eventType String // "page_view","product_view","add_to_cart","remove_from_cart","checkout_started", etc.
+  page      String?
+  productId String? @db.ObjectId
+  metadata  Json? // Additional event data
+
+  timestamp DateTime @default(now())
+
+  @@index([sessionId])
+  @@index([eventType])
+  @@index([timestamp])
+  @@map("session_events")
+}
+
+// ========================================
+// ANALYTICS & METRICS (Daily Aggregation)
+// ========================================
+
+// Pre-calculated daily metrics for fast dashboard queries
+model DailyMetrics {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  date DateTime @unique // YYYY-MM-DD
+
+  // Visitor Metrics
+  totalVisits  Int @default(0) // All session starts
+  uniqueVisits Int @default(0) // Unique sessionIds
+
+  // Session Metrics
+  totalPageViews Int @default(0)
+
+  // Conversion Metrics
+  conversionRate Float @default(0) // % of sessions that converted
+  cartRate       Float @default(0) // % added to cart
+  checkoutRate   Float @default(0) // % reached checkout
+  purchaseRate   Float @default(0) // % completed purchase
+
+  // Sales Metrics
+  totalSales        Float @default(0)
+  totalOrders       Int   @default(0)
+  averageOrderValue Float @default(0)
+  newOrders         Int   @default(0)
+  completedOrders   Int   @default(0)
+  cancelledOrders   Int   @default(0)
+
+  // Sales Goal Tracking
+  salesGoal         Float? // Target for the day/month
+  salesGoalProgress Float  @default(0) // Percentage achieved
+
+  // Customer Metrics
+  newCustomers       Int @default(0) // First-time buyers today
+  returningCustomers Int @default(0) // Repeat buyers today
+  totalCustomers     Int @default(0) // Total unique customers in system
+
+  // Product Metrics
+  totalProducts      Int @default(0)
+  inStockProducts    Int @default(0)
+  outOfStockProducts Int @default(0)
+
+  // Order Status Breakdown
+  pendingOrders    Int @default(0)
+  processingOrders Int @default(0)
+  shippedOrders    Int @default(0)
+  deliveredOrders  Int @default(0)
+  canceledOrders   Int @default(0)
+
+  // Transaction Status Breakdown
+  completedTransactions Int @default(0)
+  pendingTransactions   Int @default(0)
+  failedTransactions    Int @default(0)
+
+  // Geographic Data
+  salesByCountry Json? // { "USA": 30000, "Brazil": 25000, ... }
+
+  // Trend Indicators (vs previous period)
+  visitsChange Float? // % change
+  salesChange  Float? // % change
+  ordersChange Float? // % change
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("daily_metrics")
+}
+
+// Real-time metrics (updated every minute for "Users in last 30 minutes")
+model RealtimeMetrics {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  timestamp DateTime @default(now())
+
+  // Active users right now
+  activeUsers    Int @default(0)
+  usersPerMinute Int @default(0)
+
+  // Current conversions
+  activeCheckouts Int @default(0)
+
+  @@index([timestamp])
+  @@map("realtime_metrics")
+}
+
+// ========================================
+// PRODUCT CATALOG
+// ========================================
+
+enum ProductStatus {
+  ACTIVE
+  INACTIVE
+  DRAFT
+}
+
+model Category {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  name        String    @unique
+  slug        String    @unique
+  description String?
+  image       String?
+  // Products in this category
+  products    Product[]
+
+  visibility Boolean @default(true)
+
+  sortOrder Int @default(0)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@map("categories")
+}
+
+model Product {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  // Basic Info
+  name        String
+  slug        String @unique
+  sku         String @unique
+  description String
+
+  // Pricing
+  price         Float
+  costPrice     Float?
+  discountPrice Float?
+
+  // Inventory
+  // Inventory (Base stock, can be managed by variants)
+  stockQuantity     Int     @default(0)
+  lowStockThreshold Int     @default(10)
+  isUnlimitedStock  Boolean @default(false)
+
+  // Media
+  images    String[]
+  thumbnail String? // Main product thumbnail image
+
+  // Category
+  categoryId String   @db.ObjectId
+  category   Category @relation(fields: [categoryId], references: [id])
+
+  tags   String[]
+  colors String[] // Simple list of colors
+
+  // Analytics (Denormalized)
+  totalSales   Int   @default(0)
+  totalRevenue Float @default(0)
+  viewCount    Int   @default(0)
+
+  status     ProductStatus @default(DRAFT)
+  isFeatured Boolean       @default(false)
+
+  // Reviews & Ratings
+  averageRating Float @default(0)
+  ratingCount   Int   @default(0)
+
+  reviews Review[]
+
+  // Availability window for the product
+  expirationStart DateTime? // When product becomes available
+  expirationEnd   DateTime? // When product expires / should be hidden
+
+  orderItems OrderItem[]
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@index([categoryId])
+  @@index([status])
+  @@index([totalSales])
+  @@index([isFeatured])
+  @@index([discountPrice])
+  @@index([stockQuantity])
+  @@index([averageRating])
+  @@map("products")
+}
+
+// ========================================
+// STORE CONFIGURATION & PAYOUTS
+// ========================================
+
+model StorePaymentMethod {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  name     String // e.g. "Main Business Card"
+  type     PaymentMethod // CREDIT_CARD, BANK_TRANSFER, etc.
+  provider String? // "Visa", "Mastercard", "Chase"
+
+  last4      String
+  expiryDate String? // MM/YY
+  holderName String
+
+  isDefault Boolean @default(false)
+  status    String  @default("ACTIVE") // ACTIVE, INACTIVE
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  transactions Transaction[]
+
+  @@map("store_payment_methods")
+}
+
+// ========================================
+// ORDER MANAGEMENT
+// ========================================
+
+enum OrderStatus {
+  PENDING
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELED
+  REFUNDED
+}
+
+enum FulfillmentStatus {
+  PENDING
+  PROCESSING
+  PACKED
+  SHIPPED
+  OUT_FOR_DELIVERY
+  DELIVERED
+  RETURNED
+  CANCELED
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
+
+enum PaymentMethod {
+  CREDIT_CARD
+  DEBIT_CARD
+  PAYPAL
+  BANK_TRANSFER
+  CASH_ON_DELIVERY
+}
+
+enum PaymentGateway {
+  STRIPE
+  PAYPAL
+  RAZORPAY
+  SQUARE
+  MANUAL // For COD or bank transfer
+}
+
+model Order {
+  id          String @id @default(auto()) @map("_id") @db.ObjectId
+  orderNumber String @unique
+
+  // Customer
+  customerId String   @db.ObjectId
+  customer   Customer @relation(fields: [customerId], references: [id])
+
+  // Session tracking (which session converted)
+  sessionId String?
+
+  // Order Items
+  items OrderItem[]
+
+  // Pricing
+  subtotal    Float
+  taxAmount   Float
+  shippingFee Float
+  discount    Float @default(0)
+  totalAmount Float
+
+  // Coupon (if applied)
+  couponId   String? @db.ObjectId
+  couponCode String?
+
+  // Status
+  fulfillmentStatus FulfillmentStatus @default(PENDING)
+  paymentStatus     PaymentStatus     @default(PENDING)
+  paymentMethod     PaymentMethod?
+
+  // Shipping
+  shippingAddress CustomerAddress?
+  billingAddress  CustomerAddress?
+  trackingNumber  String?
+
+  // Transactional Fields (One-to-One)
+  transaction Transaction?
+
+  codAmount         Float? // Amount to collect
+  codCollected      Boolean   @default(false)
+  codCollectedBy    String? // Delivery person name/ID
+  codCollectionDate DateTime?
+
+  // Request Tracking
+  ipAddress String?
+  userAgent String?
+  country   String?
+
+  // Notes
+  notes String?
+
+  paidAt      DateTime?
+  shippedAt   DateTime?
+  deliveredAt DateTime?
+  canceledAt  DateTime?
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+  sessions  Session[]
+
+  @@index([customerId])
+  @@index([sessionId])
+  @@index([fulfillmentStatus])
+  @@index([paymentStatus])
+  @@index([createdAt])
+  @@index([country])
+  @@map("orders")
+}
+
+model OrderItem {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  orderId String @db.ObjectId
+  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  productId String  @db.ObjectId
+  product   Product @relation(fields: [productId], references: [id])
+
+  // Snapshot at time of order
+  productName  String
+  productSku   String
+  productImage String?
+
+  quantity   Int
+  unitPrice  Float
+  totalPrice Float
+
+  createdAt DateTime @default(now())
+
+  @@index([orderId])
+  @@index([productId])
+  @@map("order_items")
+}
+
+// ========================================
+// TRANSACTIONS
+// ========================================
+
+model Transaction {
+  id                String @id @default(auto()) @map("_id") @db.ObjectId
+  transactionNumber String @unique
+
+  // One-to-One with Order
+  orderId String @unique @db.ObjectId
+  order   Order  @relation(fields: [orderId], references: [id])
+
+  customerId String   @db.ObjectId
+  customer   Customer @relation(fields: [customerId], references: [id])
+
+  // Payment Details
+  amount         Float
+  currency       String         @default("USD")
+  paymentStatus  PaymentStatus
+  paymentMethod  PaymentMethod
+  paymentGateway PaymentGateway @default(MANUAL) // MANAL, STRIPE, PAYPAL
+
+  // Payment Details Snapshot (e.g. { last4: "4242", brand: "Visa" })
+  paymentMethodDetails Json?
+
+  // Gateway Integration
+  gatewayTransactionId String? // Stripe payment_intent_id or similar
+  gatewayResponse      Json? // Full gateway response for debugging
+
+  // Failure Tracking
+  failureReason String? // Human-readable reason
+  failureCode   String? // Gateway error code (e.g., "card_declined")
+  retryCount    Int     @default(0)
+
+  // Webhook Tracking
+  webhookReceived   Boolean   @default(false)
+  webhookReceivedAt DateTime?
+
+  // 3D Secure / Strong Customer Authentication
+  requiresAction Boolean @default(false) // Requires additional user action
+  actionUrl      String? // URL for 3D Secure redirect
+
+  // Timestamps
+  paidAt    DateTime?
+  failedAt  DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  storePaymentMethodId String?             @db.ObjectId
+  storePaymentMethod   StorePaymentMethod? @relation(fields: [storePaymentMethodId], references: [id])
+
+  @@index([customerId])
+  @@index([paymentStatus])
+  @@index([gatewayTransactionId])
+  @@index([storePaymentMethodId])
+  @@index([createdAt])
+  @@map("transactions")
+}
+
+// ========================================
+// COUPON MANAGEMENT
+// ========================================
+
+enum CouponType {
+  FIXED
+  PERCENTAGE
+  FREE_SHIPPING
+  PRICE_DISCOUNT // From UI, likely same as FIXED but maybe specific item price override? I'll treat as FIXED usually, but let's include it.
+}
+
+enum CouponStatus {
+  ACTIVE
+  INACTIVE
+  EXPIRED
+}
+
+model Coupon {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  code String @unique
+  name String
+
+  type  CouponType
+  value Float      @default(0)
+
+  startDate DateTime
+  endDate   DateTime? // Null means no expiry
+
+  usageLimit Int? // Null means unlimited
+  usageCount Int  @default(0)
+
+  status CouponStatus @default(ACTIVE)
+
+  // generic field for 'Applies to' logic (e.g. specific products/collections)
+  appliesTo Json?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("coupons")
+}
+
+// ========================================
+// REVIEWS & RATINGS
+// ========================================
+
+model Review {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  productId String  @db.ObjectId
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  customerId String?   @db.ObjectId
+  customer   Customer? @relation(fields: [customerId], references: [id])
+
+  rating  Int
+  comment String? // Optional review description
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([productId])
+  @@index([customerId])
+  @@map("reviews")
+}
