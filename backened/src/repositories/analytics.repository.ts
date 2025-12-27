@@ -277,6 +277,37 @@ export const analyticsRepository = {
       },
     });
 
+    // If no daily metrics exist, query orders directly
+    if (result._sum.totalOrders === null) {
+      const orders = await prisma.order.findMany({
+        where: { createdAt: { gte: from, lte: to } },
+      });
+
+      const totalOrders = orders.length;
+      const totalSales = orders.reduce((sum, o) => sum + o.totalAmount, 0);
+      const completedOrders = orders.filter(
+        (o) => o.fulfillmentStatus === "DELIVERED"
+      ).length;
+      const cancelledOrders = orders.filter(
+        (o) => o.fulfillmentStatus === "CANCELED"
+      ).length;
+      const pendingOrders = orders.filter(
+        (o) => o.fulfillmentStatus === "PENDING"
+      ).length;
+
+      return {
+        totalOrders,
+        totalSales,
+        completedOrders,
+        cancelledOrders,
+        pendingOrders,
+        processingOrders: 0,
+        shippedOrders: 0,
+        newOrders: 0,
+        averageOrderValue: totalOrders > 0 ? totalSales / totalOrders : 0,
+      };
+    }
+
     return {
       totalOrders: result._sum.totalOrders ?? 0,
       totalSales: result._sum.totalSales ?? 0,
@@ -308,6 +339,26 @@ export const analyticsRepository = {
       orderBy: { date: "desc" },
     });
 
+    // If no daily metrics exist, get current customer counts directly
+    if (!latestMetric) {
+      const totalCustomers = await prisma.customer.count({
+        where: { deletedAt: null },
+      });
+      const newCustomers = await prisma.customer.count({
+        where: {
+          deletedAt: null,
+          createdAt: { gte: from, lte: to },
+        },
+      });
+
+      return {
+        newCustomers,
+        returningCustomers: 0,
+        totalVisits: 0,
+        totalCustomers,
+      };
+    }
+
     return {
       newCustomers: aggregate._sum.newCustomers ?? 0,
       returningCustomers: aggregate._sum.returningCustomers ?? 0,
@@ -336,21 +387,35 @@ export const analyticsRepository = {
   },
 
   async getWeeklyProductStats({ from, to }: { from: Date; to: Date }) {
-    const result = await prisma.dailyMetrics.aggregate({
-      _sum: {
-        totalProducts: true,
-        inStockProducts: true,
-        outOfStockProducts: true,
-      },
-      where: {
-        date: { gte: from, lte: to },
-      },
+    // Get the latest record in this period for snapshot metrics
+    const latestMetric = await prisma.dailyMetrics.findFirst({
+      where: { date: { gte: from, lte: to } },
+      orderBy: { date: "desc" },
     });
 
+    // If no daily metrics exist, get current product counts directly
+    if (!latestMetric) {
+      const totalProducts = await prisma.product.count({
+        where: { deletedAt: null },
+      });
+      const inStockProducts = await prisma.product.count({
+        where: { deletedAt: null, stockQuantity: { gt: 0 } },
+      });
+      const outOfStockProducts = await prisma.product.count({
+        where: { deletedAt: null, stockQuantity: { lte: 0 } },
+      });
+
+      return {
+        totalProducts,
+        inStockProducts,
+        outOfStockProducts,
+      };
+    }
+
     return {
-      totalProducts: result._sum.totalProducts ?? 0,
-      inStockProducts: result._sum.inStockProducts ?? 0,
-      outOfStockProducts: result._sum.outOfStockProducts ?? 0,
+      totalProducts: latestMetric.totalProducts ?? 0,
+      inStockProducts: latestMetric.inStockProducts ?? 0,
+      outOfStockProducts: latestMetric.outOfStockProducts ?? 0,
     };
   },
 

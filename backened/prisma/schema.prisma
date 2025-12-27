@@ -38,7 +38,7 @@ model User {
   // Audit Fields
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
-  deletedAt   DateTime? // Soft delete
+  deletedAt   DateTime? // Soft delete (null by default in MongoDB)
   lastLoginAt DateTime?
 
   @@map("users")
@@ -96,7 +96,7 @@ model Customer {
   // Audit Fields
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
-  deletedAt    DateTime?
+  deletedAt    DateTime? // Soft delete (null by default in MongoDB)
   sessions     Session[]
   transactions Transaction[]
   reviews      Review[]
@@ -307,7 +307,7 @@ model Category {
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
-  deletedAt DateTime?
+  deletedAt DateTime? // Soft delete (null by default in MongoDB)
 
   @@map("categories")
 }
@@ -365,7 +365,7 @@ model Product {
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
-  deletedAt DateTime?
+  deletedAt DateTime? // Soft delete (null by default in MongoDB)
 
   @@index([categoryId])
   @@index([status])
@@ -508,7 +508,7 @@ model Order {
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
-  deletedAt DateTime?
+  deletedAt DateTime? // Soft delete (null by default in MongoDB)
   sessions  Session[]
 
   @@index([customerId])

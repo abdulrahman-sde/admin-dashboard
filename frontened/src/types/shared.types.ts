@@ -42,3 +42,14 @@ export interface ApiError {
   errors?: Record<string, string[]>;
   timestamp?: string;
 }
+
+export interface CustomCursorProps {
+  points?: { x: number; y: number }[];
+  height?: number;
+  offset?: { top: number };
+}
+
+export interface CustomTooltipProps {
+  active?: boolean;
+  payload?: { payload: { day: string }; value: number }[];
+}

@@ -44,7 +44,7 @@ export default function RecentTransactions() {
                 <TableHead className="text-right">Amount</TableHead>
               </TableRow>
             </TableHeader>
-            <TableBody className="[&_tr]:h-11">
+            <TableBody className="[&_tr]:h-12 ">
               {isFetching ? (
                 <RecentTransactionsSkeleton rows={6} />
               ) : transactions.length === 0 ? (
@@ -54,7 +54,7 @@ export default function RecentTransactions() {
                 />
               ) : (
                 transactions.slice(0, 6).map((transaction, index) => (
-                  <TableRow key={index}>
+                  <TableRow key={index} className="[&_td]:text-[13.5px]">
                     <TableCell>{index + 1}.</TableCell>
                     <TableCell className="font-medium">
                       #{transaction.customerId.slice(0, 10)}
@@ -67,11 +67,17 @@ export default function RecentTransactions() {
                         <div
                           className={`h-2 w-2 rounded-full ${
                             transaction.paymentStatus === "COMPLETED"
-                              ? "bg-[#4EA674]"
-                              : "bg-yellow-500"
+                              ? "bg-[#21C45D]"
+                              : "bg-warning"
                           }`}
                         />
-                        <span>{transaction.paymentStatus}</span>
+                        <span>
+                          {transaction.paymentStatus === "COMPLETED"
+                            ? "Paid"
+                            : transaction.paymentStatus === "PENDING"
+                            ? "Pending"
+                            : "Failed"}
+                        </span>
                       </div>
                     </TableCell>
                     <TableCell className="font-medium text-right">

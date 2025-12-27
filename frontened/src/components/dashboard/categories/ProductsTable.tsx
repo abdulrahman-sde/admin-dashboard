@@ -11,7 +11,24 @@ import {
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Search, SlidersHorizontal, Plus, Edit, Trash2 } from "lucide-react";
+import {
+  Search,
+  Plus,
+  Edit,
+  Trash2,
+  SlidersHorizontal,
+  ArrowUp,
+  ArrowDown,
+} from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   Pagination,
   PaginationContent,
@@ -22,15 +39,7 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 import { ProductsTableSkeleton } from "@/components/shared/skeletons";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { useProducts } from "@/hooks/products/useProducts";
-import { ArrowUp, ArrowDown } from "lucide-react";
-import type { ProductsQueryParams } from "@/types/products.types";
 import { DeleteConfirmationModal } from "@/components/shared/DeleteConfirmationModal";
 
 import { useProductDelete } from "@/hooks/products/useProductDelete";
@@ -48,26 +57,19 @@ export default function ProductsTable() {
     activeTab,
     setActiveTab,
     setCurrentPage,
-    setSortBy,
-    setSortOrder,
-    sortBy,
-    sortOrder,
     search,
     setSearch,
     selectedIds,
     handleCheckboxChange,
     handleSelectAll,
     resetSelection,
+    sortBy,
+    setSortBy,
+    sortOrder,
+    setSortOrder,
   } = useProducts();
 
-  const {
-    isDeleteModalOpen,
-    setIsDeleteModalOpen,
-    handleBulkDelete,
-    isDeleting,
-  } = useProductDelete(selectedIds, resetSelection);
-
-  const handleSort = (field: NonNullable<ProductsQueryParams["sortBy"]>) => {
+  const handleSort = (field: any) => {
     if (sortBy === field) {
       setSortOrder(sortOrder === "asc" ? "desc" : "asc");
     } else {
@@ -75,6 +77,13 @@ export default function ProductsTable() {
       setSortOrder("desc");
     }
   };
+
+  const {
+    isDeleteModalOpen,
+    setIsDeleteModalOpen,
+    handleBulkDelete,
+    isDeleting,
+  } = useProductDelete(selectedIds, resetSelection);
 
   return (
     <div className="space-y-6 bg-white py-7 px-5 shadow-sm rounded-lg">
@@ -130,75 +139,63 @@ export default function ProductsTable() {
                   onChange={(e) => setSearch(e.target.value)}
                 />
               </div>
-              <div className="flex items-center gap-2 shrink-0">
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      className={`border-neutral-300 h-10 w-10 ${
-                        sortBy && sortBy !== "createdAt"
-                          ? "text-primary border-primary bg-primary/5"
-                          : ""
-                      }`}
-                      variant="outline"
-                      size="icon"
-                    >
-                      <SlidersHorizontal className="size-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent
-                    align="end"
-                    className="w-48 border-[#E5E7EB] shadow-xl"
+
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className="border-[#E5E7EB] text-muted-foreground h-10 px-3"
                   >
-                    <DropdownMenuItem
-                      onClick={() => handleSort("createdAt")}
-                      className="flex items-center justify-between"
-                    >
-                      Date
+                    <SlidersHorizontal className="h-4 w-4 mr-2" />
+                    Sort
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-[200px]">
+                  <DropdownMenuLabel>Sort by</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuGroup>
+                    <DropdownMenuItem onClick={() => handleSort("createdAt")}>
+                      <span>Date</span>
                       {sortBy === "createdAt" &&
                         (sortOrder === "asc" ? (
-                          <ArrowUp className="size-3" />
+                          <ArrowUp className="ml-auto h-4 w-4" />
                         ) : (
-                          <ArrowDown className="size-3" />
+                          <ArrowDown className="ml-auto h-4 w-4" />
                         ))}
                     </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => handleSort("price")}
-                      className="flex items-center justify-between"
-                    >
-                      Price
+                    <DropdownMenuItem onClick={() => handleSort("price")}>
+                      <span>Price</span>
                       {sortBy === "price" &&
                         (sortOrder === "asc" ? (
-                          <ArrowUp className="size-3" />
+                          <ArrowUp className="ml-auto h-4 w-4" />
                         ) : (
-                          <ArrowDown className="size-3" />
+                          <ArrowDown className="ml-auto h-4 w-4" />
                         ))}
                     </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => handleSort("totalSales")}
-                      className="flex items-center justify-between"
-                    >
-                      Sales
-                      {sortBy === "totalSales" &&
+                    <DropdownMenuItem onClick={() => handleSort("name")}>
+                      <span>Name</span>
+                      {sortBy === "name" &&
                         (sortOrder === "asc" ? (
-                          <ArrowUp className="size-3" />
+                          <ArrowUp className="ml-auto h-4 w-4" />
                         ) : (
-                          <ArrowDown className="size-3" />
+                          <ArrowDown className="ml-auto h-4 w-4" />
                         ))}
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       onClick={() => handleSort("stockQuantity")}
-                      className="flex items-center justify-between"
                     >
-                      Stock
+                      <span>Inventory</span>
                       {sortBy === "stockQuantity" &&
                         (sortOrder === "asc" ? (
-                          <ArrowUp className="size-3" />
+                          <ArrowUp className="ml-auto h-4 w-4" />
                         ) : (
-                          <ArrowDown className="size-3" />
+                          <ArrowDown className="ml-auto h-4 w-4" />
                         ))}
                     </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                  </DropdownMenuGroup>
+                </DropdownMenuContent>
+              </DropdownMenu>
+              <div className="flex items-center gap-2 shrink-0">
                 <Button
                   size="icon"
                   className="bg-[#4EA674] hover:bg-[#3d8a5e] h-10 w-10"

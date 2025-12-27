@@ -10,14 +10,7 @@ import {
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
-import {
-  Search,
-  Save,
-  Plus,
-  AlertCircle,
-  Star,
-  ArrowUpDown,
-} from "lucide-react";
+import { Search, Save, Plus, AlertCircle, Star } from "lucide-react";
 import { ProductsTableSkeleton } from "@/components/shared/skeletons";
 import { useProducts } from "@/hooks/products/useProducts";
 import { DeleteConfirmationModal } from "@/components/shared/DeleteConfirmationModal";
@@ -41,30 +34,7 @@ export default function Products() {
     resetSelection,
     search,
     setSearch,
-    sortBy,
-    setSortBy,
-    sortOrder,
-    setSortOrder,
   } = useProducts();
-
-  const handleSort = (field: typeof sortBy) => {
-    if (sortBy === field) {
-      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
-    } else {
-      setSortBy(field);
-      setSortOrder("desc");
-    }
-  };
-
-  const SortIcon = ({ field }: { field: typeof sortBy }) => {
-    if (sortBy !== field)
-      return <ArrowUpDown className="ml-1 h-3 w-3 opacity-50" />;
-    return sortOrder === "asc" ? (
-      <ArrowUpDown className="ml-1 h-3 w-3 text-[#4EA674]" />
-    ) : (
-      <ArrowUpDown className="ml-1 h-3 w-3 text-[#4EA674] rotate-180 transition-transform" />
-    );
-  };
 
   const {
     isDeleteModalOpen,
@@ -134,31 +104,10 @@ export default function Products() {
                   }
                 />
               </TableHead>
-              <TableHead
-                className="cursor-pointer hover:bg-black/5"
-                onClick={() => handleSort("name")}
-              >
-                <div className="flex items-center">
-                  Product <SortIcon field="name" />
-                </div>
-              </TableHead>
-              <TableHead
-                className="cursor-pointer hover:bg-black/5"
-                onClick={() => handleSort("stockQuantity")}
-              >
-                <div className="flex items-center">
-                  Inventory <SortIcon field="stockQuantity" />
-                </div>
-              </TableHead>
+              <TableHead>Product</TableHead>
+              <TableHead>Inventory</TableHead>
               <TableHead className="">Color</TableHead>
-              <TableHead
-                className="cursor-pointer hover:bg-black/5"
-                onClick={() => handleSort("price")}
-              >
-                <div className="flex items-center">
-                  Price <SortIcon field="price" />
-                </div>
-              </TableHead>
+              <TableHead>Price</TableHead>
               <TableHead className="">Rating</TableHead>
             </TableRow>
           </TableHeader>

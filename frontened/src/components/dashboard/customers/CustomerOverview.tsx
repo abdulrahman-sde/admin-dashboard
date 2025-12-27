@@ -6,7 +6,12 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import type { ChartConfig } from "@/components/ui/chart";
 import { ChartContainer, ChartTooltip } from "@/components/ui/chart";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import type { CustomerOverviewProps } from "@/types";
+import { mockCustomerOverviewData } from "@/constants/mockDashboardData";
+
+import type {
+  CustomCursorProps,
+  CustomTooltipProps,
+} from "@/types/shared.types";
 
 const chartConfig = {
   customers: {
@@ -14,12 +19,6 @@ const chartConfig = {
     color: "#4EA674",
   },
 } satisfies ChartConfig;
-
-interface CustomCursorProps {
-  points?: { x: number; y: number }[];
-  height?: number;
-  offset?: { top: number };
-}
 
 const CustomCursor = (props: CustomCursorProps) => {
   const { points, height, offset } = props;
@@ -41,11 +40,6 @@ const CustomCursor = (props: CustomCursorProps) => {
   );
 };
 
-interface CustomTooltipProps {
-  active?: boolean;
-  payload?: { payload: { day: string }; value: number }[];
-}
-
 const CustomTooltip = ({ active, payload }: CustomTooltipProps) => {
   if (!active || !payload || !payload.length) return null;
 
@@ -61,10 +55,11 @@ const CustomTooltip = ({ active, payload }: CustomTooltipProps) => {
   );
 };
 
-export default function CustomerOverview({ data }: CustomerOverviewProps) {
+export default function CustomerOverview() {
   const [timeRange, setTimeRange] = React.useState("this-week");
   const [activeTab, setActiveTab] = React.useState("activeCustomers");
 
+  const data = mockCustomerOverviewData;
   const weekData =
     timeRange === "this-week"
       ? data.thisWeek.chartData
@@ -74,7 +69,7 @@ export default function CustomerOverview({ data }: CustomerOverviewProps) {
     timeRange === "this-week" ? data.thisWeek.stats : data.lastWeek.stats;
 
   return (
-    <Card className="border-[#D1D5DB]">
+    <Card className="border-[#F1F5F9] shadow-sm">
       <CardHeader className="flex flex-col sm:flex-row min-h-full items-start sm:items-center justify-between pb-4 gap-4">
         <div>
           <h3>Customer Overview</h3>

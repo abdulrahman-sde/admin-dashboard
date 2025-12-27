@@ -22,6 +22,7 @@ export const couponsApi = api.injectEndpoints({
                 type: "Coupon" as const,
                 id: coupon.id,
               })),
+              { type: "Coupon" as const, id: "LIST" },
             ]
           : [{ type: "Coupon" as const, id: "LIST" }],
     }),

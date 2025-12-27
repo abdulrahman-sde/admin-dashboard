@@ -36,7 +36,7 @@ export default function BestSellingProduct({
 
   return (
     <Card className="shadow-sm border-0">
-      <CardHeader className="flex flex-row items-center justify-between pb-4 px-6">
+      <CardHeader className="flex flex-row items-center justify-between  px-6">
         <CardTitle className="text-[17px] font-bold text-[#1e293b]">
           Best selling product
         </CardTitle>
@@ -55,16 +55,16 @@ export default function BestSellingProduct({
           <Table className="border-separate border-spacing-y-2">
             <TableHeader className="[&_tr]:border-0 bg-[#EAF8E7] rounded-lg">
               <TableRow className="hover:bg-transparent">
-                <TableHead className="rounded-tl-lg rounded-bl-lg py-4 px-4 text-[#4EA674] font-bold">
+                <TableHead className="rounded-tl-lg rounded-bl-lg py-4 px-4 text-[#6A717F] text-[13px] uppercase">
                   Product
                 </TableHead>
-                <TableHead className="text-center py-4 text-[#4EA674] font-bold">
+                <TableHead className="text-center py-4 text-[#6A717F] text-[13px] uppercase">
                   Total Order
                 </TableHead>
-                <TableHead className="text-center py-4 text-[#4EA674] font-bold">
+                <TableHead className="text-center py-4 text-[#6A717F] text-[13px] uppercase">
                   Status
                 </TableHead>
-                <TableHead className="text-right rounded-tr-lg px-4 rounded-br-lg py-4 text-[#4EA674] font-bold">
+                <TableHead className="text-right rounded-tr-lg px-4 rounded-br-lg py-4 text-[#6A717F] text-[13px] uppercase">
                   Price
                 </TableHead>
               </TableRow>
@@ -75,7 +75,7 @@ export default function BestSellingProduct({
               ) : (
                 data.map((product, index) => (
                   <TableRow key={index} className="hover:bg-[#f8fafc] border-0">
-                    <TableCell className="py-4 border-0">
+                    <TableCell className="py-2.5 border-0">
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 bg-[#f8fafc] rounded-lg flex items-center justify-center overflow-hidden border border-[#f1f5f9]">
                           {product.image ? (
@@ -88,12 +88,12 @@ export default function BestSellingProduct({
                             <div className="w-full h-full bg-[#f8fafc]" />
                           )}
                         </div>
-                        <span className="font-bold text-[#334155]">
+                        <span className="font-bold text-[#023337] text-[15px]">
                           {product.name}
                         </span>
                       </div>
                     </TableCell>
-                    <TableCell className="text-center font-bold text-[#334155] border-0">
+                    <TableCell className="text-center text-[14px] text-[#334155] border-0">
                       {product.totalOrder}
                     </TableCell>
                     <TableCell className="border-0">
@@ -103,16 +103,24 @@ export default function BestSellingProduct({
                             "h-2 w-2 rounded-full",
                             product.status.toLowerCase() === "stock" ||
                               product.status.toLowerCase() === "active"
-                              ? "bg-[#4EA674]"
-                              : "bg-[#ef4444]"
+                              ? "bg-rise"
+                              : "bg-destructive"
                           )}
                         />
-                        <span className="font-bold text-[#334155] text-[13px]">
+                        <span
+                          className={cn(
+                            " text-[13px]",
+                            product.status.toLowerCase() === "stock" ||
+                              product.status.toLowerCase() === "active"
+                              ? "text-rise"
+                              : "text-destructive"
+                          )}
+                        >
                           {product.status}
                         </span>
                       </div>
                     </TableCell>
-                    <TableCell className="font-bold text-right text-[#0f172a] border-0">
+                    <TableCell className="font-bold text-right text-[14px] text-[#0f172a] border-0">
                       $
                       {typeof product.price === "number"
                         ? product.price.toLocaleString()

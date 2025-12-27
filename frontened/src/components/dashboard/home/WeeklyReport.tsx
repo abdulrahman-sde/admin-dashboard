@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import type { ChartConfig } from "@/components/ui/chart";
 import { ChartContainer, ChartTooltip } from "@/components/ui/chart";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import type { WeeklyReportProps } from "@/types";
+import { mockWeeklyReportData } from "@/constants/mockDashboardData";
 
 const chartConfig = {
   revenue: {
@@ -42,10 +42,11 @@ const CustomCursor = (props: CustomCursorProps) => {
   );
 };
 
-export default function WeeklyReport({ data }: WeeklyReportProps) {
+export default function WeeklyReport() {
   const [timeRange, setTimeRange] = React.useState("this-week");
   const [activeTab, setActiveTab] = React.useState("customers");
 
+  const data = mockWeeklyReportData;
   const weekData =
     timeRange === "this-week"
       ? data.thisWeek.chartData
@@ -55,7 +56,7 @@ export default function WeeklyReport({ data }: WeeklyReportProps) {
     timeRange === "this-week" ? data.thisWeek.stats : data.lastWeek.stats;
 
   return (
-    <Card className="col-span-2 ">
+    <Card className="col-span-2 border-[#F1F5F9] shadow-sm">
       <CardHeader className="flex flex-col sm:flex-row min-h-full items-start sm:items-center justify-between pb-4 gap-4">
         <div>
           <h3>Report for this week</h3>

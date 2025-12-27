@@ -3,7 +3,6 @@ import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
 
-// Helper for optimized images
 const getImg = (id: string) =>
   `https://images.unsplash.com/${id}?w=300&h=300&q=40&fm=webp`;
 
@@ -33,7 +32,6 @@ const AVATARS = [
   "https://i.pravatar.cc/150?u=5",
 ];
 
-// Helper to get a date X days ago
 const getDateDaysAgo = (daysAgo: number, hour: number = 12) => {
   const date = new Date();
   date.setDate(date.getDate() - daysAgo);
@@ -42,9 +40,9 @@ const getDateDaysAgo = (daysAgo: number, hour: number = 12) => {
 };
 
 async function main() {
-  console.log("🗑️ COMPLETELY CLEARING DATABASE...");
+  console.log("🗑️ PERMANENTLY DELETING ALL DATA...");
 
-  // Delete everything in proper order
+  // Delete in proper order (foreign key constraints)
   await prisma.sessionEvent.deleteMany();
   await prisma.session.deleteMany();
   await prisma.transaction.deleteMany();
@@ -59,10 +57,10 @@ async function main() {
   await prisma.realtimeMetrics.deleteMany();
   await prisma.coupon.deleteMany();
 
-  console.log("✅ Database completely cleared!");
+  console.log("✅ All data permanently deleted!");
 
   // ============================================
-  // 1. CREATE PAYMENT METHOD
+  // 1. PAYMENT METHOD
   // ============================================
   console.log("💳 Creating Payment Method...");
   const paymentMethod = await prisma.storePaymentMethod.create({
@@ -78,11 +76,10 @@ async function main() {
   });
 
   // ============================================
-  // 2. CREATE CUSTOMERS
+  // 2. CUSTOMERS (Created 30 days ago)
   // ============================================
   console.log("👥 Creating 10 Customers...");
   const hashedPassword = await bcrypt.hash("customer123", 10);
-
   const customerData = [
     {
       firstName: "James",
@@ -179,6 +176,7 @@ async function main() {
           phone: `+1555${1000000 + i}`,
           isDefault: true,
         },
+        deletedAt: null,
       },
     });
     customers.push(customer);
@@ -186,7 +184,7 @@ async function main() {
   console.log(`   Created ${customers.length} customers`);
 
   // ============================================
-  // 3. CREATE CATEGORIES
+  // 3. CATEGORIES
   // ============================================
   console.log("📁 Creating Categories...");
   const categories = await Promise.all([
@@ -197,6 +195,7 @@ async function main() {
         image: PRODUCT_IMAGES.electronics[0],
         visibility: true,
         createdAt: getDateDaysAgo(30),
+        deletedAt: null,
       },
     }),
     prisma.category.create({
@@ -206,6 +205,7 @@ async function main() {
         image: PRODUCT_IMAGES.fashion[0],
         visibility: true,
         createdAt: getDateDaysAgo(30),
+        deletedAt: null,
       },
     }),
     prisma.category.create({
@@ -215,13 +215,14 @@ async function main() {
         image: PRODUCT_IMAGES.home[0],
         visibility: true,
         createdAt: getDateDaysAgo(30),
+        deletedAt: null,
       },
     }),
   ]);
   console.log(`   Created ${categories.length} categories`);
 
   // ============================================
-  // 4. CREATE PRODUCTS
+  // 4. PRODUCTS (5 in stock, 1 out of stock)
   // ============================================
   console.log("📦 Creating Products...");
   const productData = [
@@ -260,7 +261,7 @@ async function main() {
       imgs: PRODUCT_IMAGES.fashion,
       isFeatured: false,
       stock: 0,
-    }, // Out of stock
+    },
     {
       name: "Ceramic Vase",
       sku: "V-001",
@@ -296,6 +297,7 @@ async function main() {
         status: "ACTIVE",
         isFeatured: p.isFeatured,
         createdAt: getDateDaysAgo(25),
+        deletedAt: null,
       },
     });
     products.push(product);
@@ -303,10 +305,9 @@ async function main() {
   console.log(`   Created ${products.length} products`);
 
   // ============================================
-  // 5. CREATE ORDERS & TRANSACTIONS
+  // 5. ORDERS & TRANSACTIONS (Spread over 14 days)
   // ============================================
   console.log("🛒 Creating Orders & Transactions...");
-
   const orderSchedule = [
     { day: 0, count: 3 },
     { day: 1, count: 2 },
@@ -322,7 +323,6 @@ async function main() {
     { day: 11, count: 2 },
     { day: 12, count: 1 },
     { day: 13, count: 1 },
-    { day: 14, count: 2 },
   ];
 
   let orderNumber = 2025001;
@@ -360,6 +360,7 @@ async function main() {
               createdAt: orderDate,
             },
           },
+          deletedAt: null,
         },
       });
 
@@ -377,19 +378,17 @@ async function main() {
       });
     }
   }
-
-  const totalOrders = await prisma.order.count();
-  console.log(`   Created ${totalOrders} orders with transactions`);
+  console.log(
+    `   Created ${await prisma.order.count()} orders with transactions`
+  );
 
   // ============================================
   // 6. UPDATE CUSTOMER TOTALS
   // ============================================
   console.log("📊 Updating Customer Totals...");
-  const allCustomers = await prisma.customer.findMany({
+  for (const c of await prisma.customer.findMany({
     include: { orders: true },
-  });
-
-  for (const c of allCustomers) {
+  })) {
     const totalSpent = c.orders.reduce((sum, o) => sum + o.totalAmount, 0);
     await prisma.customer.update({
       where: { id: c.id },
@@ -408,11 +407,9 @@ async function main() {
   // 7. UPDATE PRODUCT TOTALS
   // ============================================
   console.log("📊 Updating Product Totals...");
-  const allProducts = await prisma.product.findMany({
+  for (const p of await prisma.product.findMany({
     include: { orderItems: true },
-  });
-
-  for (const p of allProducts) {
+  })) {
     const totalSales = p.orderItems.reduce(
       (sum, item) => sum + item.quantity,
       0
@@ -428,14 +425,90 @@ async function main() {
   }
 
   // ============================================
+  // 8. CREATE DAILY METRICS (14 days of actual data)
+  // ============================================
+  console.log("📈 Creating Daily Metrics...");
+  const totalCustomers = await prisma.customer.count();
+  const totalProducts = await prisma.product.count();
+  const inStockProducts = await prisma.product.count({
+    where: { stockQuantity: { gt: 0 } },
+  });
+  const outOfStockProducts = await prisma.product.count({
+    where: { stockQuantity: { lte: 0 } },
+  });
+
+  for (let day = 0; day <= 13; day++) {
+    const date = new Date();
+    date.setDate(date.getDate() - day);
+    date.setHours(0, 0, 0, 0);
+
+    const nextDay = new Date(date);
+    nextDay.setDate(nextDay.getDate() + 1);
+
+    // Get orders for this day
+    const dayOrders = await prisma.order.findMany({
+      where: { createdAt: { gte: date, lt: nextDay } },
+    });
+    const totalSales = dayOrders.reduce((sum, o) => sum + o.totalAmount, 0);
+    const completedOrders = dayOrders.filter(
+      (o) => o.fulfillmentStatus === "DELIVERED"
+    ).length;
+
+    // Get transactions for this day
+    const dayTransactions = await prisma.transaction.groupBy({
+      by: ["paymentStatus"],
+      _count: { id: true },
+      where: { createdAt: { gte: date, lt: nextDay } },
+    });
+    const completedTransactions =
+      dayTransactions.find((t) => t.paymentStatus === "COMPLETED")?._count.id ??
+      0;
+
+    await prisma.dailyMetrics.create({
+      data: {
+        date,
+        totalOrders: dayOrders.length,
+        totalSales,
+        completedOrders,
+        cancelledOrders: 0,
+        pendingOrders: 0,
+        processingOrders: 0,
+        shippedOrders: 0,
+        newOrders: dayOrders.length,
+        averageOrderValue:
+          dayOrders.length > 0 ? totalSales / dayOrders.length : 0,
+        totalCustomers,
+        newCustomers: 0, // All created on day 30
+        returningCustomers: 0,
+        totalProducts,
+        inStockProducts,
+        outOfStockProducts,
+        totalVisits: 0,
+        uniqueVisits: 0,
+        totalPageViews: 0,
+        conversionRate: 0,
+        completedTransactions,
+        pendingTransactions: 0,
+        failedTransactions: 0,
+      },
+    });
+  }
+  console.log(
+    `   Created ${await prisma.dailyMetrics.count()} daily metrics records`
+  );
+
+  // ============================================
   // SUMMARY
   // ============================================
-  console.log("\n✨ SEEDING COMPLETED! Summary:");
-  console.log(`   - Customers: ${await prisma.customer.count()}`);
-  console.log(`   - Categories: ${await prisma.category.count()}`);
-  console.log(`   - Products: ${await prisma.product.count()}`);
-  console.log(`   - Orders: ${await prisma.order.count()}`);
-  console.log(`   - Transactions: ${await prisma.transaction.count()}`);
+  console.log("\n✨ SEEDING COMPLETED!");
+  console.log(`   Customers: ${await prisma.customer.count()}`);
+  console.log(`   Categories: ${await prisma.category.count()}`);
+  console.log(
+    `   Products: ${await prisma.product.count()} (${inStockProducts} in stock, ${outOfStockProducts} out)`
+  );
+  console.log(`   Orders: ${await prisma.order.count()}`);
+  console.log(`   Transactions: ${await prisma.transaction.count()}`);
+  console.log(`   Daily Metrics: ${await prisma.dailyMetrics.count()}`);
   console.log("\n📊 ALL DATA IS CONSISTENT!");
 }
 

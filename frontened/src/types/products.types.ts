@@ -37,7 +37,16 @@ export interface Product {
   deletedAt: string | null;
   category: Category;
 }
-
+export interface BestSellingProductProps {
+  data?: {
+    name: string;
+    totalOrder: number;
+    status: string;
+    price: string | number;
+    image: string;
+  }[];
+  isLoading?: boolean;
+}
 export interface Meta {
   all: number;
   featured: number;
