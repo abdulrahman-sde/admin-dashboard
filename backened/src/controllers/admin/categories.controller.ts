@@ -1,6 +1,7 @@
 import type { Request, Response } from "express";
 import { categoriesService } from "../../services/categories.service.js";
 import { successResponse, paginatedResponse } from "../../utils/response.js";
+
 import {
   createCategorySchema,
   updateCategorySchema,

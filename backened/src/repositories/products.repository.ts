@@ -4,10 +4,7 @@ import type {
   CreateProductInput,
   UpdateProductInput,
 } from "../utils/validators/product.validator.js";
-import type {
-  ProductStatsFacetResult,
-  ProductStatsResult,
-} from "../types/products.types.js";
+import type { ProductStatsResult } from "../types/products.types.js";
 
 export const productRepository = {
   getAll: async ({
@@ -103,6 +100,16 @@ export const productRepository = {
     });
   },
 
+  incrementViewCount: async (id: string, count: number) => {
+    return prisma.product.update({
+      where: { id },
+      data: {
+        viewCount: { increment: count },
+      },
+      select: { id: true },
+    });
+  },
+
   deleteMany: async (ids: string[]): Promise<number> => {
     const result = await prisma.product.updateMany({
       where: { id: { in: ids } },
@@ -128,7 +135,9 @@ export const productRepository = {
               { $count: "count" },
             ],
             outOfStock: [
-              { $match: { stockQuantity: { $lte: 0 } } },
+              {
+                $match: { stockQuantity: { $lte: 0 }, isUnlimitedStock: false },
+              },
               { $count: "count" },
             ],
           },
@@ -145,5 +154,13 @@ export const productRepository = {
       onSale: facetResult?.onSale[0]?.count ?? 0,
       outOfStock: facetResult?.outOfStock[0]?.count ?? 0,
     };
+  },
+
+  getTopProducts: async (limit: number = 10): Promise<Product[]> => {
+    return prisma.product.findMany({
+      where: { deletedAt: null },
+      orderBy: { totalSales: "desc" },
+      take: limit,
+    });
   },
 };

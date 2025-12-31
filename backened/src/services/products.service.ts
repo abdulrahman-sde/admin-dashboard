@@ -7,7 +7,7 @@ import type {
 import { ValidationError, NotFoundError } from "../utils/errors.js";
 import { getSkipTake, getPaginationMeta } from "../utils/query.utils.js";
 
-import type { Prisma } from "@prisma/client";
+import type { Prisma, ProductStatus } from "@prisma/client";
 
 import type { GetProductsQuery } from "../utils/validators/product.validator.js";
 
@@ -40,7 +40,7 @@ export const productsService = {
 
     // 2. Filters
     if (categoryId) andConditions.push({ categoryId });
-    if (status) andConditions.push({ status });
+    if (status) andConditions.push({ status: status as ProductStatus });
 
     if (isFeatured) andConditions.push({ isFeatured: true });
     if (hasDiscount) andConditions.push({ discountPrice: { gt: 0 } });
@@ -48,11 +48,20 @@ export const productsService = {
     // 3. Stock Status Logic
     if (stockStatus) {
       if (stockStatus === "OUT_OF_STOCK") {
-        andConditions.push({ stockQuantity: { lte: 0 } });
+        andConditions.push({
+          stockQuantity: { lte: 0 },
+          isUnlimitedStock: false,
+        });
       } else if (stockStatus === "LOW_STOCK") {
-        andConditions.push({ stockQuantity: { gt: 0, lte: 10 } });
+        andConditions.push({
+          stockQuantity: { gt: 0, lte: 10 },
+          isUnlimitedStock: false,
+        });
       } else if (stockStatus === "IN_STOCK") {
-        andConditions.push({ stockQuantity: { gt: 0 } });
+        andConditions.push({
+          stockQuantity: { gt: 0 },
+          isUnlimitedStock: false,
+        });
       }
     }
 
@@ -62,13 +71,21 @@ export const productsService = {
 
     const { skip, take } = getSkipTake({ page, limit });
 
+    // Build orderBy parameter. Support combined sales+revenue sorting
+    let orderByParam: any = undefined;
+    if (sortBy === "salesAndRevenue") {
+      orderByParam = [{ totalSales: sortOrder }, { totalRevenue: sortOrder }];
+    } else if (sortBy) {
+      orderByParam = { [sortBy]: sortOrder };
+    }
+
     // Execute queries in parallel
     const [productsResult, stats] = await Promise.all([
       productRepository.getAll({
         skip,
         take,
         where,
-        orderBy: { [sortBy]: sortOrder },
+        orderBy: orderByParam as Prisma.ProductOrderByWithRelationInput,
       }),
       productRepository.getFilterCounts(),
     ]);

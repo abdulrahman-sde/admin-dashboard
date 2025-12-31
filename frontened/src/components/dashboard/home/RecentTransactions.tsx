@@ -12,23 +12,79 @@ import {
 } from "@/components/ui/table";
 import { Filter } from "lucide-react";
 import { useTransactions } from "@/hooks/transactions";
+import { useState } from "react";
+import { useNavigate } from "react-router";
 import { RecentTransactionsSkeleton } from "@/components/shared/skeletons";
 import { DataTableEmptyState } from "@/components/shared/DataTableEmptyState";
 
 export default function RecentTransactions() {
-  const { transactions, isFetching } = useTransactions();
+  const { transactions, isFetching, setPaymentStatus, paymentStatus } =
+    useTransactions();
+  const [showFilter, setShowFilter] = useState(false);
+  const navigate = useNavigate();
   return (
     <Card className="shadow-sm border-0">
       <CardHeader className="flex flex-row items-center justify-between ">
         <h3 className="font-semibold">Transaction</h3>
-        <Button
-          variant="default"
-          size="sm"
-          className="bg-primary text-white hover:bg-primary/90 gap-2"
-        >
-          <Filter className="h-4 w-4" />
-          Filter
-        </Button>
+        <div className="relative">
+          <Button
+            variant="default"
+            size="sm"
+            className="bg-primary text-white hover:bg-primary/90 gap-2"
+            onClick={() => setShowFilter((s) => !s)}
+          >
+            <Filter className="h-4 w-4" />
+            Filter
+          </Button>
+          {showFilter && (
+            <div className="absolute right-0 mt-2 w-40 bg-white border-neutral-200 border rounded shadow p-2 z-20">
+              <button
+                className={`block w-full text-left px-2 py-1 rounded ${
+                  !paymentStatus ? "bg-slate-100" : ""
+                }`}
+                onClick={() => {
+                  setPaymentStatus(undefined);
+                  setShowFilter(false);
+                }}
+              >
+                All
+              </button>
+              <button
+                className={`block w-full text-left px-2 py-1 rounded ${
+                  paymentStatus === "COMPLETED" ? "bg-slate-100" : ""
+                }`}
+                onClick={() => {
+                  setPaymentStatus("COMPLETED");
+                  setShowFilter(false);
+                }}
+              >
+                Paid
+              </button>
+              <button
+                className={`block w-full text-left px-2 py-1 rounded ${
+                  paymentStatus === "PENDING" ? "bg-slate-100" : ""
+                }`}
+                onClick={() => {
+                  setPaymentStatus("PENDING");
+                  setShowFilter(false);
+                }}
+              >
+                Pending
+              </button>
+              <button
+                className={`block w-full text-left px-2 py-1 rounded ${
+                  paymentStatus === "FAILED" ? "bg-slate-100" : ""
+                }`}
+                onClick={() => {
+                  setPaymentStatus("FAILED");
+                  setShowFilter(false);
+                }}
+              >
+                Failed
+              </button>
+            </div>
+          )}
+        </div>
       </CardHeader>
 
       <CardContent>
@@ -95,6 +151,7 @@ export default function RecentTransactions() {
           <Button
             variant="outline"
             className="text-tertiary border-tertiary rounded-3xl px-6"
+            onClick={() => navigate("/dashboard/transactions")}
           >
             Details
           </Button>

@@ -11,12 +11,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import OrderDetailsDialog from "./OrderDetailsDialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useState } from "react";
 import {
   Pagination,
   PaginationContent,
@@ -36,6 +38,10 @@ import {
   ArrowDown,
   Eye,
 } from "lucide-react";
+import deliveredSvg from "@/assets/icons/delivered.svg";
+import pendingSvg from "@/assets/icons/pending.svg";
+import shippedSvg from "@/assets/icons/shipped.svg";
+import cancelledSvg from "@/assets/icons/cancelled.svg";
 import { OrdersTableSkeleton } from "@/components/shared/skeletons";
 import type {
   OrderListItem,
@@ -90,6 +96,10 @@ export function OrdersTable({
   paymentStatus,
   onPaymentStatusChange,
 }: OrdersTableProps) {
+  const [isOrderDialogOpen, setIsOrderDialogOpen] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState<OrderListItem | undefined>(
+    undefined
+  );
   const toggleSort = (field: string) => {
     if (!setSortBy || !setSortOrder) return;
     if (sortBy === field) {
@@ -103,54 +113,14 @@ export function OrdersTable({
   const getStatusIcon = (status: OrderStatus) => {
     switch (status) {
       case "DELIVERED":
-        return (
-          <svg
-            className="size-4"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-          >
-            <path d="M5 12l5 5L20 7" />
-          </svg>
-        );
+        return <img src={deliveredSvg} alt="delivered" className="w-5 h-5" />;
       case "PENDING":
-        return (
-          <svg
-            className="size-4"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-          >
-            <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-        );
+        return <img src={pendingSvg} alt="pending" className="w-5 h-5" />;
       case "SHIPPED":
       case "PROCESSING":
-        return (
-          <svg
-            className="size-4"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-          >
-            <path d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m-4 0v-6m4 6v-6m10 6a2 2 0 104 0m-4 0a2 2 0 114 0m-4 0v-6m4 6v-6" />
-          </svg>
-        );
+        return <img src={shippedSvg} alt="shipped" className="w-5 h-5" />;
       case "CANCELED":
-        return (
-          <svg
-            className="size-4"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-          >
-            <path d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        );
+        return <img src={cancelledSvg} alt="cancelled" className="w-5 h-5" />;
       default:
         return null;
     }
@@ -166,176 +136,173 @@ export function OrdersTable({
       {/* Tabs */}
       <Tabs defaultValue="all" value={activeTab} onValueChange={onTabChange}>
         <div className="p-4 pb-3 border-b border-[#D1D5DB]">
-          <div className="flex items-center justify-between gap-4 flex-wrap">
-            {/* Standard Radix Tabs */}
-            <TabsList className="h-auto p-1 bg-fade-green rounded-lg border-none">
-              <TabsTrigger
-                value="all"
-                className="px-4 py-1.5 text-sm z-30 rounded-md data-[state=active]:bg-white data-[state=active]:shadow-sm transition-all"
-              >
-                All order
-                <span className="text-primary ml-1">
-                  ({statusCounts?.all ?? totalOrders})
-                </span>
-              </TabsTrigger>
-              <TabsTrigger
-                value="completed"
-                className="px-4 py-1.5 text-sm rounded-md data-[state=active]:bg-white data-[state=active]:shadow-sm transition-all"
-              >
-                Completed{" "}
-                <span className="text-primary ml-1">
-                  ({statusCounts?.completed ?? 0})
-                </span>
-              </TabsTrigger>
-              <TabsTrigger
-                value="pending"
-                className="px-4 py-1.5 text-sm rounded-md data-[state=active]:bg-white data-[state=active]:shadow-sm transition-all"
-              >
-                Pending{" "}
-                <span className="text-primary ml-1">
-                  ({statusCounts?.pending ?? 0})
-                </span>
-              </TabsTrigger>
-              <TabsTrigger
-                value="canceled"
-                className="px-4 py-1.5 text-sm rounded-md data-[state=active]:bg-white data-[state=active]:shadow-sm transition-all"
-              >
-                Canceled{" "}
-                <span className="text-primary ml-1">
-                  ({statusCounts?.cancelled ?? 0})
-                </span>
-              </TabsTrigger>
-            </TabsList>
+          <div className="flex flex-col gap-4">
+            {/* Tabs - Scrollable */}
+            <div className="overflow-x-auto no-scrollbar -mx-4 px-4">
+              <TabsList className="h-auto p-1 bg-fade-green rounded-lg border-none flex-nowrap justify-start min-w-max">
+                <TabsTrigger
+                  value="all"
+                  className="px-4 py-1.5 text-sm z-30 rounded-md data-[state=active]:bg-white data-[state=active]:shadow-sm transition-all shrink-0"
+                >
+                  All order
+                  <span className="text-primary ml-1">
+                    ({statusCounts?.all ?? totalOrders})
+                  </span>
+                </TabsTrigger>
+                <TabsTrigger
+                  value="completed"
+                  className="px-4 py-1.5 text-sm rounded-md data-[state=active]:bg-white data-[state=active]:shadow-sm transition-all shrink-0"
+                >
+                  Completed
+                  <span className="text-primary ml-1">
+                    ({statusCounts?.completed ?? 0})
+                  </span>
+                </TabsTrigger>
+                <TabsTrigger
+                  value="pending"
+                  className="px-4 py-1.5 text-sm rounded-md data-[state=active]:bg-white data-[state=active]:shadow-sm transition-all shrink-0"
+                >
+                  Pending{" "}
+                  <span className="text-primary ml-1">
+                    ({statusCounts?.pending ?? 0})
+                  </span>
+                </TabsTrigger>
+                <TabsTrigger
+                  value="canceled"
+                  className="px-4 py-1.5 text-sm rounded-md data-[state=active]:bg-white data-[state=active]:shadow-sm transition-all shrink-0"
+                >
+                  Canceled{" "}
+                  <span className="text-primary ml-1">
+                    ({statusCounts?.cancelled ?? 0})
+                  </span>
+                </TabsTrigger>
+              </TabsList>
+            </div>
 
-            {/* Search and Filter */}
-            <div className="flex items-center gap-2">
-              <div className="relative">
+            {/* Search and Filter Row */}
+            <div className="flex items-center justify-between gap-4 flex-wrap">
+              <div className="relative flex-1 min-w-[200px]">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
                 <Input
                   placeholder="Search order report"
-                  className="pl-9 w-60 h-10 border-[#D1D5DB]"
+                  className="pl-9 w-full h-10 border-[#D1D5DB]"
                   value={search}
                   onChange={(e) => onSearchChange(e.target.value)}
                 />
               </div>
 
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className={`h-10 w-10 border-[#D1D5DB] rounded-lg focus:ring-0 shadow-none text-gray-500 hover:text-primary transition-all ${
-                      paymentStatus
-                        ? "border-primary bg-primary/5 text-primary"
-                        : ""
-                    }`}
-                    size="icon"
-                  >
-                    <SlidersHorizontal className="size-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-48">
-                  <DropdownMenuItem
-                    onClick={() => onPaymentStatusChange?.(undefined)}
-                  >
-                    All Payment Status
-                    {!paymentStatus && <Check className="ml-auto size-4" />}
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={() => onPaymentStatusChange?.("COMPLETED")}
-                  >
-                    Paid
-                    {paymentStatus === "COMPLETED" && (
-                      <Check className="ml-auto size-4" />
-                    )}
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={() => onPaymentStatusChange?.("PENDING")}
-                  >
-                    Pending
-                    {paymentStatus === "PENDING" && (
-                      <Check className="ml-auto size-4" />
-                    )}
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={() => onPaymentStatusChange?.("FAILED")}
-                  >
-                    Failed
-                    {paymentStatus === "FAILED" && (
-                      <Check className="ml-auto size-4" />
-                    )}
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={() => onPaymentStatusChange?.("REFUNDED")}
-                  >
-                    Refunded
-                    {paymentStatus === "REFUNDED" && (
-                      <Check className="ml-auto size-4" />
-                    )}
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              {/* Filters - Scrollable */}
+              <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={`h-10 w-10 border-[#D1D5DB] rounded-lg focus:ring-0 shadow-none text-gray-500 hover:text-primary transition-all shrink-0 ${
+                        paymentStatus
+                          ? "border-primary bg-primary/5 text-primary"
+                          : ""
+                      }`}
+                      size="icon"
+                    >
+                      <SlidersHorizontal className="size-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-48">
+                    <DropdownMenuItem
+                      onClick={() => onPaymentStatusChange?.(undefined)}
+                    >
+                      All Payment Status
+                      {!paymentStatus && <Check className="ml-auto size-4" />}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => onPaymentStatusChange?.("COMPLETED")}
+                    >
+                      Paid
+                      {paymentStatus === "COMPLETED" && (
+                        <Check className="ml-auto size-4" />
+                      )}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => onPaymentStatusChange?.("PENDING")}
+                    >
+                      Pending
+                      {paymentStatus === "PENDING" && (
+                        <Check className="ml-auto size-4" />
+                      )}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => onPaymentStatusChange?.("FAILED")}
+                    >
+                      Failed
+                      {paymentStatus === "FAILED" && (
+                        <Check className="ml-auto size-4" />
+                      )}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => onPaymentStatusChange?.("REFUNDED")}
+                    >
+                      Refunded
+                      {paymentStatus === "REFUNDED" && (
+                        <Check className="ml-auto size-4" />
+                      )}
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
 
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className={`h-10 w-10 border-[#D1D5DB] rounded-lg focus:ring-0 shadow-none text-gray-500 hover:text-primary transition-all ${
-                      sortBy && sortBy !== "createdAt"
-                        ? "border-primary bg-primary/5 text-primary"
-                        : ""
-                    }`}
-                    size="icon"
-                  >
-                    <ArrowUpDown className="size-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-48">
-                  <DropdownMenuItem
-                    onClick={() => toggleSort("createdAt")}
-                    className="flex items-center justify-between"
-                  >
-                    Date
-                    {sortBy === "createdAt" &&
-                      (sortOrder === "asc" ? (
-                        <ArrowUp className="size-3" />
-                      ) : (
-                        <ArrowDown className="size-3" />
-                      ))}
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={() => toggleSort("totalAmount")}
-                    className="flex items-center justify-between"
-                  >
-                    Price
-                    {sortBy === "totalAmount" &&
-                      (sortOrder === "asc" ? (
-                        <ArrowUp className="size-3" />
-                      ) : (
-                        <ArrowDown className="size-3" />
-                      ))}
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={() => toggleSort("orderNumber")}
-                    className="flex items-center justify-between"
-                  >
-                    Order Number
-                    {sortBy === "orderNumber" &&
-                      (sortOrder === "asc" ? (
-                        <ArrowUp className="size-3" />
-                      ) : (
-                        <ArrowDown className="size-3" />
-                      ))}
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-
-              <Button
-                variant="outline"
-                className="h-10 w-10 border-[#D1D5DB] rounded-lg"
-                size="icon"
-              >
-                <MoreVertical className="size-4" />
-              </Button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={`h-10 w-10 border-[#D1D5DB] rounded-lg focus:ring-0 shadow-none text-gray-500 hover:text-primary transition-all shrink-0 ${
+                        sortBy && sortBy !== "createdAt"
+                          ? "border-primary bg-primary/5 text-primary"
+                          : ""
+                      }`}
+                      size="icon"
+                    >
+                      <ArrowUpDown className="size-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-48">
+                    <DropdownMenuItem
+                      onClick={() => toggleSort("createdAt")}
+                      className="flex items-center justify-between"
+                    >
+                      Date
+                      {sortBy === "createdAt" &&
+                        (sortOrder === "asc" ? (
+                          <ArrowUp className="size-3" />
+                        ) : (
+                          <ArrowDown className="size-3" />
+                        ))}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => toggleSort("totalAmount")}
+                      className="flex items-center justify-between"
+                    >
+                      Price
+                      {sortBy === "totalAmount" &&
+                        (sortOrder === "asc" ? (
+                          <ArrowUp className="size-3" />
+                        ) : (
+                          <ArrowDown className="size-3" />
+                        ))}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => toggleSort("orderNumber")}
+                      className="flex items-center justify-between"
+                    >
+                      Order Number
+                      {sortBy === "orderNumber" &&
+                        (sortOrder === "asc" ? (
+                          <ArrowUp className="size-3" />
+                        ) : (
+                          <ArrowDown className="size-3" />
+                        ))}
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
             </div>
           </div>
         </div>
@@ -359,7 +326,7 @@ export function OrdersTable({
                   </TableHead>
                 </TableRow>
               </TableHeader>
-              <TableBody className="[&_tr]:h-16 [&_tr]:border-b text-[#131523]">
+              <TableBody className="[&_tr]:h-16 [&_tr]:border-b text-[#131523] text-[15px]">
                 {isLoading ? (
                   <OrdersTableSkeleton rows={8} />
                 ) : data.length === 0 ? (
@@ -376,42 +343,7 @@ export function OrdersTable({
                       <TableCell className="px-4 font-medium w-[15%] truncate">
                         {order.orderNumber}
                       </TableCell>
-                      {/* <TableCell className="w-[25%]">
-                        <div className="ps-5 flex items-center gap-2">
-                          {order.items && order.items.length > 0 ? (
-                            <>
-                              <span className="shrink-0">
-                                <img
-                                  src={
-                                    order.items[0].productImage ||
-                                    "https://via.placeholder.com/48?text=No+Img"
-                                  }
-                                  alt=""
-                                  className="w-12 h-12 object-cover rounded-lg"
-                                  onError={(e) => {
-                                    (e.target as HTMLImageElement).src =
-                                      "https://via.placeholder.com/48?text=No+Img";
-                                  }}
-                                />
-                              </span>
-                              <div className="overflow-hidden">
-                                <p className="font-medium line-clamp-1">
-                                  {order.items[0].productName}
-                                </p>
-                                {order.items.length > 1 && (
-                                  <p className="text-xs text-muted-foreground">
-                                    + {order.items.length - 1} more items
-                                  </p>
-                                )}
-                              </div>
-                            </>
-                          ) : (
-                            <p className="text-muted-foreground italic">
-                              No items
-                            </p>
-                          )}
-                        </div>
-                      </TableCell> */}
+
                       <TableCell className="text-center text-muted-foreground w-[15%]">
                         {order.createdAt
                           ? new Date(order.createdAt).toLocaleDateString()
@@ -425,11 +357,11 @@ export function OrdersTable({
                           <div
                             className={`size-2 rounded-full ${
                               order.paymentStatus === "COMPLETED"
-                                ? "bg-[#4EA674]"
+                                ? "bg-[#21C45D]"
                                 : order.paymentStatus === "REFUNDED"
-                                ? "bg-orange-500"
+                                ? "bg-[#F59F0A]"
                                 : order.paymentStatus === "FAILED"
-                                ? "bg-destructive"
+                                ? "bg-[#EF4343]"
                                 : "bg-yellow-400"
                             }`}
                           />
@@ -446,7 +378,7 @@ export function OrdersTable({
                       </TableCell>
                       <TableCell className="w-[12%]">
                         <div
-                          className={`flex items-center justify-center gap-2 text-[13px] ${getOrderStatusColor(
+                          className={`flex items-center justify-center gap-2 text-[14px] ${getOrderStatusColor(
                             order.fulfillmentStatus
                           )}`}
                         >
@@ -456,30 +388,18 @@ export function OrdersTable({
                       </TableCell>
                       <TableCell className="w-[8%]">
                         <div className="flex justify-center">
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-8 w-8 text-muted-foreground hover:text-foreground"
-                              >
-                                <MoreVertical className="size-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuItem
-                                onClick={() =>
-                                  window.open(
-                                    `/dashboard/orders/${order.id}`,
-                                    "_blank"
-                                  )
-                                }
-                              >
-                                <Eye className="mr-2 size-4" />
-                                View Full Order
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="flex items-center gap-2 text-muted-foreground hover:text-foreground"
+                            onClick={() => {
+                              setSelectedOrder(order);
+                              setIsOrderDialogOpen(true);
+                            }}
+                          >
+                            <Eye className="size-4" />
+                            {/* <span>Details</span> */}
+                          </Button>
                         </div>
                       </TableCell>
                     </TableRow>
@@ -490,6 +410,13 @@ export function OrdersTable({
           </div>
         </TabsContent>
       </Tabs>
+
+      {/* Order Details Dialog */}
+      <OrderDetailsDialog
+        open={isOrderDialogOpen}
+        onOpenChange={(open) => setIsOrderDialogOpen(open)}
+        order={selectedOrder}
+      />
 
       {/* Pagination */}
       <div className="flex items-center justify-between ">
@@ -553,3 +480,6 @@ export function OrdersTable({
     </Card>
   );
 }
+
+// Append dialog render inside the same file so it's available to the component
+// We render it through hooks state defined in the component scope above

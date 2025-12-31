@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import type { ChartConfig } from "@/components/ui/chart";
 import { ChartContainer, ChartTooltip } from "@/components/ui/chart";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { mockWeeklyReportData } from "@/constants/mockDashboardData";
+import { useGetDetailedDailyMetricsQuery } from "@/lib/store/services/analytics/analyticsApi";
 
 const chartConfig = {
   revenue: {
@@ -35,9 +35,9 @@ const CustomCursor = (props: CustomCursorProps) => {
       y1={y}
       x2={x}
       y2={bottom}
-      stroke="#4EA674"
-      strokeWidth={1}
-      strokeDasharray="5 5"
+      stroke="#C1E6BA"
+      strokeWidth={0.7}
+      strokeDasharray="4 4"
     />
   );
 };
@@ -46,14 +46,54 @@ export default function WeeklyReport() {
   const [timeRange, setTimeRange] = React.useState("this-week");
   const [activeTab, setActiveTab] = React.useState("customers");
 
-  const data = mockWeeklyReportData;
-  const weekData =
-    timeRange === "this-week"
-      ? data.thisWeek.chartData
-      : data.lastWeek.chartData;
-  const chartData = weekData[activeTab as keyof typeof weekData];
-  const stats =
-    timeRange === "this-week" ? data.thisWeek.stats : data.lastWeek.stats;
+  const { data: analyticsData, isLoading } = useGetDetailedDailyMetricsQuery();
+
+  const metrics = React.useMemo(() => {
+    if (!analyticsData) return [];
+    return timeRange === "this-week"
+      ? analyticsData.data.report.thisWeek
+      : analyticsData.data.report.lastWeek;
+  }, [analyticsData, timeRange]);
+
+  const stats = React.useMemo(() => {
+    if (!metrics.length) {
+      return {
+        customers: 0,
+        totalProducts: 0,
+        stockProducts: 0,
+        outOfStock: 0,
+        revenue: 0,
+      };
+    }
+
+    const totalCustomers = metrics.reduce((sum, m) => sum + m.customers, 0);
+    const totalRevenue = metrics.reduce((sum, m) => sum + m.revenue, 0);
+
+    // For snapshot metrics, take the latest available day that has data, or the last day
+    // Since we seeded data for past days, the "latest" is the last element.
+    const latestSnapshot = metrics[metrics.length - 1];
+
+    return {
+      customers: totalCustomers,
+      totalProducts: latestSnapshot.totalProducts,
+      stockProducts: latestSnapshot.stockProducts,
+      outOfStock: latestSnapshot.outOfStock,
+      revenue: totalRevenue.toLocaleString(undefined, {
+        minimumFractionDigits: 1,
+        maximumFractionDigits: 1,
+      }),
+    };
+  }, [metrics]);
+
+  if (isLoading) {
+    return (
+      <Card className="col-span-2 border-[#F1F5F9] shadow-sm h-[400px] flex items-center justify-center">
+        <div className="animate-pulse text-muted-foreground">
+          Loading report...
+        </div>
+      </Card>
+    );
+  }
 
   return (
     <Card className="col-span-2 border-[#F1F5F9] shadow-sm">
@@ -83,14 +123,14 @@ export default function WeeklyReport() {
         </ToggleGroup>
       </CardHeader>
       <CardContent>
-        {/* Stats Row */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-6 mb-8">
+        {/* Stats Row - Horizontally scrollable on mobile */}
+        <div className="flex overflow-x-auto no-scrollbar md:grid md:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-6 mb-8 pb-2">
           <button
             onClick={() => setActiveTab("customers")}
-            className="space-y-1 text-left transition-opacity hover:opacity-80"
+            className="flex-none md:flex-auto space-y-1 text-left transition-opacity hover:opacity-80 min-w-[120px]"
           >
             <h2 className="">{stats.customers}</h2>
-            <p className="text-[14px] leading-[18px] font-normal text-muted-foreground">
+            <p className="text-[14px] leading-[18px] font-normal text-muted-foreground whitespace-nowrap">
               Customers
             </p>
             {activeTab === "customers" && (
@@ -99,10 +139,10 @@ export default function WeeklyReport() {
           </button>
           <button
             onClick={() => setActiveTab("totalProducts")}
-            className="space-y-1 text-left transition-opacity hover:opacity-80"
+            className="flex-none md:flex-auto space-y-1 text-left transition-opacity hover:opacity-80 min-w-[120px]"
           >
             <h2 className="text-2xl font-semibold">{stats.totalProducts}</h2>
-            <p className="text-[14px] leading-[18px] font-normal text-muted-foreground">
+            <p className="text-[14px] leading-[18px] font-normal text-muted-foreground whitespace-nowrap">
               Total Products
             </p>
             {activeTab === "totalProducts" && (
@@ -111,10 +151,10 @@ export default function WeeklyReport() {
           </button>
           <button
             onClick={() => setActiveTab("stockProducts")}
-            className="space-y-1 text-left transition-opacity hover:opacity-80"
+            className="flex-none md:flex-auto space-y-1 text-left transition-opacity hover:opacity-80 min-w-[120px]"
           >
             <h2 className="text-2xl font-semibold">{stats.stockProducts}</h2>
-            <p className="text-[14px] leading-[18px] font-normal text-muted-foreground">
+            <p className="text-[14px] leading-[18px] font-normal text-muted-foreground whitespace-nowrap">
               Stock Products
             </p>
             {activeTab === "stockProducts" && (
@@ -123,10 +163,10 @@ export default function WeeklyReport() {
           </button>
           <button
             onClick={() => setActiveTab("outOfStock")}
-            className="space-y-1 text-left transition-opacity hover:opacity-80"
+            className="flex-none md:flex-auto space-y-1 text-left transition-opacity hover:opacity-80 min-w-[120px]"
           >
             <h2 className="text-2xl font-semibold">{stats.outOfStock}</h2>
-            <p className="text-[14px] leading-[18px] font-normal text-muted-foreground">
+            <p className="text-[14px] leading-[18px] font-normal text-muted-foreground whitespace-nowrap">
               Out of Stock
             </p>
             {activeTab === "outOfStock" && (
@@ -135,10 +175,10 @@ export default function WeeklyReport() {
           </button>
           <button
             onClick={() => setActiveTab("revenue")}
-            className="space-y-1 text-left transition-opacity hover:opacity-80"
+            className="flex-none md:flex-auto space-y-1 text-left transition-opacity hover:opacity-80 min-w-[120px]"
           >
             <h2 className="text-2xl font-semibold">{stats.revenue}</h2>
-            <p className="text-[14px] leading-[18px] font-normal text-muted-foreground">
+            <p className="text-[14px] leading-[18px] font-normal text-muted-foreground whitespace-nowrap">
               Revenue
             </p>
             {activeTab === "revenue" && (
@@ -147,80 +187,84 @@ export default function WeeklyReport() {
           </button>
         </div>
 
-        {/* Chart */}
-        <ChartContainer
-          config={chartConfig}
-          className="h-[300px] w-full -ms-4 md:ms-0"
-        >
-          <AreaChart
-            data={chartData}
-            margin={{
-              left: 0,
-              right: 0,
-              top: 10,
-              bottom: 0,
-            }}
-          >
-            <defs>
-              <linearGradient id="fillRevenue" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#4EA6744D" stopOpacity={1} />
-                <stop offset="100%" stopColor="#4EA67400" stopOpacity={0} />
-              </linearGradient>
-            </defs>
-            <CartesianGrid
-              strokeDasharray="0"
-              vertical={false}
-              stroke="#f0f0f0"
-            />
-            <XAxis
-              dataKey="day"
-              tickLine={false}
-              axisLine={false}
-              tickMargin={8}
-              tick={{
-                fill: "#02333780",
-                fontSize: 12,
-              }}
-            />
-            <YAxis
-              tickLine={false}
-              axisLine={false}
-              tickMargin={8}
-              tick={{
-                fill: "#02333780",
-                fontSize: 12,
-              }}
-              tickFormatter={(value) => `${value / 1000}k`}
-            />
-            <ChartTooltip
-              cursor={<CustomCursor />}
-              wrapperStyle={{ outline: "none" }}
-              content={({ active, payload }) => {
-                if (active && payload && payload.length) {
-                  return (
-                    <div className="bg-[#C1E6BA] text-black px-[21.5px] py-2 rounded-md shadow-lg border-none text-center">
-                      <p className="font-semibold text-sm">
-                        {payload[0].payload.day}
-                      </p>
-                      <p className="text-xs">
-                        {payload[0].value?.toLocaleString()}
-                      </p>
-                    </div>
-                  );
-                }
-                return null;
-              }}
-            />
-            <Area
-              dataKey="value"
-              type="monotone"
-              fill="url(#fillRevenue)"
-              fillOpacity={1}
-              stroke="#4EA674"
-              strokeWidth={2}
-            />
-          </AreaChart>
-        </ChartContainer>
+        {/* Chart - Wrapped in scrollable container */}
+        <div className="overflow-x-auto no-scrollbar -mx-6 px-6">
+          <div className="min-w-[600px] md:min-w-0">
+            <ChartContainer config={chartConfig} className="h-[300px] w-full">
+              <AreaChart
+                data={metrics}
+                margin={{
+                  left: 0,
+                  right: 0,
+                  top: 10,
+                  bottom: 0,
+                }}
+              >
+                <defs>
+                  <linearGradient id="fillRevenue" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#4EA6744D" stopOpacity={1} />
+                    <stop offset="100%" stopColor="#4EA67400" stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid
+                  strokeDasharray="0"
+                  vertical={false}
+                  stroke="#f0f0f0"
+                />
+                <XAxis
+                  dataKey="day"
+                  tickLine={false}
+                  axisLine={false}
+                  tickMargin={8}
+                  tick={{
+                    fill: "#02333780",
+                    fontSize: 12,
+                  }}
+                />
+                <YAxis
+                  tickLine={false}
+                  axisLine={false}
+                  tickMargin={8}
+                  tick={{
+                    fill: "#02333780",
+                    fontSize: 12,
+                  }}
+                  tickFormatter={(value) => {
+                    if (value >= 1000) return `${(value / 1000).toFixed(1)}k`;
+                    return value;
+                  }}
+                />
+                <ChartTooltip
+                  cursor={<CustomCursor />}
+                  wrapperStyle={{ outline: "none" }}
+                  content={({ active, payload }) => {
+                    if (active && payload && payload.length) {
+                      return (
+                        <div className="bg-[#C1E6BA] text-black px-[21.5px] py-2 rounded-md shadow-lg border-none text-center">
+                          <p className="font-semibold text-sm">
+                            {payload[0].payload.day}
+                          </p>
+                          <p className="text-xs">
+                            {Number(payload[0].value)?.toLocaleString()}
+                          </p>
+                        </div>
+                      );
+                    }
+                    return null;
+                  }}
+                />
+                <Area
+                  dataKey={activeTab}
+                  type="monotone"
+                  fill="url(#fillRevenue)"
+                  fillOpacity={1}
+                  stroke="#4EA674"
+                  strokeWidth={2}
+                />
+              </AreaChart>
+            </ChartContainer>
+          </div>
+        </div>
       </CardContent>
     </Card>
   );

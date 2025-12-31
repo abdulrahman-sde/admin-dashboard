@@ -1,17 +1,3 @@
-import * as React from "react";
-import {
-  IconShoppingCart,
-  IconUsers,
-  IconTicket,
-  IconCategory,
-  IconCreditCard,
-  IconFileText,
-  IconPlus,
-  IconList,
-  IconUserCog,
-  IconHome,
-} from "@tabler/icons-react";
-
 import { NavDocuments } from "@/components/ui/nav-documents";
 import { NavUser } from "@/components/ui/nav-user";
 import {
@@ -23,6 +9,16 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
+import homeIcon from "@/assets/icons/home.svg";
+import orderIcon from "@/assets/icons/orders.svg";
+import usersIcon from "@/assets/icons/users.svg";
+import transactionIcon from "@/assets/icons/card.svg";
+import couponIcon from "@/assets/icons/coupon.svg";
+import categoryIcon from "@/assets/icons/categories.svg";
+import reportsIcon from "@/assets/icons/reports.svg";
+import addProductIcon from "@/assets/icons/add.svg";
+import productIcon from "@/assets/icons/products.svg";
+import adminIcon from "@/assets/icons/user.svg";
 import { Link } from "react-router";
 import logoImage from "@/assets/images/logo.svg";
 
@@ -36,56 +32,56 @@ const data = {
     {
       name: "Dashboard",
       url: "/dashboard",
-      icon: IconHome,
+      icon: homeIcon,
     },
     {
       name: "Order Management",
       url: "/dashboard/orders",
-      icon: IconShoppingCart,
+      icon: orderIcon,
     },
     {
       name: "Customers",
       url: "/dashboard/customers",
-      icon: IconUsers,
+      icon: usersIcon,
     },
     {
       name: "Coupon",
       url: "/dashboard/coupons",
-      icon: IconTicket,
+      icon: couponIcon,
     },
     {
       name: "Categories",
       url: "/dashboard/categories",
-      icon: IconCategory,
+      icon: categoryIcon,
     },
     {
       name: "Transaction",
       url: "/dashboard/transactions",
-      icon: IconCreditCard,
+      icon: transactionIcon,
     },
     {
       name: "Reports",
       url: "/dashboard/reports",
-      icon: IconFileText,
+      icon: reportsIcon,
     },
   ],
   navProducts: [
     {
       name: "Add Products",
       url: "/dashboard/products/add",
-      icon: IconPlus,
+      icon: addProductIcon,
     },
     {
       name: "Product List",
       url: "/dashboard/products",
-      icon: IconList,
+      icon: productIcon,
     },
   ],
   navAdmin: [
     {
       name: "Admin role",
       url: "/dashboard/admin",
-      icon: IconUserCog,
+      icon: adminIcon,
     },
   ],
 };

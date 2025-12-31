@@ -1,7 +1,5 @@
 "use client";
 
-import { type Icon } from "@tabler/icons-react";
-
 import {
   SidebarGroup,
   SidebarGroupLabel,
@@ -18,7 +16,7 @@ export function NavDocuments({
   items: {
     name: string;
     url: string;
-    icon: Icon;
+    icon: string;
   }[];
   label?: string;
 }) {
@@ -39,7 +37,12 @@ export function NavDocuments({
                 className="data-[active=true]:bg-primary data-[active=true]:text-white"
               >
                 <Link to={item.url}>
-                  <item.icon />
+                  <img
+                    src={item.icon}
+                    alt={item.name}
+                    className={`size-[17.5px]`}
+                  />
+
                   <span>{item.name}</span>
                 </Link>
               </SidebarMenuButton>

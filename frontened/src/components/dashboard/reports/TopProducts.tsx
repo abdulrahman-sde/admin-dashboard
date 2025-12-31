@@ -1,8 +1,6 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-
 interface TopProductsProps {
   data: Array<{
-    id: number;
+    id: string;
     name: string;
     image: string;
     clicks: string;
@@ -12,47 +10,43 @@ interface TopProductsProps {
 
 export function TopProducts({ data }: TopProductsProps) {
   return (
-    <Card className="border-none shadow-sm h-full">
-      <CardHeader>
-        <CardTitle className="text-base font-bold">Top Products</CardTitle>
-      </CardHeader>
-      <CardContent className="p-0">
-        <div className="w-full overflow-auto">
-          <table className="w-full text-sm text-left">
-            <thead className="text-gray-500 border-b">
-              <tr>
-                <th className="px-6 py-3 font-medium">Name</th>
-                <th className="px-6 py-3 font-medium">Clicks</th>
-                <th className="px-6 py-3 font-medium text-right">Units Sold</th>
+    <div className="bg-white p-8 rounded-2xl shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07)]">
+      <h2 className="text-[17px] font-bold text-gray-900 mb-8">Top Products</h2>
+      <div className="w-full overflow-x-auto">
+        <table className="w-full text-sm">
+          <thead className="text-[#8E92BC]">
+            <tr>
+              <th className="pb-6 font-medium text-left">Name</th>
+              <th className="pb-6 font-medium text-center">Clicks</th>
+              <th className="pb-6 font-medium text-right">Units Sold</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-50">
+            {data.map((product) => (
+              <tr key={product.id}>
+                <td className="py-4 flex items-center gap-3">
+                  <div className="h-10 w-10 shrink-0 rounded-lg overflow-hidden bg-gray-50">
+                    <img
+                      src={product.image}
+                      alt={product.name}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <span className="font-medium text-gray-700">
+                    {product.name}
+                  </span>
+                </td>
+                <td className="py-4 text-center text-[#5D6679]">
+                  {product.clicks}
+                </td>
+                <td className="py-4 text-right font-bold text-[#5D6679]">
+                  {product.unitsSold}
+                </td>
               </tr>
-            </thead>
-            <tbody>
-              {data.map((product) => (
-                <tr
-                  key={product.id}
-                  className="border-b last:border-0 hover:bg-gray-50/50"
-                >
-                  <td className="px-6 py-4 flex items-center gap-3">
-                    <div className="h-10 w-10 bg-gray-100 rounded-md overflow-hidden shrink-0">
-                      {/* Placeholder for images since we don't have real assets */}
-                      <div className="w-full h-full bg-slate-200 flex items-center justify-center text-xs text-slate-400">
-                        IMG
-                      </div>
-                    </div>
-                    <span className="font-medium text-gray-900">
-                      {product.name}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 text-gray-600">{product.clicks}</td>
-                  <td className="px-6 py-4 text-right font-medium text-gray-900">
-                    {product.unitsSold}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </CardContent>
-    </Card>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
   );
 }

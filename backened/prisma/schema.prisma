@@ -235,9 +235,9 @@ model DailyMetrics {
   totalCustomers     Int @default(0) // Total unique customers in system
 
   // Product Metrics
-  totalProducts      Int @default(0)
-  inStockProducts    Int @default(0)
-  outOfStockProducts Int @default(0)
+  totalProducts      Int @default(0) // total products as of now in catalog
+  inStockProducts    Int @default(0) // in stock products as of now
+  outOfStockProducts Int @default(0) // out of stock products as of now
 
   // Order Status Breakdown
   pendingOrders    Int @default(0)
@@ -280,6 +280,30 @@ model RealtimeMetrics {
 
   @@index([timestamp])
   @@map("realtime_metrics")
+}
+
+// ========================================
+// MONTHLY GOALS
+// ========================================
+model MonthlyGoal {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  // YYYY-MM, e.g. "2025-12"
+  month String @unique
+
+  // Target sales for the month (currency float)
+  goalAmount Float
+
+  // Optional author/admin who set the goal
+  createdBy String? @db.ObjectId
+
+  // Optional progress snapshot
+  achievedAmount Float? @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("monthly_goals")
 }
 
 // ========================================

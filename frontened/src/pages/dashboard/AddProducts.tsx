@@ -3,6 +3,7 @@ import { useCategory } from "@/hooks/useCategory";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import aiIcon from "@/assets/icons/ai.svg";
 import {
   Form,
   FormControl,
@@ -38,6 +39,7 @@ import {
 } from "lucide-react";
 import { useRef } from "react";
 import { useParams } from "react-router";
+import { toast } from "sonner";
 
 export default function AddProductsPage() {
   const { id } = useParams<{ id: string }>();
@@ -52,6 +54,10 @@ export default function AddProductsPage() {
     isEditing,
     isLoading,
     isDirty,
+    isGeneratingDescription,
+    generateDescription,
+    description,
+    setDescription,
   } = useProductForm(id);
 
   const { data: categories } = useCategory();
@@ -121,25 +127,57 @@ export default function AddProductsPage() {
                       )}
                     />
 
-                    <FormField
-                      control={form.control}
-                      name="description"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Product Description</FormLabel>
-                          <FormControl>
-                            <div className="relative">
-                              <Textarea
-                                placeholder="The iPhone 15 delivers cutting-edge performance..."
-                                className="min-h-40 resize-y pr-8"
-                                {...field}
-                              />
-                            </div>
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                        Product Description
+                      </label>
+                      <div className="relative">
+                        <Textarea
+                          placeholder="The iPhone 15 delivers cutting-edge performance..."
+                          className="min-h-52 resize-y pr-8"
+                          readOnly={isGeneratingDescription}
+                          value={description}
+                          onChange={(e) => {
+                            setDescription(e.target.value);
+                            form.setValue("description", e.target.value, {
+                              shouldValidate: false,
+                              shouldDirty: true,
+                            });
+                          }}
+                        />
+                        {isGeneratingDescription ? (
+                          <div className="absolute right-3 bottom-3 h-5 w-5 flex items-center justify-center bg-white rounded-full shadow-sm">
+                            <Loader2 className="h-4 w-4 animate-spin text-[#4EA674]" />
+                          </div>
+                        ) : (
+                          <img
+                            src={aiIcon}
+                            alt="Generate Description"
+                            className="absolute right-3 bottom-3 cursor-pointer size-5 hover:opacity-80 transition-opacity"
+                            onClick={() => {
+                              const productName = form.getValues("name");
+                              if (
+                                !productName ||
+                                productName.trim() === "" ||
+                                productName.length < 3
+                              ) {
+                                toast.error(
+                                  "Product name is required with length greater than 3 characters"
+                                );
+                                return;
+                              }
+                              generateDescription(productName);
+                            }}
+                            onMouseDown={(e) => e.preventDefault()}
+                          />
+                        )}
+                      </div>
+                      {form.formState.errors.description && (
+                        <p className="text-sm font-medium text-destructive">
+                          {form.formState.errors.description.message}
+                        </p>
                       )}
-                    />
+                    </div>
                   </div>
 
                   {/* Pricing Section */}

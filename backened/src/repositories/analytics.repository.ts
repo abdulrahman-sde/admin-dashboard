@@ -120,33 +120,42 @@ export const analyticsRepository = {
 
   // 2. Product Metrics (Global Snapshot)
   async getProductMetrics() {
-    const products = await prisma.product.aggregate({
-      _count: {
-        id: true,
-      },
-      where: {
-        deletedAt: null,
-      },
-    });
+    // Single aggregation pipeline to compute counts in one round-trip for performance
+    const result = (await prisma.product.aggregateRaw({
+      pipeline: [
+        { $match: { deletedAt: null } },
+        {
+          $facet: {
+            total: [{ $count: "count" }],
+            inStock: [
+              { $match: { stockQuantity: { $gt: 0 } } },
+              { $count: "count" },
+            ],
+            outOfStock: [
+              { $match: { stockQuantity: { $lte: 0 } } },
+              { $count: "count" },
+            ],
+          },
+        },
+        {
+          $project: {
+            total: { $arrayElemAt: ["$total.count", 0] },
+            inStock: { $arrayElemAt: ["$inStock.count", 0] },
+            outOfStock: { $arrayElemAt: ["$outOfStock.count", 0] },
+          },
+        },
+      ],
+    })) as unknown as Array<{
+      total?: number;
+      inStock?: number;
+      outOfStock?: number;
+    }>;
 
-    const inStock = await prisma.product.count({
-      where: {
-        stockQuantity: { gt: 0 },
-        deletedAt: null,
-      },
-    });
-
-    const outOfStock = await prisma.product.count({
-      where: {
-        stockQuantity: 0,
-        deletedAt: null,
-      },
-    });
-
+    const r = result[0] || {};
     return {
-      totalProducts: products._count.id,
-      inStockProducts: inStock,
-      outOfStockProducts: outOfStock,
+      totalProducts: Number(r.total ?? 0),
+      inStockProducts: Number(r.inStock ?? 0),
+      outOfStockProducts: Number(r.outOfStock ?? 0),
     };
   },
 
@@ -168,50 +177,110 @@ export const analyticsRepository = {
 
   // 4. Session Metrics
   async getSessionMetrics(startOfDay: Date, endOfDay: Date) {
-    // Combine Session Counts into one Aggregation
-    const rawSessionMetrics = (await prisma.session.aggregateRaw({
-      pipeline: [
-        {
-          $match: {
-            startedAt: {
-              $gte: { $date: startOfDay.toISOString() },
-              $lt: { $date: endOfDay.toISOString() },
+    // Run aggregated queries in parallel for performance.
+    const [
+      rawSessionMetrics,
+      totalPageViews,
+      addToCartCount,
+      checkoutStartedCount,
+      convertedSessions,
+    ] = await Promise.all([
+      prisma.session.aggregateRaw({
+        pipeline: [
+          {
+            $match: {
+              startedAt: {
+                $gte: { $date: startOfDay.toISOString() },
+                $lt: { $date: endOfDay.toISOString() },
+              },
             },
           },
-        },
-        {
-          $facet: {
-            totalVisits: [{ $count: "count" }],
-            uniqueVisits: [
-              { $group: { _id: "$visitorId" } },
-              { $count: "count" },
-            ],
+          {
+            $facet: {
+              totalVisits: [{ $count: "count" }],
+              uniqueVisits: [
+                { $group: { _id: "$visitorId" } },
+                { $count: "count" },
+              ],
+              convertedSessions: [
+                { $match: { converted: true } },
+                { $count: "count" },
+              ],
+            },
           },
-        },
-        {
-          $project: {
-            totalVisits: { $arrayElemAt: ["$totalVisits.count", 0] },
-            uniqueVisits: { $arrayElemAt: ["$uniqueVisits.count", 0] },
+          {
+            $project: {
+              totalVisits: { $arrayElemAt: ["$totalVisits.count", 0] },
+              uniqueVisits: { $arrayElemAt: ["$uniqueVisits.count", 0] },
+              convertedSessions: {
+                $arrayElemAt: ["$convertedSessions.count", 0],
+              },
+            },
           },
+        ],
+      }),
+
+      // page views, add_to_cart, checkout_started counts from session_events
+      prisma.sessionEvent.count({
+        where: {
+          timestamp: { gte: startOfDay, lt: endOfDay },
+          eventType: "page_view",
         },
-      ],
-    })) as unknown as RawSessionMetrics[];
+      }),
 
-    const sessionStats = rawSessionMetrics[0] || {};
+      prisma.sessionEvent.count({
+        where: {
+          timestamp: { gte: startOfDay, lt: endOfDay },
+          eventType: "add_to_cart",
+        },
+      }),
 
-    // Page views must be queried from session_events
-    const totalPageViews = await prisma.sessionEvent.count({
-      where: {
-        timestamp: { gte: startOfDay, lt: endOfDay },
-        eventType: "page_view",
-      },
-    });
+      prisma.sessionEvent.count({
+        where: {
+          timestamp: { gte: startOfDay, lt: endOfDay },
+          eventType: "checkout_started",
+        },
+      }),
+
+      // Converted sessions count (fallback if aggregateRaw didn't include it)
+      prisma.session.count({
+        where: {
+          startedAt: { gte: startOfDay, lt: endOfDay },
+          converted: true,
+        },
+      }),
+    ]);
+
+    const sessionStats =
+      (rawSessionMetrics as unknown as RawSessionMetrics[])[0] || {};
+
+    // Prefer convertedSessions from the sessions aggregate if present
+    const converted = Number(
+      sessionStats.convertedSessions ?? convertedSessions ?? 0
+    );
 
     return {
       totalVisits: Number(sessionStats.totalVisits || 0),
       uniqueVisits: Number(sessionStats.uniqueVisits || 0),
       totalPageViews,
+      addToCartCount: Number(addToCartCount),
+      checkoutStartedCount: Number(checkoutStartedCount),
+      convertedSessions: converted,
     };
+  },
+
+  async getProductViewMetrics(startOfDay: Date, endOfDay: Date) {
+    return prisma.sessionEvent.groupBy({
+      by: ["productId"],
+      where: {
+        eventType: "product_view",
+        timestamp: { gte: startOfDay, lt: endOfDay },
+        productId: { not: null },
+      },
+      _count: {
+        id: true,
+      },
+    });
   },
 
   // 5. Transaction Metrics
@@ -419,11 +488,21 @@ export const analyticsRepository = {
     };
   },
 
-  async getTopProducts(limit: number = 10) {
-    return prisma.product.findMany({
-      where: { deletedAt: null },
-      orderBy: { totalSales: "desc" },
-      take: limit,
+  async getDailyMetricsInRange({ from, to }: { from: Date; to: Date }) {
+    const metrics = await prisma.dailyMetrics.findMany({
+      where: {
+        date: { gte: from, lte: to },
+      },
+      orderBy: { date: "asc" },
     });
+
+    return metrics;
+  },
+
+  async getRealTimeStats() {
+    const stats = await prisma.dailyMetrics.findFirst({
+      orderBy: { date: "desc" },
+    });
+    return stats;
   },
 };

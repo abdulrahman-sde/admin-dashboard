@@ -1,4 +1,3 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   LineChart,
   Line,
@@ -19,58 +18,74 @@ interface AvgOrderValueProps {
 
 export function AvgOrderValue({ data }: AvgOrderValueProps) {
   return (
-    <Card className="border-none shadow-sm h-full">
-      <CardHeader className="space-y-4">
-        <CardTitle className="text-base font-bold">
+    <div className="bg-white p-8 rounded-2xl shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07)] h-full flex flex-col">
+      <div className="flex flex-col gap-1 mb-8">
+        <h2 className="text-[17px] font-bold text-gray-900">
           Average Order Value
-        </CardTitle>
-        <div className="flex items-center gap-4 text-sm">
-          <div>
-            <span className="text-gray-500 mr-2">This Month</span>
-            <span className="font-bold">${data.thisMonth.toFixed(2)}</span>
+        </h2>
+        <div className="flex items-center gap-6 mt-2">
+          <div className="flex items-center gap-2">
+            <span className="text-[13px] text-[#8E92BC] font-medium">
+              This Month
+            </span>
+            <span className="text-[14px] font-bold text-gray-900">
+              ${data.thisMonth.toFixed(2)}
+            </span>
           </div>
-          <div>
-            <span className="text-gray-500 mr-2">Previous Month</span>
-            <span className="font-bold text-gray-500">
+          <div className="flex items-center gap-2">
+            <span className="text-[13px] text-[#8E92BC] font-medium">
+              Previous Month
+            </span>
+            <span className="text-[14px] font-bold text-gray-900">
               ${data.prevMonth.toFixed(2)}
             </span>
           </div>
         </div>
-      </CardHeader>
-      <CardContent>
-        <div className="h-[200px] w-full">
+      </div>
+
+      <div className="flex-1 w-full overflow-x-auto no-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0">
+        <div className="h-full min-h-[180px] min-w-[400px]">
           <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={data.trend}>
+            <LineChart
+              data={data.trend}
+              margin={{ top: 0, right: 0, left: -20, bottom: 20 }}
+            >
               <CartesianGrid
                 vertical={false}
                 strokeDasharray="3 3"
-                stroke="#f0f0f0"
+                stroke="#F1F3F9"
               />
               <XAxis
                 dataKey="time"
                 axisLine={false}
                 tickLine={false}
-                tick={{ fontSize: 11, fill: "#9ca3af" }}
-                tickMargin={10}
+                tick={{ fill: "#8E92BC", fontSize: 12 }}
+                dy={15}
               />
               <YAxis
                 axisLine={false}
                 tickLine={false}
-                tick={{ fontSize: 11, fill: "#9ca3af" }}
+                tick={{ fill: "#8E92BC", fontSize: 12 }}
                 tickFormatter={(val) => `$${val}`}
               />
-              <Tooltip cursor={{ stroke: "#e5e7eb" }} />
+              <Tooltip
+                contentStyle={{
+                  borderRadius: "12px",
+                  border: "none",
+                  boxShadow: "0 10px 15px -3px rgba(0,0,0,0.1)",
+                }}
+              />
               <Line
                 type="monotone"
                 dataKey="value"
-                stroke="#22c55e"
-                strokeWidth={2}
+                stroke="#4EA674"
+                strokeWidth={3}
                 dot={false}
               />
             </LineChart>
           </ResponsiveContainer>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }

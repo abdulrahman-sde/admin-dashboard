@@ -116,7 +116,7 @@ export const getProductsQuerySchema = paginationSchema.extend({
 
   // Sorting
   sortBy: enumField(
-    ["createdAt", "price", "stockQuantity", "totalSales"],
+    ["createdAt", "price", "stockQuantity", "totalSales", "salesAndRevenue"],
     "Sort By"
   ).default("createdAt"),
   sortOrder: enumField(["asc", "desc"], "Sort Order").default("desc"),

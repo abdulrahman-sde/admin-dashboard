@@ -7,10 +7,9 @@ export const addCouponSchema = z.object({
   value: z.number().min(0, "Value must be 0 or greater"),
   startDate: z.date(),
   endDate: z.date().optional().nullable(),
+  durationDays: z.number().optional().nullable(),
   usageLimit: z.number().optional().nullable(),
-  appliesTo: z
-    .enum(["ALL", "SPECIFIC_PRODUCTS", "SPECIFIC_CATEGORIES"])
-    .optional(),
+  // coupon applies globally by default
   noEndDate: z.boolean(),
   noUsageLimit: z.boolean(),
 });

@@ -38,9 +38,9 @@ export function TransactionDetailsModal({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[550px] p-0 overflow-hidden border-none shadow-2xl">
-        <DialogHeader className="p-6 bg-linear-to-r from-primary/5 to-transparent border-b border-gray-100">
+        <DialogHeader className="p-6 bg-linear-to-r from-primary/5 to-transparent border-b border-gray-100 pr-12">
           <div className="flex items-center justify-between mb-2">
-            <DialogTitle className="text-xl font-bold flex items-center gap-2">
+            <DialogTitle className="text-lg font-semibold flex items-center gap-2">
               <Receipt className="h-5 w-5 text-primary" />
               Transaction Details
             </DialogTitle>

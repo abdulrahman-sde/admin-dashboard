@@ -1,16 +1,16 @@
 export const customerGrowthData = [
-  { month: "Jan", returning: 450, new: 350 },
-  { month: "Feb", returning: 380, new: 260 },
-  { month: "Mar", returning: 350, new: 180 },
-  { month: "Apr", returning: 420, new: 280 },
-  { month: "May", returning: 460, new: 210 },
-  { month: "Jun", returning: 360, new: 260 },
-  { month: "Jul", returning: 410, new: 200 },
-  { month: "Aug", returning: 430, new: 160 },
-  { month: "Sep", returning: 440, new: 200 },
-  { month: "Oct", returning: 400, new: 260 },
-  { month: "Nov", returning: 430, new: 160 },
-  { month: "Dec", returning: 430, new: 120 },
+  { month: "Jan", returningCustomers: 450, newCustomers: 350 },
+  { month: "Feb", returningCustomers: 380, newCustomers: 260 },
+  { month: "Mar", returningCustomers: 350, newCustomers: 180 },
+  { month: "Apr", returningCustomers: 420, newCustomers: 280 },
+  { month: "May", returningCustomers: 460, newCustomers: 210 },
+  { month: "Jun", returningCustomers: 360, newCustomers: 260 },
+  { month: "Jul", returningCustomers: 410, newCustomers: 200 },
+  { month: "Aug", returningCustomers: 430, newCustomers: 160 },
+  { month: "Sep", returningCustomers: 440, newCustomers: 200 },
+  { month: "Oct", returningCustomers: 400, newCustomers: 260 },
+  { month: "Nov", returningCustomers: 430, newCustomers: 160 },
+  { month: "Dec", returningCustomers: 430, newCustomers: 120 },
 ];
 
 export const keyMetricsData = {
@@ -73,6 +73,7 @@ export const topCustomersData = [
     avatar: "https://i.pravatar.cc/150?u=2",
     orders: 43,
     spent: 909.54,
+    order: 2,
   },
   {
     id: 3,
@@ -101,35 +102,40 @@ export const topProductsData = [
   {
     id: 1,
     name: "Men White T-Shirt",
-    image: "/placeholder-tshirt.png",
+    image:
+      "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=100&q=80",
     clicks: "12.040",
     unitsSold: 195,
   },
   {
     id: 2,
-    name: "Women White T-Shirt",
-    image: "/placeholder-tshirt-w.png",
+    name: "Wome White T-Shirt",
+    image:
+      "https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=100&q=80",
     clicks: "11.234",
     unitsSold: 146,
   },
   {
     id: 3,
     name: "Women Striped T-Shirt",
-    image: "/placeholder-striped.png",
+    image:
+      "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=100&q=80",
     clicks: "10.054",
     unitsSold: 122,
   },
   {
     id: 4,
     name: "Men Grey Hoodie",
-    image: "/placeholder-hoodie.png",
+    image:
+      "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=100&q=80",
     clicks: "8.405",
     unitsSold: 110,
   },
   {
     id: 5,
     name: "Women Red T-Shirt",
-    image: "/placeholder-red.png",
+    image:
+      "https://images.unsplash.com/photo-1503342394128-c104d54dba01?w=100&q=80",
     clicks: "5.600",
     unitsSold: 87,
   },

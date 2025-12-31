@@ -10,13 +10,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+
 import { Calendar } from "@/components/ui/calendar";
 import {
   Popover,
@@ -222,9 +216,13 @@ export default function AddCoupon() {
                         type="number"
                         placeholder="Amount"
                         className="h-11 bg-[#F9FAFB] border border-gray-200 shadow-none focus:border-[#48A878] focus:ring-0 rounded-lg placeholder:text-muted-foreground"
-                        value={field.value}
+                        value={field.value ?? ""}
                         onChange={(e) =>
-                          field.onChange(Number(e.target.value) || 0)
+                          field.onChange(
+                            e.target.value === ""
+                              ? undefined
+                              : Number(e.target.value)
+                          )
                         }
                         disabled={watchType === "FREE_SHIPPING"}
                       />
@@ -234,84 +232,88 @@ export default function AddCoupon() {
                 )}
               />
 
-              <FormField
-                control={form.control}
-                name="appliesTo"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-sm font-medium text-gray-600">
-                      Applies to
-                    </FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger className="h-11 bg-[#F9FAFB] border border-gray-200 shadow-none focus:border-[#48A878] focus:ring-0 rounded-lg text-gray-500">
-                          <SelectValue placeholder="Choose" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="ALL">All Products</SelectItem>
-                        <SelectItem value="SPECIFIC_PRODUCTS">
-                          Specific Products
-                        </SelectItem>
-                        <SelectItem value="SPECIFIC_CATEGORIES">
-                          Specific Categories
-                        </SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              {/* appliesTo removed; coupon applies globally by default */}
             </div>
 
             {/* Duration & Usage Limits */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-4">
-                <FormField
-                  control={form.control}
-                  name="startDate"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-sm font-medium text-gray-600">
-                        Duration
-                      </FormLabel>
-                      <FormControl>
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <Button
-                              variant="outline"
-                              className={cn(
-                                "w-full h-11 justify-between text-left font-normal bg-[#F9FAFB] border border-gray-200 shadow-none focus:border-[#48A878] focus:ring-0 rounded-lg",
-                                !field.value && "text-muted-foreground"
-                              )}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="startDate"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-sm font-medium text-gray-600">
+                          Start Date
+                        </FormLabel>
+                        <FormControl>
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <Button
+                                variant="outline"
+                                className={cn(
+                                  "w-full h-11 justify-between text-left font-normal bg-[#F9FAFB] border border-gray-200 shadow-none focus:border-[#48A878] focus:ring-0 rounded-lg",
+                                  !field.value && "text-muted-foreground"
+                                )}
+                              >
+                                {field.value ? (
+                                  format(field.value, "PPP")
+                                ) : (
+                                  <span className="text-muted-foreground">
+                                    Set start date
+                                  </span>
+                                )}
+                                <CalendarIcon className="h-4 w-4 text-muted-foreground" />
+                              </Button>
+                            </PopoverTrigger>
+                            <PopoverContent
+                              className="w-auto p-0"
+                              align="start"
                             >
-                              {field.value ? (
-                                format(field.value, "PPP")
-                              ) : (
-                                <span className="text-muted-foreground">
-                                  Set Duration
-                                </span>
-                              )}
-                              <CalendarIcon className="h-4 w-4 text-muted-foreground" />
-                            </Button>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-auto p-0" align="start">
-                            <Calendar
-                              mode="single"
-                              selected={field.value}
-                              onSelect={field.onChange}
-                              initialFocus
-                            />
-                          </PopoverContent>
-                        </Popover>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                              <Calendar
+                                mode="single"
+                                selected={field.value}
+                                onSelect={field.onChange}
+                                initialFocus
+                              />
+                            </PopoverContent>
+                          </Popover>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="durationDays"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-sm font-medium text-gray-600">
+                          Duration (days)
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            placeholder="e.g. 7"
+                            className="h-11 bg-[#F9FAFB] border border-gray-200 shadow-none focus:border-[#48A878] focus:ring-0 rounded-lg placeholder:text-muted-foreground"
+                            value={field.value ?? ""}
+                            onChange={(e) =>
+                              field.onChange(
+                                e.target.value === ""
+                                  ? null
+                                  : Number(e.target.value)
+                              )
+                            }
+                            disabled={form.watch("noEndDate")}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
 
                 <FormField
                   control={form.control}

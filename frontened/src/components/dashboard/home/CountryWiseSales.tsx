@@ -37,19 +37,23 @@ export default function CountryWiseSales({ data }: CountrySalesProps) {
           <p className="text-[15px] leading-[18px] font-normal text-muted-foreground mb-3">
             Users per minute
           </p>
-          <ChartContainer config={chartConfig} className="h-16 w-full">
-            <BarChart
-              data={chartData}
-              margin={{ top: 0, right: 0, bottom: 0, left: 0 }}
-            >
-              <Bar
-                dataKey="value"
-                fill="#4EA674"
-                radius={[2, 2, 2, 2]}
-                maxBarSize={11}
-              />
-            </BarChart>
-          </ChartContainer>
+          <div className="overflow-x-auto no-scrollbar">
+            <div className="min-w-[200px]">
+              <ChartContainer config={chartConfig} className="h-16 w-full">
+                <BarChart
+                  data={chartData}
+                  margin={{ top: 0, right: 0, bottom: 0, left: 0 }}
+                >
+                  <Bar
+                    dataKey="value"
+                    fill="#4EA674"
+                    radius={[2, 2, 2, 2]}
+                    maxBarSize={11}
+                  />
+                </BarChart>
+              </ChartContainer>
+            </div>
+          </div>
         </div>
 
         {/* Countries Section */}

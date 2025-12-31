@@ -10,7 +10,15 @@ import {
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Search, Save, Plus, AlertCircle, Star } from "lucide-react";
+import {
+  Search,
+  Save,
+  Plus,
+  AlertCircle,
+  Star,
+  ArrowRight,
+  ArrowLeft,
+} from "lucide-react";
 import { ProductsTableSkeleton } from "@/components/shared/skeletons";
 import { useProducts } from "@/hooks/products/useProducts";
 import { DeleteConfirmationModal } from "@/components/shared/DeleteConfirmationModal";
@@ -76,20 +84,20 @@ export default function Products() {
             <Plus className="h-4 w-4 sm:mr-2" />
             <span className="hidden sm:inline">Add Product</span>
           </Button>
-          <Button
+          {/* <Button
             variant="outline"
             disabled={true}
             className="border-[#E5E7EB] hidden md:flex "
           >
             <Save className="h-4 w-4 mr-2" />
             Save to draft
-          </Button>
+          </Button> */}
         </div>
       </div>
 
-      {/* Table */}
-      <div className="bg-white rounded-lg overflow-hidden min-h-[300px]">
-        <Table>
+      {/* Table - Scrollable */}
+      <div className="bg-white rounded-lg overflow-x-auto no-scrollbar min-h-[300px] border border-[#E5E7EB]">
+        <Table className="min-w-[800px]">
           <TableHeader className=" bg-white ">
             <TableRow className="[&_th]:pt-8 [&_th]:pb-3 text-[14px] [&_th]:text-muted-foreground">
               <TableHead className="w-12 ps-8">
@@ -162,13 +170,16 @@ export default function Products() {
                   <TableCell>
                     <div className="flex flex-col">
                       <span className="text-[#111827]">
-                        {product.stockQuantity} in stock
+                        {product.isUnlimitedStock
+                          ? "Unlimited Stock"
+                          : product.stockQuantity}
                       </span>
-                      {product.stockQuantity < 10 && (
-                        <span className="text-xs text-red-500 font-medium">
-                          Low Stock
-                        </span>
-                      )}
+                      {product.stockQuantity < 10 &&
+                        !product.isUnlimitedStock && (
+                          <span className="text-xs text-red-500 font-medium">
+                            Low Stock
+                          </span>
+                        )}
                     </div>
                   </TableCell>
                   <TableCell>
@@ -194,7 +205,7 @@ export default function Products() {
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-1">
-                      <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                      {/* <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" /> */}
                       <span className="font-medium text-[#111827]">
                         {product.averageRating?.toFixed(1) || "0.0"}
                       </span>
@@ -210,48 +221,44 @@ export default function Products() {
         </Table>
       </div>
 
-      {/* Pagination */}
-      <div className="flex items-center justify-between border-t border-[#E5E7EB] pt-4">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-          disabled={currentPage === 1}
-          className="h-8 border-[#E5E7EB]"
-        >
-          Previous
-        </Button>
-        <div className="flex items-center gap-2">
-          {pages.map((page, index) => (
-            <Button
-              key={index}
-              variant={currentPage === page ? "default" : "outline"}
-              size="sm"
-              onClick={() => typeof page === "number" && setCurrentPage(page)}
-              disabled={page === "..."}
-              className={`h-8 w-8 p-0 ${
-                currentPage === page
-                  ? "bg-[#4EA674] hover:bg-[#3d8a5e]"
-                  : "text-[#6B7280] border-transparent"
-              }`}
-            >
-              {page}
-            </Button>
-          ))}
+      {/* Pagination - Scrollable on very small screens */}
+      <div className="px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="flex items-center gap-3 overflow-x-auto no-scrollbar max-w-full pb-1">
+          <button
+            onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+            disabled={currentPage === 1}
+            className="p-1.5 text-gray-400 hover:text-gray-900 disabled:opacity-30 transition-colors shrink-0"
+          >
+            <ArrowLeft className="h-5 w-5" />
+          </button>
+          <div className="flex items-center gap-1.5 min-w-max">
+            {pages.map((p, i) => (
+              <button
+                key={i}
+                onClick={() => typeof p === "number" && setCurrentPage(p)}
+                className={`w-8 h-8 rounded-md text-[13px] font-bold transition-all shrink-0 ${
+                  currentPage === p
+                    ? "bg-[#ECF2FF] text-[#4EA674]"
+                    : "text-[#7E84A3] hover:bg-gray-50"
+                }`}
+              >
+                {p}
+              </button>
+            ))}
+          </div>
+          <button
+            onClick={() =>
+              setCurrentPage(Math.min(pages.length, currentPage + 1))
+            }
+            disabled={currentPage === pages.length}
+            className="p-1.5 text-gray-400 hover:text-gray-900 disabled:hover:text-gray-400 disabled:opacity-30 transition-colors shrink-0"
+          >
+            <ArrowRight className="h-5 w-5" />
+          </button>
         </div>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() =>
-            setCurrentPage(
-              Math.min(pagination?.totalPages || 1, currentPage + 1)
-            )
-          }
-          disabled={currentPage === (pagination?.totalPages || 1)}
-          className="h-8 border-[#E5E7EB]"
-        >
-          Next
-        </Button>
+        <div className="text-[13px] text-[#7E84A3] font-bold shrink-0">
+          {pagination?.total || 0} Results
+        </div>
       </div>
 
       <DeleteConfirmationModal

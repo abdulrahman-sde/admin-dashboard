@@ -10,6 +10,8 @@ import couponsRoutes from "./coupons.routes.js";
 import sessionRoutes from "./session.routes.js";
 import analyticsRoutes from "./analytics.routes.js";
 import paymentMethodsRoutes from "./payment-methods.routes.js";
+import monthlyGoalsRoutes from "./monthly-goals.routes.js";
+import aiRoutes from "./ai.routes.js";
 
 const router = Router();
 
@@ -25,5 +27,7 @@ router.use("/coupons", couponsRoutes);
 router.use("/sessions", sessionRoutes);
 router.use("/analytics", analyticsRoutes);
 router.use("/payment-methods", paymentMethodsRoutes);
+router.use("/monthly-goals", monthlyGoalsRoutes);
+router.use("/ai", aiRoutes);
 
 export default router;

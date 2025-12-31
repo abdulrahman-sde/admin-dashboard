@@ -165,21 +165,22 @@ export function CustomerTable() {
           </Table>
         </div>
 
-        {/* Pagination */}
-        <div className="flex items-center justify-between ">
-          <Pagination>
-            <PaginationContent className="w-full flex justify-between px-4">
+        {/* Pagination - scrollable on very small screens */}
+        <div className="flex items-center justify-between mt-4 overflow-x-auto no-scrollbar max-w-full px-4">
+          <Pagination className="w-full">
+            <PaginationContent className="w-full flex justify-between gap-1 sm:gap-2">
               <PaginationItem>
                 <PaginationPrevious
                   className={`${
                     !pagination?.hasPrevPage
                       ? "pointer-events-none opacity-50 "
                       : "cursor-pointer"
-                  } shadow-[0_1px_3px_0_rgba(0,0,0,0.2)]`}
+                  } shadow-sm border border-neutral-200 h-9 px-3`}
                   onClick={() => setCurrentPage(currentPage - 1)}
                 />
               </PaginationItem>
-              <div className="flex items-center gap-2">
+
+              <div className="hidden sm:flex items-center gap-1">
                 {pages.map((page, idx) => (
                   <PaginationItem key={idx}>
                     {page === "..." ? (
@@ -188,7 +189,7 @@ export function CustomerTable() {
                       <PaginationLink
                         isActive={currentPage === page}
                         onClick={() => setCurrentPage(page as number)}
-                        className="cursor-pointer border-none shadow-none"
+                        className="cursor-pointer border-none shadow-none h-9 w-9 flex items-center justify-center font-bold"
                       >
                         {page}
                       </PaginationLink>
@@ -196,6 +197,12 @@ export function CustomerTable() {
                   </PaginationItem>
                 ))}
               </div>
+
+              {/* Mobile Page Indicator */}
+              <div className="flex sm:hidden items-center px-2 text-sm font-medium">
+                Page {currentPage} of {pages[pages.length - 1] || 1}
+              </div>
+
               <PaginationItem>
                 <PaginationNext
                   onClick={() => setCurrentPage(currentPage + 1)}
@@ -205,7 +212,7 @@ export function CustomerTable() {
                         ? "pointer-events-none opacity-50"
                         : "cursor-pointer"
                     }
-                    shadow-[0_1px_3px_0_rgba(0,0,0,0.2)]
+                    shadow-sm border border-neutral-200 h-9 px-3
                   `}
                 />
               </PaginationItem>

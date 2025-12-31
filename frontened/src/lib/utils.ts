@@ -60,14 +60,14 @@ export function getCustomerStatusColor(status: string) {
 export function getOrderStatusColor(status: string) {
   switch (status) {
     case "DELIVERED":
-      return "text-[#4EA674]";
+      return "text-[#21C45D]";
     case "PENDING":
-      return "text-orange-500";
+      return "text-[#F59F0A]";
     case "SHIPPED":
     case "PROCESSING":
-      return "text-muted-foreground";
+      return "text-black";
     case "CANCELED":
-      return "text-destructive";
+      return "text-[#EF4343]";
     default:
       return "text-muted-foreground";
   }

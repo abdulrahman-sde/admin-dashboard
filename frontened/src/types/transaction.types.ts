@@ -56,7 +56,9 @@ export interface TransactionsQuery {
   limit?: number;
   search?: string;
   paymentStatus?: TransactionStatus;
-  paymentMethod?: PaymentMethod;
+  storePaymentMethodId?: string;
+  startDate?: string;
+  endDate?: string;
   sortBy?: string;
   sortOrder?: "asc" | "desc";
 }

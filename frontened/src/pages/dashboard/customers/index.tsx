@@ -10,17 +10,18 @@ export default function Users() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1>Customers</h1>
-        <div>
-          <Link to="/dashboard/customers/add">
-            <Button>Add Customer</Button>
-          </Link>
-        </div>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <h1 className="text-2xl font-bold">Customers</h1>
+        <Link to="/dashboard/customers/add" className="w-full sm:w-auto">
+          <Button className="w-full sm:w-auto bg-[#4EA674] hover:bg-[#3d8a5e]">
+            Add Customer
+          </Button>
+        </Link>
       </div>
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         {/* Customer Stat Cards */}
-        <div className="lg:col-span-1 grid grid-cols-1 gap-4">
+        <div className="lg:col-span-1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-4">
           {dynamicStats.map((stat, index) => (
             <StatCard
               key={index}
@@ -29,6 +30,7 @@ export default function Users() {
               change={stat.change}
               subtitle={stat.subtitle}
               isLoading={isFetching}
+              className="h-full"
             />
           ))}
         </div>

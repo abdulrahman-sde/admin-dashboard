@@ -16,6 +16,7 @@ export function useProducts(params: ProductsQueryParams = {}) {
   const [activeTab, setActiveTab] = useState<keyof Meta>("all");
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
+
   const [sortBy, setSortBy] = useState<ProductsQueryParams["sortBy"]>(
     params.sortBy || "createdAt"
   );

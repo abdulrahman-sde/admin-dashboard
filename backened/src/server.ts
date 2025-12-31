@@ -4,7 +4,10 @@ import cors from "cors";
 import routes from "./routes/index.js";
 import { errorHandler } from "./middlewares/error.middleware.js";
 import cookieParser from "cookie-parser";
-import "./jobs/calculateDailyMetrics.js";
+import { analyticsJob } from "./jobs/analytics.job.js";
+
+// Initialize Cron Jobs
+analyticsJob.init();
 dotenv.config();
 
 const app = express();

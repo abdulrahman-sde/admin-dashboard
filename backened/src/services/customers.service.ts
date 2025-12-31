@@ -1,4 +1,4 @@
-import type { Prisma } from "@prisma/client";
+import type { Prisma, CustomerStatus } from "@prisma/client";
 import { customerRepository } from "../repositories/customers.repository.js";
 import type {
   GetCustomersQuery,
@@ -26,7 +26,8 @@ export const customersService = {
     }
 
     // 2. Filters
-    if (status) andConditions.push({ status });
+    if (status)
+      andConditions.push({ status: { equals: status as CustomerStatus } });
 
     if (andConditions.length > 0) {
       where.AND = andConditions;

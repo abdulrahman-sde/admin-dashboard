@@ -7,7 +7,6 @@ import {
   YAxis,
   Tooltip,
 } from "recharts";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Select,
   SelectContent,
@@ -19,23 +18,29 @@ import type { CustomerGrowthProps } from "@/types";
 
 export function CustomerGrowth({ data }: CustomerGrowthProps) {
   return (
-    <Card className="w-full h-full border-none shadow-none">
-      <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0 p-0 pb-6">
-        <div className="flex flex-col gap-2">
-          <CardTitle className="text-base font-bold">Customer Growth</CardTitle>
-          <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-[14px]">
+    <div className="w-full">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
+        <div className="flex flex-col gap-3">
+          <h2 className="text-[17px] font-bold text-gray-900">
+            Customer Growth
+          </h2>
+          <div className="flex items-center gap-5">
             <div className="flex items-center gap-2">
-              <span className="h-3 w-3 rounded-xs bg-[#E2E8F0]"></span>
-              <span className="text-gray-500">Returning customers</span>
+              <div className="w-3.5 h-3.5 rounded-sm bg-[#D7DBEC]" />
+              <span className="text-[13px] text-[#8E92BC] font-medium">
+                Returning customers
+              </span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="h-3 w-3 rounded-xs bg-[#22c55e]"></span>
-              <span className="text-gray-500">New customers</span>
+              <div className="w-3.5 h-3.5 rounded-sm bg-[#4EA674]" />
+              <span className="text-[13px] text-[#8E92BC] font-medium">
+                New customers
+              </span>
             </div>
           </div>
         </div>
         <Select defaultValue="12months">
-          <SelectTrigger className="w-full sm:w-[140px] border-none shadow-none text-gray-500 hover:text-gray-900 bg-transparent focus:ring-0">
+          <SelectTrigger className="w-[130px] border-none shadow-none text-[#8E92BC] text-[13px] font-medium bg-transparent focus:ring-0">
             <SelectValue placeholder="Select range" />
           </SelectTrigger>
           <SelectContent>
@@ -44,73 +49,57 @@ export function CustomerGrowth({ data }: CustomerGrowthProps) {
             <SelectItem value="30days">Last 30 Days</SelectItem>
           </SelectContent>
         </Select>
-      </CardHeader>
-      <CardContent className="pl-0 pr-0 pt-0 pb-0">
-        <div className="overflow-x-auto">
-          <div className="min-w-[600px] h-[250px] sm:h-[300px] lg:h-[350px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart
-                data={data}
-                margin={{
-                  top: 0,
-                  right: 30,
-                  left: 0,
-                  bottom: 5,
+      </div>
+
+      <div className="overflow-x-auto no-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0">
+        <div className="h-[350px] min-w-[600px] w-full">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart
+              data={data}
+              margin={{ top: 0, right: 0, left: -20, bottom: 20 }}
+              barGap={6}
+            >
+              <CartesianGrid
+                vertical={false}
+                strokeDasharray="3 3"
+                stroke="#F1F3F9"
+              />
+              <XAxis
+                dataKey="month"
+                axisLine={false}
+                tickLine={false}
+                tick={{ fill: "#8E92BC", fontSize: 12 }}
+                dy={15}
+              />
+              <YAxis
+                axisLine={false}
+                tickLine={false}
+                tick={{ fill: "#8E92BC", fontSize: 12 }}
+              />
+              <Tooltip
+                cursor={{ fill: "#F8F9FB" }}
+                contentStyle={{
+                  borderRadius: "12px",
+                  border: "none",
+                  boxShadow: "0 10px 15px -3px rgba(0,0,0,0.1)",
                 }}
-                barGap={8}
-              >
-                <CartesianGrid
-                  vertical={false}
-                  strokeDasharray="4 4"
-                  stroke="#eaeaea"
-                />
-                <XAxis
-                  dataKey="month"
-                  stroke="#888888"
-                  fontSize={11}
-                  tickLine={false}
-                  axisLine={false}
-                  tickMargin={15}
-                  interval="preserveStartEnd"
-                  angle={0}
-                  textAnchor="middle"
-                />
-                <YAxis
-                  stroke="#888888"
-                  fontSize={11}
-                  tickLine={false}
-                  axisLine={false}
-                  ticks={[0, 100, 200, 300, 400, 500]}
-                  tickFormatter={(value) => `${value}`}
-                  domain={[0, 500]}
-                  width={40}
-                />
-                <Tooltip
-                  cursor={{ fill: "rgba(0, 0, 0, 0.05)" }}
-                  contentStyle={{
-                    backgroundColor: "white",
-                    border: "1px solid #e5e7eb",
-                    borderRadius: "8px",
-                    fontSize: "12px",
-                  }}
-                />
-                <Bar
-                  dataKey="returningCustomers"
-                  fill="#D7DBEC"
-                  radius={[4, 4, 4, 4]}
-                  barSize={8}
-                />
-                <Bar
-                  dataKey="newCustomers"
-                  fill="#4EA674"
-                  radius={[4, 4, 4, 4]}
-                  barSize={8}
-                />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
+              />
+              <Bar
+                dataKey="returningCustomers"
+                fill="#D7DBEC"
+                radius={[2, 2, 0, 0]}
+                barSize={6}
+              />
+              <Bar
+                dataKey="newCustomers"
+                fill="#4EA674"
+                radius={[2, 2, 0, 0]}
+                barSize={6}
+              />
+            </BarChart>
+          </ResponsiveContainer>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }

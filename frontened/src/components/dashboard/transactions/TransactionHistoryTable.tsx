@@ -22,7 +22,6 @@ import {
   ArrowUp,
   ArrowDown,
   ArrowUpDown,
-  MoreVertical,
   Check,
 } from "lucide-react";
 import {
@@ -97,140 +96,143 @@ export default function TransactionHistoryTable() {
       {/* Tabs and Controls */}
       <Tabs value={activeTab} onValueChange={onTabChange}>
         <div className="p-4 pb-3 border-b border-[#D1D5DB]">
-          <div className="flex items-center justify-between gap-4 flex-wrap">
-            <TabsList className="h-auto p-1 bg-fade-green rounded-lg border-none">
-              <TabsTrigger
-                value="all"
-                className="px-4 py-1.5 text-sm rounded-md data-[state=active]:bg-white data-[state=active]:shadow-sm transition-all"
-              >
-                All order
-                <span className="text-primary ml-1">({totalTransactions})</span>
-              </TabsTrigger>
-              <TabsTrigger
-                value="paid"
-                className="px-4 py-1.5 text-sm rounded-md data-[state=active]:bg-white data-[state=active]:shadow-sm transition-all"
-              >
-                Completed
-              </TabsTrigger>
-              <TabsTrigger
-                value="pending"
-                className="px-4 py-1.5 text-sm rounded-md data-[state=active]:bg-white data-[state=active]:shadow-sm transition-all"
-              >
-                Pending
-              </TabsTrigger>
-              <TabsTrigger
-                value="failed"
-                className="px-4 py-1.5 text-sm rounded-md data-[state=active]:bg-white data-[state=active]:shadow-sm transition-all"
-              >
-                Canceled
-              </TabsTrigger>
-            </TabsList>
+          <div className="flex flex-col gap-4">
+            {/* Tabs List - Scrollable */}
+            <div className="overflow-x-auto no-scrollbar -mx-4 px-4">
+              <TabsList className="h-auto p-1 bg-fade-green rounded-lg border-none flex-nowrap justify-start min-w-max">
+                <TabsTrigger
+                  value="all"
+                  className="px-4 py-1.5 text-sm rounded-md data-[state=active]:bg-white data-[state=active]:shadow-sm transition-all shrink-0"
+                >
+                  All Transactions
+                </TabsTrigger>
+                <TabsTrigger
+                  value="paid"
+                  className="px-4 py-1.5 text-sm rounded-md data-[state=active]:bg-white data-[state=active]:shadow-sm transition-all shrink-0"
+                >
+                  Completed
+                </TabsTrigger>
+                <TabsTrigger
+                  value="pending"
+                  className="px-4 py-1.5 text-sm rounded-md data-[state=active]:bg-white data-[state=active]:shadow-sm transition-all shrink-0"
+                >
+                  Pending
+                </TabsTrigger>
+                <TabsTrigger
+                  value="failed"
+                  className="px-4 py-1.5 text-sm rounded-md data-[state=active]:bg-white data-[state=active]:shadow-sm transition-all shrink-0"
+                >
+                  Canceled
+                </TabsTrigger>
+              </TabsList>
+            </div>
 
-            <div className="flex items-center gap-2">
-              <div className="relative">
+            <div className="flex items-center justify-between gap-4 flex-wrap">
+              <div className="relative flex-1 min-w-[200px]">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
                 <Input
                   placeholder="Search payment history"
-                  className="pl-9 w-60 h-10 border-[#D1D5DB]"
+                  className="pl-9 w-full h-10 border-[#D1D5DB]"
                   value={search}
                   onChange={(e) => onSearchChange(e.target.value)}
                 />
               </div>
 
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className={`h-10 w-10 border-[#D1D5DB] rounded-lg transition-all ${
-                      paymentStatus
-                        ? "border-primary bg-primary/5 text-primary"
-                        : "text-gray-500"
-                    }`}
-                    size="icon"
-                  >
-                    <SlidersHorizontal className="size-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56">
-                  <div className="p-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                    Payment Status
-                  </div>
-                  <DropdownMenuItem onClick={() => setPaymentStatus(undefined)}>
-                    All Statuses
-                    {!paymentStatus && <Check className="ml-auto size-4" />}
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={() => setPaymentStatus("COMPLETED")}
-                  >
-                    Paid/Completed
-                    {paymentStatus === "COMPLETED" && (
-                      <Check className="ml-auto size-4" />
-                    )}
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setPaymentStatus("PENDING")}>
-                    Pending
-                    {paymentStatus === "PENDING" && (
-                      <Check className="ml-auto size-4" />
-                    )}
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setPaymentStatus("FAILED")}>
-                    Failed/Canceled
-                    {paymentStatus === "FAILED" && (
-                      <Check className="ml-auto size-4" />
-                    )}
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              {/* Filters - Scrollable if too many */}
+              <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={`h-10 w-10 border-[#D1D5DB] rounded-lg transition-all shrink-0 ${
+                        paymentStatus
+                          ? "border-primary bg-primary/5 text-primary"
+                          : "text-gray-500"
+                      }`}
+                      size="icon"
+                    >
+                      <SlidersHorizontal className="size-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-56">
+                    <div className="p-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                      Payment Status
+                    </div>
+                    <DropdownMenuItem
+                      onClick={() => setPaymentStatus(undefined)}
+                    >
+                      All Statuses
+                      {!paymentStatus && <Check className="ml-auto size-4" />}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => setPaymentStatus("COMPLETED")}
+                    >
+                      Paid/Completed
+                      {paymentStatus === "COMPLETED" && (
+                        <Check className="ml-auto size-4" />
+                      )}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => setPaymentStatus("PENDING")}
+                    >
+                      Pending
+                      {paymentStatus === "PENDING" && (
+                        <Check className="ml-auto size-4" />
+                      )}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => setPaymentStatus("FAILED")}
+                    >
+                      Failed/Canceled
+                      {paymentStatus === "FAILED" && (
+                        <Check className="ml-auto size-4" />
+                      )}
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
 
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className={`h-10 w-10 border-[#D1D5DB] rounded-lg transition-all ${
-                      sortBy && sortBy !== "createdAt"
-                        ? "border-primary bg-primary/5 text-primary"
-                        : "text-gray-500"
-                    }`}
-                    size="icon"
-                  >
-                    <ArrowUpDown className="size-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-48">
-                  <DropdownMenuItem
-                    onClick={() => toggleSort("amount")}
-                    className="flex items-center justify-between"
-                  >
-                    Amount
-                    {sortBy === "amount" &&
-                      (sortOrder === "asc" ? (
-                        <ArrowUp className="size-3" />
-                      ) : (
-                        <ArrowDown className="size-3" />
-                      ))}
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={() => toggleSort("createdAt")}
-                    className="flex items-center justify-between"
-                  >
-                    Date
-                    {sortBy === "createdAt" &&
-                      (sortOrder === "asc" ? (
-                        <ArrowUp className="size-3" />
-                      ) : (
-                        <ArrowDown className="size-3" />
-                      ))}
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-
-              <Button
-                variant="outline"
-                className="h-10 w-10 border-[#D1D5DB] rounded-lg"
-                size="icon"
-              >
-                <MoreVertical className="size-4 text-gray-500" />
-              </Button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={`h-10 w-10 border-[#D1D5DB] rounded-lg transition-all shrink-0 ${
+                        sortBy && sortBy !== "createdAt"
+                          ? "border-primary bg-primary/5 text-primary"
+                          : "text-gray-500"
+                      }`}
+                      size="icon"
+                    >
+                      <ArrowUpDown className="size-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-48">
+                    <DropdownMenuItem
+                      onClick={() => toggleSort("amount")}
+                      className="flex items-center justify-between"
+                    >
+                      Amount
+                      {sortBy === "amount" &&
+                        (sortOrder === "asc" ? (
+                          <ArrowUp className="size-3" />
+                        ) : (
+                          <ArrowDown className="size-3" />
+                        ))}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => toggleSort("createdAt")}
+                      className="flex items-center justify-between"
+                    >
+                      Date
+                      {sortBy === "createdAt" &&
+                        (sortOrder === "asc" ? (
+                          <ArrowUp className="size-3" />
+                        ) : (
+                          <ArrowDown className="size-3" />
+                        ))}
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
             </div>
           </div>
         </div>

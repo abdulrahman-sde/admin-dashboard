@@ -11,6 +11,7 @@ import {
   useUpdatePaymentMethodMutation,
 } from "@/lib/store/services/payment-methods/paymentMethodsApi";
 import { AddPaymentMethodModal } from "./AddPaymentMethodModal";
+import { RelevantTransactionsModal } from "./RelevantTransactionsModal";
 import { toast } from "sonner";
 import { useNavigate } from "react-router";
 import { useTransactions } from "@/hooks/transactions/useTransactions";
@@ -18,6 +19,7 @@ import { useTransactions } from "@/hooks/transactions/useTransactions";
 export default function PaymentMethodCard() {
   const navigate = useNavigate();
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isViewTransactionsOpen, setIsViewTransactionsOpen] = useState(false);
   const { data, isLoading } = useGetPaymentMethodsQuery();
   const [updateMethod] = useUpdatePaymentMethodMutation();
 
@@ -92,7 +94,7 @@ export default function PaymentMethodCard() {
                 <Switch
                   checked={activeMethod?.status === "ACTIVE"}
                   onCheckedChange={handleStatusToggle}
-                  className="data-[state=checked]:bg-white"
+                  className="data-[state=checked]:bg-white [&[data-state=checked]_span]:bg-[#4EA674]"
                   disabled={!activeMethod}
                 />
               </div>
@@ -151,7 +153,7 @@ export default function PaymentMethodCard() {
               </span>
             </div>
             <button
-              onClick={() => navigate("/dashboard/transactions")}
+              onClick={() => setIsViewTransactionsOpen(true)}
               className="text-sm text-[#4EA674] hover:underline text-left block"
             >
               View Transactions
@@ -183,6 +185,12 @@ export default function PaymentMethodCard() {
       <AddPaymentMethodModal
         open={isAddModalOpen}
         onOpenChange={setIsAddModalOpen}
+      />
+
+      <RelevantTransactionsModal
+        open={isViewTransactionsOpen}
+        onOpenChange={setIsViewTransactionsOpen}
+        storePaymentMethodId={activeMethod?.id}
       />
     </Card>
   );

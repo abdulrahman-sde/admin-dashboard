@@ -3,7 +3,7 @@ import { paginationSchema, enumField } from "./helpers.js";
 
 export const getTransactionsQuerySchema = paginationSchema.extend({
   search: z.string().optional(), // transactionNumber or orderNumber or customer
-
+  storePaymentMethodId: z.string().optional(), // Filter by store payment method ID
   paymentStatus: enumField(
     ["PENDING", "COMPLETED", "FAILED", "REFUNDED"],
     "Payment Status"

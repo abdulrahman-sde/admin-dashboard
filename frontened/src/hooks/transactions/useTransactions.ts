@@ -1,16 +1,20 @@
 import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router";
 import { useGetAllTransactionsQuery } from "@/lib/store/services/transactions/transactionsApi";
 import { useGetAnalytics } from "@/hooks/analytics/useGetAnalytics";
 import type { TransactionStatus } from "@/types/transaction.types";
 import { generatePagination } from "@/lib/utils";
 
 export const useTransactions = () => {
+  const [searchParams] = useSearchParams();
+  const initialSearch = searchParams.get("search") || "";
+
   const [currentPage, setCurrentPage] = useState(1);
   const [status, setStatus] = useState<TransactionStatus | undefined>(
     undefined
   );
-  const [search, setSearch] = useState("");
-  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [search, setSearch] = useState(initialSearch);
+  const [debouncedSearch, setDebouncedSearch] = useState(initialSearch);
   const [sortBy, setSortBy] = useState<string | undefined>("createdAt");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc" | undefined>(
     "desc"

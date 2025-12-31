@@ -1,4 +1,3 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PieChart, Pie, Cell, ResponsiveContainer, Label } from "recharts";
 
 interface SalesGoalProps {
@@ -12,32 +11,32 @@ interface SalesGoalProps {
 
 export function SalesGoal({ data }: SalesGoalProps) {
   const chartData = [
-    { name: "Sold", value: data.percentage, fill: "#FFD700" }, // Gold color as per image (yellowish)
-    { name: "Remaining", value: 100 - data.percentage, fill: "#F3F4F6" },
+    { name: "Sold", value: data.percentage },
+    { name: "Remaining", value: 100 - data.percentage },
   ];
 
   return (
-    <Card className="border-none shadow-sm h-full">
-      <CardHeader>
-        <CardTitle className="text-base font-bold">Sales Goal</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="h-[200px] w-full relative">
+    <div className="bg-white p-8 rounded-2xl shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07)] h-full flex flex-col">
+      <h2 className="text-[17px] font-bold text-gray-900 mb-6">Sales Goal</h2>
+
+      <div className="overflow-x-auto no-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0">
+        <div className="h-[180px] min-w-[200px] w-full relative mb-6">
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Pie
                 data={chartData}
                 cx="50%"
                 cy="50%"
-                innerRadius={60}
+                innerRadius={65}
                 outerRadius={80}
                 startAngle={90}
                 endAngle={-270}
                 dataKey="value"
                 stroke="none"
+                paddingAngle={0}
               >
-                <Cell key="sold" fill="#FACC15" />
-                <Cell key="remaining" fill="#F3F4F6" />
+                <Cell fill="#FACC15" />
+                <Cell fill="#F1F3F9" />
                 <Label
                   value={`${data.percentage}%`}
                   position="center"
@@ -47,24 +46,28 @@ export function SalesGoal({ data }: SalesGoalProps) {
             </PieChart>
           </ResponsiveContainer>
         </div>
+      </div>
 
-        <div className="mt-4 space-y-3">
-          <div className="flex justify-between text-sm">
-            <span className="text-gray-500">Sold for:</span>
-            <span className="font-bold">${data.soldFor.toLocaleString()}</span>
-          </div>
-          <div className="flex justify-between text-sm">
-            <span className="text-gray-500">Month goal:</span>
-            <span className="font-bold">
-              ${data.monthGoal.toLocaleString()}
-            </span>
-          </div>
-          <div className="flex justify-between text-sm">
-            <span className="text-gray-500">Left:</span>
-            <span className="font-bold">${data.left.toLocaleString()}</span>
-          </div>
+      <div className="mt-auto space-y-4">
+        <div className="flex justify-between items-center text-sm font-medium">
+          <span className="text-[#8E92BC]">Sold for:</span>
+          <span className="text-gray-900 font-bold">
+            ${(data.soldFor / 1000).toFixed(3)}
+          </span>
         </div>
-      </CardContent>
-    </Card>
+        <div className="flex justify-between items-center text-sm font-medium">
+          <span className="text-[#8E92BC]">Month goal:</span>
+          <span className="text-gray-900 font-bold">
+            ${(data.monthGoal / 1000).toFixed(3)}
+          </span>
+        </div>
+        <div className="flex justify-between items-center text-sm font-medium">
+          <span className="text-[#8E92BC]">Left:</span>
+          <span className="text-gray-900 font-bold">
+            ${(data.left / 1000).toFixed(3)}
+          </span>
+        </div>
+      </div>
+    </div>
   );
 }

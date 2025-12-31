@@ -18,6 +18,7 @@ export const useProductForm = (productId?: string) => {
     useGetProductQuery(productId || "", {
       skip: !productId,
     });
+  const [isGeneratingDescription, setIsGeneratingDescription] = useState(false);
 
   const form = useForm<ProductFormValues>({
     resolver: zodResolver(productSchema) as any,
@@ -37,10 +38,12 @@ export const useProductForm = (productId?: string) => {
   });
 
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+  const [description, setDescription] = useState("");
 
   useEffect(() => {
     if (existingProduct?.data) {
       const product = existingProduct.data;
+      setDescription(product.description || "");
       form.reset({
         name: product.name,
         description: product.description,
@@ -71,6 +74,56 @@ export const useProductForm = (productId?: string) => {
       }
     }
   }, [existingProduct, form]);
+
+  const generateDescription = async (productName: string) => {
+    form.clearErrors("description");
+    try {
+      setIsGeneratingDescription(true);
+      const res = await fetch(
+        `${import.meta.env.VITE_API_URL}/ai/generate-description`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ productName }),
+        }
+      );
+      if (!res.ok) {
+        throw new Error("Failed to generate description");
+      }
+      const reader = res.body?.getReader();
+      if (!reader) {
+        throw new Error("Reader not found");
+      }
+      const decoder = new TextDecoder();
+      let text = "";
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) {
+          break;
+        }
+        const chunk = decoder.decode(value, { stream: true });
+        text += chunk;
+        setDescription(text);
+        form.setValue("description", text, {
+          shouldDirty: true,
+          shouldTouch: true,
+          shouldValidate: false,
+        });
+      }
+      // Final update
+      setDescription(text);
+      form.setValue("description", text, {
+        shouldDirty: true,
+        shouldTouch: true,
+        shouldValidate: false,
+      });
+
+      setIsGeneratingDescription(false);
+    } catch (error) {
+      console.error("Error generating description:", error);
+      setIsGeneratingDescription(false);
+    }
+  };
 
   const onImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
@@ -133,6 +186,10 @@ export const useProductForm = (productId?: string) => {
 
   const onSubmit = async (data: ProductFormValues) => {
     try {
+      // Ensure description is from the local state in case implicit sync was weird, though setValue should handle it.
+      // We will override validation just in case during typing, but here we want to submit the real value.
+      data.description = description;
+
       // Handle image uploads
       const uploadedImages = await Promise.all(
         (data.images || []).map(async (image: string | File) => {
@@ -172,8 +229,8 @@ export const useProductForm = (productId?: string) => {
         toast.success("Product added successfully");
       }
       // Reset form with current values to clear isDirty state
+      // Also clear description state
       form.reset(form.getValues());
-      // Removed navigate to keep user on page as requested
     } catch (error) {
       console.error("Submission error:", error);
       toast.error("An error occurred while saving the product");
@@ -181,6 +238,9 @@ export const useProductForm = (productId?: string) => {
   };
 
   const handleAction = () => {
+    // Manually set value before submit to ensure form state has it
+    form.setValue("description", description);
+
     form.handleSubmit(onSubmit, (errors) => {
       const errorKeys = Object.keys(errors);
       if (errorKeys.length > 0) {
@@ -203,7 +263,11 @@ export const useProductForm = (productId?: string) => {
     isEditing: !!productId,
     isLoading: isLoadingProduct,
     isSaving: form.formState.isSubmitting,
+    isGeneratingDescription,
+    generateDescription,
     isDirty: form.formState.isDirty,
     productStatus: existingProduct?.data?.status,
+    description,
+    setDescription,
   };
 };

@@ -14,6 +14,7 @@ export const transactionsService = {
       limit,
       search,
       paymentStatus,
+      storePaymentMethodId,
       startDate,
       endDate,
       sortBy,
@@ -26,7 +27,10 @@ export const transactionsService = {
     if (paymentStatus)
       and.push({ paymentStatus: paymentStatus as PaymentStatus });
 
+    if (storePaymentMethodId) and.push({ storePaymentMethodId });
+
     if (search) {
+      const searchTerms = search.trim().split(/\s+/);
       const orConditions: Prisma.TransactionWhereInput[] = [
         { transactionNumber: { contains: search, mode: "insensitive" } },
         {
@@ -34,16 +38,22 @@ export const transactionsService = {
             orderNumber: { contains: search, mode: "insensitive" },
           },
         },
-        {
-          customer: {
-            OR: [
-              { email: { contains: search, mode: "insensitive" } },
-              { firstName: { contains: search, mode: "insensitive" } },
-              { lastName: { contains: search, mode: "insensitive" } },
-            ],
-          },
-        },
+        { customer: { email: { contains: search, mode: "insensitive" } } },
       ];
+
+      // Smart Name Search: All terms must be present in either firstName or lastName
+      if (searchTerms.length > 0) {
+        orConditions.push({
+          customer: {
+            AND: searchTerms.map((term) => ({
+              OR: [
+                { firstName: { contains: term, mode: "insensitive" } },
+                { lastName: { contains: term, mode: "insensitive" } },
+              ],
+            })),
+          },
+        });
+      }
 
       // Add exact ID search if it matches MongoDB ObjectId format
       if (/^[0-9a-fA-F]{24}$/.test(search)) {
@@ -61,7 +71,7 @@ export const transactionsService = {
 
     const orderBy: Prisma.TransactionOrderByWithRelationInput = {
       [sortBy]: sortOrder,
-    } as any;
+    } as Prisma.TransactionOrderByWithRelationInput;
 
     const { skip, take } = getSkipTake({ page, limit });
 

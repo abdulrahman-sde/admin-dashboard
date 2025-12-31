@@ -11,6 +11,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Filter } from "lucide-react";
+import { useNavigate } from "react-router";
 import { BestSellingProductSkeleton } from "@/components/shared/skeletons";
 import { DataTableEmptyState } from "@/components/shared/DataTableEmptyState";
 import { cn } from "@/lib/utils";
@@ -30,6 +31,7 @@ export default function BestSellingProduct({
   data,
   isLoading,
 }: BestSellingProductProps) {
+  const navigate = useNavigate();
   if (isLoading) {
     return <BestSellingProductSkeleton />;
   }
@@ -40,14 +42,14 @@ export default function BestSellingProduct({
         <CardTitle className="text-[17px] font-bold text-[#1e293b]">
           Best selling product
         </CardTitle>
-        <Button
+        {/* <Button
           variant="default"
           size="sm"
           className="bg-primary text-white hover:bg-primary/90 gap-2 h-9 px-4 rounded-lg font-bold"
         >
           <Filter className="h-4 w-4" />
           Filter
-        </Button>
+        </Button> */}
       </CardHeader>
 
       <CardContent className="px-6">
@@ -139,6 +141,7 @@ export default function BestSellingProduct({
             variant="outline"
             size="sm"
             className="text-[#6366f1] h-[34px] px-6 border-[#6366f1] border hover:bg-[#6366f1] hover:text-white transition-all duration-200 text-[14px] font-bold rounded-full bg-transparent"
+            onClick={() => navigate("/dashboard/products")}
           >
             Details
           </Button>

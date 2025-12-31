@@ -12,6 +12,9 @@ export interface AggregationResult {
   totalVisits: number;
   uniqueVisits: number;
   totalPageViews: number;
+  cartRate: number;
+  checkoutRate: number;
+  purchaseRate: number;
   conversionRate: number;
   completedTransactions: number;
   pendingTransactions: number;
@@ -44,6 +47,10 @@ export interface RawProductMetrics {
 export interface RawSessionMetrics {
   totalVisits?: number;
   uniqueVisits?: number;
+  // Counts derived during session aggregation
+  convertedSessions?: number;
+  addToCartCount?: number;
+  checkoutStartedCount?: number;
 }
 
 export interface RawTransactionMetrics {

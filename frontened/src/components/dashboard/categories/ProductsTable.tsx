@@ -172,15 +172,7 @@ export default function ProductsTable() {
                           <ArrowDown className="ml-auto h-4 w-4" />
                         ))}
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => handleSort("name")}>
-                      <span>Name</span>
-                      {sortBy === "name" &&
-                        (sortOrder === "asc" ? (
-                          <ArrowUp className="ml-auto h-4 w-4" />
-                        ) : (
-                          <ArrowDown className="ml-auto h-4 w-4" />
-                        ))}
-                    </DropdownMenuItem>
+
                     <DropdownMenuItem
                       onClick={() => handleSort("stockQuantity")}
                     >

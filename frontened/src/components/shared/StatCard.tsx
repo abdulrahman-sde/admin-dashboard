@@ -79,7 +79,7 @@ export function StatCard({
           size="icon"
           className="h-8 w-8 text-neutral-400 -mt-2 -mr-2"
         >
-          <MoreVertical className="h-5 w-5" />
+          {/* <MoreVertical className="h-5 w-5" /> */}
         </Button>
       </CardHeader>
       <CardContent className="px-4">
