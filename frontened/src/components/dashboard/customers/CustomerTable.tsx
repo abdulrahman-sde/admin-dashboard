@@ -144,10 +144,7 @@ export function CustomerTable() {
                       </div>
                     </TableCell>
                     <TableCell className="w-[10%] text-right pr-4">
-                      <div className="flex items-center justify-end">
-                        <Button variant="ghost" size="icon" className="h-8 w-8">
-                          <MessageSquare className="h-4 w-4 text-muted-foreground" />
-                        </Button>
+                      <div className="flex items-center justify-center">
                         <Button
                           variant="ghost"
                           size="icon"

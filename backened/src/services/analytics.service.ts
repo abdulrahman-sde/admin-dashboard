@@ -4,6 +4,7 @@ import { getWeeklyStats, setWeeklyStats } from "../utils/redis.utils.js";
 import type {
   DashboardWeeklyStats,
   DetailedDailyMetricsResponse,
+  RealTimeStats,
 } from "../types/analytics.types.js";
 import {
   formatCustomerOverviewMetrics,
@@ -92,7 +93,7 @@ export const analyticsService = {
   //    return analyticsRepository.getTopProducts(limit);
   // },
 
-  async getRealTimeStats(): Promise<[]> {
+  async getRealTimeStats(): Promise<RealTimeStats> {
     const stats = await analyticsRepository.getRealTimeStats();
     return stats;
   },

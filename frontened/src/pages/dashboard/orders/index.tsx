@@ -6,6 +6,7 @@ export default function Orders() {
   const {
     orders,
     isFetching,
+    isStatsLoading,
     currentPage,
     setCurrentPage,
     totalPages,
@@ -36,7 +37,7 @@ export default function Orders() {
             value={stat.value}
             change={stat.change}
             subtitle={stat.subtitle}
-            isLoading={isFetching}
+            isLoading={isStatsLoading}
           />
         ))}
       </div>

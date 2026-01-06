@@ -32,8 +32,9 @@ model User {
   status    UserStatus @default(ACTIVE)
 
   // Profile Information
-  avatar String?
-  phone  String?
+  avatar    String?
+  phone     String?
+  biography String?
 
   // Audit Fields
   createdAt   DateTime  @default(now())
@@ -106,6 +107,7 @@ model Customer {
   @@index([role])
   @@index([totalSpent])
   @@index([createdAt])
+  @@index([deletedAt])
   @@map("customers")
 }
 
@@ -254,6 +256,9 @@ model DailyMetrics {
   // Geographic Data
   salesByCountry Json? // { "USA": 30000, "Brazil": 25000, ... }
 
+  // Device Analytics
+  visitsByDevice Json? // { "mobile": 120, "desktop": 80, "tablet": 20 }
+
   // Trend Indicators (vs previous period)
   visitsChange Float? // % change
   salesChange  Float? // % change
@@ -398,6 +403,7 @@ model Product {
   @@index([discountPrice])
   @@index([stockQuantity])
   @@index([averageRating])
+  @@index([deletedAt])
   @@map("products")
 }
 
@@ -541,6 +547,7 @@ model Order {
   @@index([paymentStatus])
   @@index([createdAt])
   @@index([country])
+  @@index([deletedAt])
   @@map("orders")
 }
 

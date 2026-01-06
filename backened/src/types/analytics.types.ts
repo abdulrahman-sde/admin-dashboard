@@ -29,6 +29,7 @@ export interface WeeklyOrderStats {
   shippedOrders: number;
   newOrders: number;
   averageOrderValue: number;
+  countrySales?: Record<string, number>;
 }
 
 export interface WeeklyCustomerStats {
@@ -55,6 +56,7 @@ export interface CustomerOverviewMetric {
   activeCustomers: number;
   repeatCustomers: number;
   shopVisitor: number;
+  conversionRate: number;
 }
 
 export interface ReportMetric {
@@ -76,4 +78,8 @@ export interface DetailedDailyMetricsResponse {
     thisWeek: ReportMetric[];
     lastWeek: ReportMetric[];
   };
+}
+export interface RealTimeStats {
+  activeUsers: number;
+  usersPerMinute: number[];
 }

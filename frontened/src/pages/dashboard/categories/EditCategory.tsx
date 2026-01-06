@@ -151,19 +151,13 @@ export default function EditCategory() {
                           <div
                             key={product.id}
                             onClick={() => setSelectedProduct(product.id)}
-                            className={`flex items-center gap-3 p-3 rounded-lg border transition-all cursor-pointer ${
+                            className={`flex ps-4 items-center gap-3 p-3 rounded-lg border transition-all cursor-pointer ${
                               selectedProduct === product.id
                                 ? "border-[#4EA674] bg-[#4EA674]/5"
                                 : "border-[#E5E7EB] hover:border-[#4EA674]/50"
                             }`}
                           >
-                            <button
-                              type="button"
-                              className="text-[#6B7280] hover:text-[#111827]"
-                            >
-                              <MoreVertical className="h-4 w-4" />
-                            </button>
-                            <div className="h-12 w-12 rounded bg-[#F3F4F6] flex items-center justify-center overflow-hidden shrink-0">
+                            <div className="h-12 w-12  rounded bg-[#F3F4F6] flex items-center justify-center overflow-hidden shrink-0">
                               {product.image ? (
                                 <img
                                   src={product.image}

@@ -7,6 +7,10 @@ export const useDashboardHome = () => {
     weeklySalesChange,
     weeklyOrdersChange,
     weeklyCancelledOrderChange,
+    weeklyCustomersChange,
+    weeklyNewCustomersChange,
+    weeklyVisitsChange,
+    countrySalesGrowth,
     isFetching,
   } = useGetAnalytics();
 
@@ -24,7 +28,7 @@ export const useDashboardHome = () => {
     name: p.name,
     itemCode: p.sku || (p.id && p.id.slice(-6).toUpperCase()),
     price: p.price,
-    image: p.thumbnail || p.images?.[0] || "",
+    image: p.thumbnail || p.images?.[0] || p.image || "",
   }));
 
   const bestSellingProductsFormatted = productsList
@@ -34,7 +38,7 @@ export const useDashboardHome = () => {
       totalOrder: p.totalSales || 0,
       status: p.stockQuantity > 0 ? "Stock" : "Out of Stock",
       price: p.price,
-      image: p.thumbnail || p.images?.[0] || "",
+      image: p.thumbnail || p.images?.[0] || p.image || "",
     }));
 
   return {
@@ -42,6 +46,10 @@ export const useDashboardHome = () => {
     weeklySalesChange,
     weeklyOrdersChange,
     weeklyCancelledOrderChange,
+    weeklyCustomersChange,
+    weeklyNewCustomersChange,
+    weeklyVisitsChange,
+    countrySalesGrowth,
     isFetching,
     topProductsFormatted,
     bestSellingProductsFormatted,

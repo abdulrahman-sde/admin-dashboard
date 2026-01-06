@@ -1,9 +1,8 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
-import App from "./App.tsx";
 import { createBrowserRouter, RouterProvider } from "react-router";
-import ProtectedRoute from "./components/ProtectedRoute.tsx";
+import AuthInitializer from "./components/auth/AuthInitializer.tsx";
 import Layout from "./components/dashboard/Layout.tsx";
 import Login from "./pages/auth/Login.tsx";
 import Home from "./pages/dashboard/Home.tsx";
@@ -26,36 +25,43 @@ import { Toaster } from "sonner";
 import Coupons from "./pages/dashboard/coupons/index.tsx";
 import AddCoupon from "./pages/dashboard/coupons/AddCoupon.tsx";
 
-const router = createBrowserRouter([
-  { path: "/", element: <App /> },
-  { path: "/login", element: <Login /> },
+import Register from "./pages/auth/Register.tsx";
 
+const router = createBrowserRouter([
   {
-    path: "/dashboard",
-    element: (
-      <ProtectedRoute>
-        <Layout />
-      </ProtectedRoute>
-    ),
+    element: <AuthInitializer />,
     children: [
-      { index: true, element: <Home /> },
-      { path: "customers", element: <Customers /> },
-      { path: "customers/add", element: <AddCustomer /> },
-      { path: "customers/:id", element: <CustomerDetail /> },
-      { path: "orders", element: <Orders /> },
-      { path: "coupons", element: <Coupons /> },
-      { path: "coupons/add", element: <AddCoupon /> },
-      { path: "categories", element: <Categories /> },
-      { path: "categories/add", element: <EditCategory /> },
-      { path: "categories/edit/:id", element: <EditCategory /> },
-      { path: "transactions", element: <Transactions /> },
-      { path: "reports", element: <Reports /> },
-      { path: "products/add", element: <AddProducts /> },
-      { path: "products/edit/:id", element: <AddProducts /> },
-      { path: "products", element: <Products /> },
-      { path: "reviews", element: <Reviews /> },
-      { path: "payment-methods", element: <PaymentMethods /> },
-      { path: "admin", element: <Admin /> },
+      { path: "/", element: null }, // Handled by AuthInitializer
+      {
+        path: "/login",
+        element: <Login />,
+      },
+      { path: "/register", element: <Register /> },
+      {
+        path: "/dashboard",
+        element: <Layout />,
+        children: [
+          { index: true, element: <Home /> },
+          { path: "customers", element: <Customers /> },
+          { path: "customers/add", element: <AddCustomer /> },
+          { path: "customers/:id", element: <CustomerDetail /> },
+          { path: "orders", element: <Orders /> },
+          { path: "coupons", element: <Coupons /> },
+          { path: "coupons/add", element: <AddCoupon /> },
+          { path: "categories", element: <Categories /> },
+          { path: "categories/add", element: <EditCategory /> },
+          { path: "categories/edit/:id", element: <EditCategory /> },
+          { path: "transactions", element: <Transactions /> },
+          { path: "reports", element: <Reports /> },
+          { path: "products/add", element: <AddProducts /> },
+          { path: "products/edit/:id", element: <AddProducts /> },
+          { path: "products", element: <Products /> },
+          { path: "reviews", element: <Reviews /> },
+          { path: "payment-methods", element: <PaymentMethods /> },
+          { path: "admin", element: <Admin /> },
+        ],
+      },
+      { path: "*", element: <Login /> },
     ],
   },
 ]);

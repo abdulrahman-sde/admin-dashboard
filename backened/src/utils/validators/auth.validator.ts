@@ -15,7 +15,7 @@ export const registerSchema = z.object({
     .string()
     .min(6, "Password must be at least 6 characters")
     .max(100, "Password must be at most 100 characters"),
-  role: z.enum(["SUPER_ADMIN", "ADMIN"]).optional(),
+  role: z.enum(["ADMIN"]).optional(),
 });
 
 // Login Schema
@@ -26,6 +26,32 @@ export const loginSchema = z.object({
     .min(6, "Password must be at least 6 characters")
     .max(100, "Password must be at most 100 characters"),
 });
+
+// Profile Update Schema
+export const updateProfileSchema = z.object({
+  firstName: z.string().min(2, "First name is too short").max(50).optional(),
+  lastName: z.string().min(2, "Last name is too short").max(50).optional(),
+  email: z.string().email("Invalid email").optional(),
+  phone: z.string().optional(),
+  biography: z.string().max(1000).optional(),
+  avatar: z.string().url("Invalid avatar URL").optional().or(z.literal("")),
+});
+
+// Change Password Schema
+export const changePasswordSchema = z
+  .object({
+    currentPassword: z.string().min(1, "Current password is required"),
+    newPassword: z
+      .string()
+      .min(6, "New password must be at least 6 characters"),
+    confirmPassword: z
+      .string()
+      .min(6, "Confirm password must be at least 6 characters"),
+  })
+  .refine((data) => data.newPassword === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ["confirmPassword"],
+  });
 
 // Customer Auth Schemas
 export const registerCustomerSchema = z.object({
@@ -49,3 +75,5 @@ export type RegisterInput = z.infer<typeof registerSchema>;
 export type LoginInput = z.infer<typeof loginSchema>;
 export type RegisterCustomerInput = z.infer<typeof registerCustomerSchema>;
 export type LoginCustomerInput = z.infer<typeof loginCustomerSchema>;
+export type UpdateProfileInput = z.infer<typeof updateProfileSchema>;
+export type ChangePasswordInput = z.infer<typeof changePasswordSchema>;

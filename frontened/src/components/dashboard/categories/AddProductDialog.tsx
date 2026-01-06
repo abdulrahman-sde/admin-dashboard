@@ -1,5 +1,3 @@
-"use client";
-
 import { useState } from "react";
 import {
   Dialog,
@@ -182,7 +180,7 @@ export default function AddProductDialog({
                         setImagePreview("");
                         setImageFile(null);
                       }}
-                      className="absolute -top-2 -right-2 p-1.5 bg-red-500 text-white rounded-full hover:bg-red-600 shadow-md z-20 transition-transform active:scale-90"
+                      className="absolute -top-2 -right-2 p-1.5 bg-destructive text-white rounded-full hover:bg-destructive/80 shadow-md z-20 transition-transform active:scale-90"
                     >
                       <X className="h-4 w-4" />
                     </button>

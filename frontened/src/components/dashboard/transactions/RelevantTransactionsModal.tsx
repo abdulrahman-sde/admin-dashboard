@@ -1,5 +1,3 @@
-"use client";
-
 import {
   Dialog,
   DialogContent,
@@ -16,7 +14,6 @@ import {
 } from "@/components/ui/table";
 import { useGetAllTransactionsQuery } from "@/lib/store/services/transactions/transactionsApi";
 import { Loader2, Receipt } from "lucide-react";
-import { format } from "date-fns";
 import { getTransactionStatusColor, cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 
@@ -31,8 +28,6 @@ export function RelevantTransactionsModal({
   onOpenChange,
   storePaymentMethodId,
 }: RelevantTransactionsModalProps) {
-  // We no longer search by text for this modal, we Filter by ID.
-
   const { data, isLoading } = useGetAllTransactionsQuery(
     {
       page: 1,
@@ -69,8 +64,7 @@ export function RelevantTransactionsModal({
             <Table>
               <TableHeader className="bg-gray-50/50 sticky top-0 z-10">
                 <TableRow className="border-b border-gray-100">
-                  <TableHead className="w-[140px] pl-6">Date</TableHead>
-                  <TableHead>Customer</TableHead>
+                  <TableHead className="ps-8">Customer</TableHead>
                   <TableHead className="text-right">Amount</TableHead>
                   <TableHead className="text-center pr-6">Status</TableHead>
                 </TableRow>
@@ -81,10 +75,7 @@ export function RelevantTransactionsModal({
                     key={tx.id}
                     className="border-b border-gray-50 last:border-0 hover:bg-gray-50/50 transition-colors"
                   >
-                    <TableCell className="text-sm pl-6 text-muted-foreground">
-                      {format(new Date(tx.createdAt), "MMM d, yyyy")}
-                    </TableCell>
-                    <TableCell className="font-medium">
+                    <TableCell className="font-medium ps-8">
                       <div className="flex flex-col">
                         <span className="text-sm text-gray-900">
                           {tx.customer.firstName} {tx.customer.lastName}

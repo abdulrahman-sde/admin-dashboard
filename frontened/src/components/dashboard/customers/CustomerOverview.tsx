@@ -1,5 +1,3 @@
-"use client";
-
 import React from "react";
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -82,15 +80,20 @@ export default function CustomerOverview() {
     const totalRepeat = metrics.reduce((sum, m) => sum + m.repeatCustomers, 0);
     const totalVisitors = metrics.reduce((sum, m) => sum + m.shopVisitor, 0);
     // Average conversion rate
-    const avgConversion =
-      metrics.reduce((sum, m) => sum + m.conversionRate, 0) /
-      (metrics.length || 1);
+    const totalConversion = metrics.reduce(
+      (sum, m) => sum + (m.conversionRate || 0),
+      0
+    );
+    const avgConversion = totalConversion / (metrics.length || 1);
 
     return {
       activeCustomers: totalActive,
       repeatCustomers: totalRepeat,
       shopVisitor: totalVisitors,
-      conversionRate: `${avgConversion.toFixed(1)}%`,
+      conversionRate: `${(Number.isNaN(avgConversion)
+        ? 0
+        : avgConversion
+      ).toFixed(1)}%`,
     };
   }, [metrics]);
 

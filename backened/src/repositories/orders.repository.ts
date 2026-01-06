@@ -158,8 +158,20 @@ export const ordersRepository = {
             select: { firstName: true, lastName: true, email: true },
           },
           items: {
-            take: 1,
-            select: { productName: true, productImage: true, quantity: true },
+            take: 20,
+            select: {
+              productId: true,
+              productName: true,
+              productImage: true,
+              quantity: true,
+              unitPrice: true,
+              product: {
+                select: {
+                  thumbnail: true,
+                  images: true,
+                },
+              },
+            },
           },
         },
       }),

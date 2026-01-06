@@ -13,7 +13,11 @@ export const authenticateAdmin = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const token = req.headers.authorization?.replace("Bearer ", "");
+    let token = req.headers.authorization?.replace("Bearer ", "");
+
+    if (!token && req.cookies) {
+      token = req.cookies.accessToken;
+    }
 
     if (!token) {
       throw new UnauthorizedError("No token provided");

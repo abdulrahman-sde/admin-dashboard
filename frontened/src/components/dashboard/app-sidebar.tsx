@@ -21,7 +21,18 @@ import productIcon from "@/assets/icons/products.svg";
 import adminIcon from "@/assets/icons/user.svg";
 import { Link } from "react-router";
 import logoImage from "@/assets/images/logo.svg";
+import { useAuth } from "@/hooks/useAuth";
 
+import activeHomeIcon from "@/assets/icons/activeHomeIcon.svg";
+import activeOrdersIcon from "@/assets/icons/activeOrdersIcon.svg";
+import activeUsersIcon from "@/assets/icons/activeUsersIcon.svg";
+import activeCouponIcon from "@/assets/icons/activeCouponIcon.svg";
+import activeCategoriesIcon from "@/assets/icons/activeCategoriesIcon.svg";
+import activeCardIcon from "@/assets/icons/activeCardIcon.svg";
+import activeReportsIcon from "@/assets/icons/activeReportsIcon.svg";
+import activeAddProductIcon from "@/assets/icons/activeAddProductIcon.svg";
+import activeProductIcon from "@/assets/icons/activeProductIcon.svg";
+import activeAdminIcon from "@/assets/icons/activeAdminIcon.svg";
 const data = {
   user: {
     name: "Dealport",
@@ -33,36 +44,43 @@ const data = {
       name: "Dashboard",
       url: "/dashboard",
       icon: homeIcon,
+      activeIcon: activeHomeIcon,
     },
     {
       name: "Order Management",
       url: "/dashboard/orders",
       icon: orderIcon,
+      activeIcon: activeOrdersIcon,
     },
     {
       name: "Customers",
       url: "/dashboard/customers",
       icon: usersIcon,
+      activeIcon: activeUsersIcon,
     },
     {
       name: "Coupon",
       url: "/dashboard/coupons",
       icon: couponIcon,
+      activeIcon: activeCouponIcon,
     },
     {
       name: "Categories",
       url: "/dashboard/categories",
       icon: categoryIcon,
+      activeIcon: activeCategoriesIcon,
     },
     {
       name: "Transaction",
       url: "/dashboard/transactions",
       icon: transactionIcon,
+      activeIcon: activeCardIcon,
     },
     {
       name: "Reports",
       url: "/dashboard/reports",
       icon: reportsIcon,
+      activeIcon: activeReportsIcon,
     },
   ],
   navProducts: [
@@ -70,11 +88,13 @@ const data = {
       name: "Add Products",
       url: "/dashboard/products/add",
       icon: addProductIcon,
+      activeIcon: activeAddProductIcon,
     },
     {
       name: "Product List",
       url: "/dashboard/products",
       icon: productIcon,
+      activeIcon: activeProductIcon,
     },
   ],
   navAdmin: [
@@ -82,11 +102,22 @@ const data = {
       name: "Admin role",
       url: "/dashboard/admin",
       icon: adminIcon,
+      activeIcon: activeAdminIcon,
     },
   ],
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const { user } = useAuth();
+
+  const userData = user
+    ? {
+        name: `${user.firstName} ${user.lastName}`,
+        email: user.email,
+        avatar: user.avatar || "https://github.com/shadcn.png",
+      }
+    : data.user;
+
   return (
     <Sidebar
       collapsible="offcanvas"
@@ -113,7 +144,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavDocuments label="Admin" items={data.navAdmin} />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser user={userData} />
       </SidebarFooter>
     </Sidebar>
   );

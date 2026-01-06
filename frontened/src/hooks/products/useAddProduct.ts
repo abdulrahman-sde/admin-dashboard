@@ -184,21 +184,30 @@ export const useProductForm = (productId?: string) => {
     }
   };
 
-  const onSubmit = async (data: ProductFormValues) => {
+  const onSubmit = async (
+    data: ProductFormValues,
+    status: "ACTIVE" | "DRAFT" = "ACTIVE"
+  ) => {
     try {
-      // Ensure description is from the local state in case implicit sync was weird, though setValue should handle it.
-      // We will override validation just in case during typing, but here we want to submit the real value.
       data.description = description;
 
-      // Handle image uploads
-      const uploadedImages = await Promise.all(
-        (data.images || []).map(async (image: string | File) => {
-          if (image instanceof File) {
-            return await uploadToCloudinary(image);
-          }
-          return image;
-        })
+      // Only upload if we have actual File objects
+      const hasNewImages = (data.images || []).some(
+        (img) => img instanceof File
       );
+
+      let uploadedImages = data.images as string[];
+
+      if (hasNewImages) {
+        uploadedImages = await Promise.all(
+          (data.images || []).map(async (image: string | File) => {
+            if (image instanceof File) {
+              return await uploadToCloudinary(image);
+            }
+            return image;
+          })
+        );
+      }
 
       const slug =
         data.name.toLowerCase().replace(/ /g, "-") + "-" + Date.now();
@@ -213,23 +222,23 @@ export const useProductForm = (productId?: string) => {
         tags: data.tagId ? [data.tagId] : [],
         slug,
         sku,
-        status: "ACTIVE" as const,
+        status: status,
         lowStockThreshold: 10,
-        // If unlimited stock is checked, we don't send stockQuantity or send 0
         stockQuantity: data.isUnlimitedStock ? 0 : data.stockQuantity,
       };
 
       if (productId) {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { slug: _s, sku: _k, ...updateData } = productData;
         await updateProduct({ id: productId, ...updateData }).unwrap();
         toast.success("Product updated successfully");
       } else {
         await addProduct(productData).unwrap();
-        toast.success("Product added successfully");
+        toast.success(
+          status === "DRAFT"
+            ? "Product saved as draft"
+            : "Product added successfully"
+        );
       }
-      // Reset form with current values to clear isDirty state
-      // Also clear description state
       form.reset(form.getValues());
     } catch (error) {
       console.error("Submission error:", error);
@@ -237,24 +246,28 @@ export const useProductForm = (productId?: string) => {
     }
   };
 
-  const handleAction = () => {
-    // Manually set value before submit to ensure form state has it
+  const handleAction = (status: "ACTIVE" | "DRAFT" = "ACTIVE") => {
     form.setValue("description", description);
 
-    form.handleSubmit(onSubmit, (errors) => {
-      const errorKeys = Object.keys(errors);
-      if (errorKeys.length > 0) {
-        const firstError = errors[errorKeys[0] as keyof typeof errors];
-        toast.error(
-          firstError?.message?.toString() || "Please check the form for errors"
-        );
+    form.handleSubmit(
+      (data) => onSubmit(data, status),
+      (errors) => {
+        const errorKeys = Object.keys(errors);
+        if (errorKeys.length > 0) {
+          const firstError = errors[errorKeys[0] as keyof typeof errors];
+          toast.error(
+            firstError?.message?.toString() ||
+              "Please check the form for errors"
+          );
+        }
       }
-    })();
+    )();
   };
 
   return {
     form,
-    onSubmit: form.handleSubmit(onSubmit),
+    onSubmit: (e?: React.BaseSyntheticEvent) =>
+      form.handleSubmit((data) => onSubmit(data, "ACTIVE"))(e),
     handleAction,
     imagePreviews,
     onImageUpload,

@@ -1,5 +1,3 @@
-"use client";
-
 import React from "react";
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -9,9 +7,9 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { useGetDetailedDailyMetricsQuery } from "@/lib/store/services/analytics/analyticsApi";
 
 const chartConfig = {
-  revenue: {
-    label: "Revenue",
-    color: "#4EA674",
+  active: {
+    label: "Value",
+    color: "var(--primary)",
   },
 } satisfies ChartConfig;
 
@@ -26,7 +24,6 @@ const CustomCursor = (props: CustomCursorProps) => {
   if (!points || points.length === 0) return null;
 
   const { x, y } = points[0];
-  // Calculate the bottom of the chart area (where x-axis is)
   const bottom = (offset?.top || 0) + (height || 0);
 
   return (
@@ -35,16 +32,17 @@ const CustomCursor = (props: CustomCursorProps) => {
       y1={y}
       x2={x}
       y2={bottom}
-      stroke="#C1E6BA"
+      stroke="var(--primary)"
       strokeWidth={0.7}
       strokeDasharray="4 4"
+      opacity={0.4}
     />
   );
 };
 
 export default function WeeklyReport() {
   const [timeRange, setTimeRange] = React.useState("this-week");
-  const [activeTab, setActiveTab] = React.useState("customers");
+  const [activeTab, setActiveTab] = React.useState("revenue");
 
   const { data: analyticsData, isLoading } = useGetDetailedDailyMetricsQuery();
 
@@ -68,16 +66,13 @@ export default function WeeklyReport() {
 
     const totalCustomers = metrics.reduce((sum, m) => sum + m.customers, 0);
     const totalRevenue = metrics.reduce((sum, m) => sum + m.revenue, 0);
-
-    // For snapshot metrics, take the latest available day that has data, or the last day
-    // Since we seeded data for past days, the "latest" is the last element.
-    const latestSnapshot = metrics[metrics.length - 1];
+    const latest = metrics[metrics.length - 1];
 
     return {
       customers: totalCustomers,
-      totalProducts: latestSnapshot.totalProducts,
-      stockProducts: latestSnapshot.stockProducts,
-      outOfStock: latestSnapshot.outOfStock,
+      totalProducts: latest.totalProducts,
+      stockProducts: latest.stockProducts,
+      outOfStock: latest.outOfStock,
       revenue: totalRevenue.toLocaleString(undefined, {
         minimumFractionDigits: 1,
         maximumFractionDigits: 1,
@@ -87,7 +82,7 @@ export default function WeeklyReport() {
 
   if (isLoading) {
     return (
-      <Card className="col-span-2 border-[#F1F5F9] shadow-sm h-[400px] flex items-center justify-center">
+      <Card className="col-span-2 border-[#F1F5F9] shadow-sm h-[480px] flex items-center justify-center">
         <div className="animate-pulse text-muted-foreground">
           Loading report...
         </div>
@@ -97,173 +92,131 @@ export default function WeeklyReport() {
 
   return (
     <Card className="col-span-2 border-[#F1F5F9] shadow-sm">
-      <CardHeader className="flex flex-col sm:flex-row min-h-full items-start sm:items-center justify-between pb-4 gap-4">
+      <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between pb-4 gap-4 px-6 pt-6">
         <div>
-          <h3>Report for this week</h3>
+          <h3 className="text-[18px] font-bold text-[#0D1F3C]">
+            Report for this week
+          </h3>
         </div>
 
         <ToggleGroup
           type="single"
           value={timeRange}
           onValueChange={(value) => value && setTimeRange(value)}
-          className="bg-muted rounded-lg p-1 w-full sm:w-auto"
+          className="bg-[#F5F7FA] rounded-lg p-1"
         >
           <ToggleGroupItem
             value="this-week"
-            className="data-[state=on]:bg-white data-[state=on]:shadow-sm rounded-md px-4 py-1.5 text-sm flex-1 sm:flex-none"
+            className="data-[state=on]:bg-white data-[state=on]:shadow-sm rounded-md px-4 py-1.5 text-sm font-medium"
           >
             This week
           </ToggleGroupItem>
           <ToggleGroupItem
             value="last-week"
-            className="data-[state=on]:bg-white data-[state=on]:shadow-sm rounded-md px-4 py-1.5 text-sm flex-1 sm:flex-none"
+            className="data-[state=on]:bg-white data-[state=on]:shadow-sm rounded-md px-4 py-1.5 text-sm font-medium"
           >
             Last week
           </ToggleGroupItem>
         </ToggleGroup>
       </CardHeader>
-      <CardContent>
-        {/* Stats Row - Horizontally scrollable on mobile */}
-        <div className="flex overflow-x-auto no-scrollbar md:grid md:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-6 mb-8 pb-2">
-          <button
-            onClick={() => setActiveTab("customers")}
-            className="flex-none md:flex-auto space-y-1 text-left transition-opacity hover:opacity-80 min-w-[120px]"
-          >
-            <h2 className="">{stats.customers}</h2>
-            <p className="text-[14px] leading-[18px] font-normal text-muted-foreground whitespace-nowrap">
-              Customers
-            </p>
-            {activeTab === "customers" && (
-              <div className="h-0.5 w-[80%] mt-1 bg-primary rounded-full" />
-            )}
-          </button>
-          <button
-            onClick={() => setActiveTab("totalProducts")}
-            className="flex-none md:flex-auto space-y-1 text-left transition-opacity hover:opacity-80 min-w-[120px]"
-          >
-            <h2 className="text-2xl font-semibold">{stats.totalProducts}</h2>
-            <p className="text-[14px] leading-[18px] font-normal text-muted-foreground whitespace-nowrap">
-              Total Products
-            </p>
-            {activeTab === "totalProducts" && (
-              <div className="h-0.5 w-[80%] mt-1 bg-primary rounded-full" />
-            )}
-          </button>
-          <button
-            onClick={() => setActiveTab("stockProducts")}
-            className="flex-none md:flex-auto space-y-1 text-left transition-opacity hover:opacity-80 min-w-[120px]"
-          >
-            <h2 className="text-2xl font-semibold">{stats.stockProducts}</h2>
-            <p className="text-[14px] leading-[18px] font-normal text-muted-foreground whitespace-nowrap">
-              Stock Products
-            </p>
-            {activeTab === "stockProducts" && (
-              <div className="h-0.5 w-[80%] mt-1 bg-primary rounded-full" />
-            )}
-          </button>
-          <button
-            onClick={() => setActiveTab("outOfStock")}
-            className="flex-none md:flex-auto space-y-1 text-left transition-opacity hover:opacity-80 min-w-[120px]"
-          >
-            <h2 className="text-2xl font-semibold">{stats.outOfStock}</h2>
-            <p className="text-[14px] leading-[18px] font-normal text-muted-foreground whitespace-nowrap">
-              Out of Stock
-            </p>
-            {activeTab === "outOfStock" && (
-              <div className="h-0.5 w-[80%] mt-1 bg-primary rounded-full" />
-            )}
-          </button>
-          <button
-            onClick={() => setActiveTab("revenue")}
-            className="flex-none md:flex-auto space-y-1 text-left transition-opacity hover:opacity-80 min-w-[120px]"
-          >
-            <h2 className="text-2xl font-semibold">{stats.revenue}</h2>
-            <p className="text-[14px] leading-[18px] font-normal text-muted-foreground whitespace-nowrap">
-              Revenue
-            </p>
-            {activeTab === "revenue" && (
-              <div className="h-0.5 w-[80%] mt-1 bg-primary rounded-full" />
-            )}
-          </button>
+
+      <CardContent className="px-6 pb-6">
+        <div className="flex overflow-x-auto no-scrollbar md:grid md:grid-cols-5 gap-6 mb-8 mt-2 pb-2">
+          {(
+            [
+              "customers",
+              "totalProducts",
+              "stockProducts",
+              "outOfStock",
+              "revenue",
+            ] as const
+          ).map((key) => (
+            <button
+              key={key}
+              onClick={() => setActiveTab(key)}
+              className="flex-none md:flex-auto space-y-1 text-left transition-opacity hover:opacity-80 min-w-[120px]"
+            >
+              <h2 className="text-[24px] font-bold text-[#0D1F3C]">
+                {key === "revenue" ? "" : ""} {stats[key]}
+              </h2>
+              <p className="text-[14px] font-medium text-[#707D94] whitespace-nowrap capitalize">
+                {key.replace(/([A-Z])/g, " $1").trim()}
+              </p>
+              {activeTab === key && (
+                <div className="h-0.5 w-[80%] mt-1 bg-primary rounded-full transition-all duration-300" />
+              )}
+            </button>
+          ))}
         </div>
 
-        {/* Chart - Wrapped in scrollable container */}
-        <div className="overflow-x-auto no-scrollbar -mx-6 px-6">
-          <div className="min-w-[600px] md:min-w-0">
-            <ChartContainer config={chartConfig} className="h-[300px] w-full">
-              <AreaChart
-                data={metrics}
-                margin={{
-                  left: 0,
-                  right: 0,
-                  top: 10,
-                  bottom: 0,
+        <div className="h-[300px] w-full mt-4">
+          <ChartContainer config={chartConfig} className="h-full w-full">
+            <AreaChart
+              data={metrics}
+              margin={{ left: -20, right: 0, top: 10, bottom: 0 }}
+            >
+              <defs>
+                <linearGradient id="colorMetric" x1="0" y1="0" x2="0" y2="1">
+                  <stop
+                    offset="5%"
+                    stopColor="var(--primary)"
+                    stopOpacity={0.15}
+                  />
+                  <stop
+                    offset="95%"
+                    stopColor="var(--primary)"
+                    stopOpacity={0}
+                  />
+                </linearGradient>
+              </defs>
+              <CartesianGrid
+                vertical={false}
+                strokeDasharray="0"
+                stroke="#F1F5F9"
+              />
+              <XAxis
+                dataKey="day"
+                axisLine={false}
+                tickLine={false}
+                tick={{ fill: "#707D94", fontSize: 12 }}
+                tickMargin={12}
+              />
+              <YAxis
+                axisLine={false}
+                tickLine={false}
+                tick={{ fill: "#707D94", fontSize: 12 }}
+                tickFormatter={(v) =>
+                  v >= 1000 ? `${(v / 1000).toFixed(1)}k` : v
+                }
+              />
+              <ChartTooltip
+                cursor={<CustomCursor />}
+                content={({ active, payload }) => {
+                  if (active && payload && payload.length) {
+                    return (
+                      <div className="bg-primary text-white px-3 py-1.5 rounded-md shadow-lg border-none text-center">
+                        <p className="font-semibold text-xs">
+                          {payload[0].payload.day}
+                        </p>
+                        <p className="text-[11px]">
+                          {Number(payload[0].value).toLocaleString()}
+                        </p>
+                      </div>
+                    );
+                  }
+                  return null;
                 }}
-              >
-                <defs>
-                  <linearGradient id="fillRevenue" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#4EA6744D" stopOpacity={1} />
-                    <stop offset="100%" stopColor="#4EA67400" stopOpacity={0} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid
-                  strokeDasharray="0"
-                  vertical={false}
-                  stroke="#f0f0f0"
-                />
-                <XAxis
-                  dataKey="day"
-                  tickLine={false}
-                  axisLine={false}
-                  tickMargin={8}
-                  tick={{
-                    fill: "#02333780",
-                    fontSize: 12,
-                  }}
-                />
-                <YAxis
-                  tickLine={false}
-                  axisLine={false}
-                  tickMargin={8}
-                  tick={{
-                    fill: "#02333780",
-                    fontSize: 12,
-                  }}
-                  tickFormatter={(value) => {
-                    if (value >= 1000) return `${(value / 1000).toFixed(1)}k`;
-                    return value;
-                  }}
-                />
-                <ChartTooltip
-                  cursor={<CustomCursor />}
-                  wrapperStyle={{ outline: "none" }}
-                  content={({ active, payload }) => {
-                    if (active && payload && payload.length) {
-                      return (
-                        <div className="bg-[#C1E6BA] text-black px-[21.5px] py-2 rounded-md shadow-lg border-none text-center">
-                          <p className="font-semibold text-sm">
-                            {payload[0].payload.day}
-                          </p>
-                          <p className="text-xs">
-                            {Number(payload[0].value)?.toLocaleString()}
-                          </p>
-                        </div>
-                      );
-                    }
-                    return null;
-                  }}
-                />
-                <Area
-                  dataKey={activeTab}
-                  type="monotone"
-                  fill="url(#fillRevenue)"
-                  fillOpacity={1}
-                  stroke="#4EA674"
-                  strokeWidth={2}
-                />
-              </AreaChart>
-            </ChartContainer>
-          </div>
+              />
+              <Area
+                type="monotone"
+                dataKey={activeTab}
+                stroke="var(--primary)"
+                strokeWidth={2}
+                fillOpacity={1}
+                fill="url(#colorMetric)"
+              />
+            </AreaChart>
+          </ChartContainer>
         </div>
       </CardContent>
     </Card>

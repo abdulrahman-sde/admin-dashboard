@@ -11,28 +11,31 @@ export const rtkQueryErrorLogger: Middleware = () => (next) => (action) => {
       data?: { message?: string; errors?: unknown };
     };
 
-    // CASE A: Network Error / CORS / Server Down (FetchBaseQueryError)
+    // CASE A: Forbidden or Unauthorized (Expected states, handle in UI)
+    if (payload?.status === 401 || payload?.status === 403) {
+      return next(action);
+    }
+
+    // CASE B: Network Error / CORS / Server Down
     if (payload?.status === "FETCH_ERROR") {
       toast.error("Network Error", {
         description:
-          "Please check your internet connection or try again later.",
+          "Cannot connect to the server. Please check if the backend is running.",
       });
       return next(action);
     }
 
-    // CASE B: Standard API Error (Your existing logic)
-    const errorData = payload?.data; // Safely access data
+    // CASE C: API Error Response
+    const errorData = payload?.data as any;
     if (errorData) {
-      // ... your existing validation logic ...
-      if (errorData.message === "Validation error" && errorData.errors) {
-        // ...
-      } else {
-        toast.error(errorData.message || "An error occurred", {
-          description: `Status: ${payload.status || "Unknown"}`,
-        });
+      const message = errorData.message || "An error occurred";
+
+      // Don't toast for common internal validation/auth messages if we handle them in forms
+      if (message !== "No token provided" && message !== "JWT expired") {
+        toast.error(message);
       }
     } else {
-      // CASE C: Unknown Error Shape
+      // CASE D: Unknown Error Shape
       toast.error("Something went wrong", {
         description: "An unexpected error occurred.",
       });

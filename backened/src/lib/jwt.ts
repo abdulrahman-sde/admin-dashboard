@@ -10,9 +10,7 @@ export const generateTokens = (payload: JWTPayload) => {
   });
 
   const refreshToken = jwt.sign(
-    "userId" in payload
-      ? { userId: payload.userId, type: payload.type }
-      : { customerId: payload.customerId, type: payload.type },
+    { userId: payload.userId, type: payload.type },
     process.env.JWT_SECRET!,
     {
       expiresIn: "7d",

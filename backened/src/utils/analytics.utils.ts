@@ -18,15 +18,17 @@ export const formatCustomerOverviewMetrics = (
     activeCustomers: 0,
     repeatCustomers: 0,
     shopVisitor: 0,
+    conversionRate: 0,
   }));
 
   metrics.forEach((metric) => {
     const dayIndex = new Date(metric.date).getDay();
     formatted[dayIndex] = {
-      day: daysOfWeek[dayIndex],
+      day: daysOfWeek[dayIndex] || "",
       activeCustomers: metric.newCustomers + metric.returningCustomers,
       repeatCustomers: metric.returningCustomers,
       shopVisitor: metric.totalVisits,
+      conversionRate: metric.conversionRate,
     };
   });
 
@@ -53,7 +55,7 @@ export const formatReportMetrics = (
   metrics.forEach((metric) => {
     const dayIndex = new Date(metric.date).getDay();
     formatted[dayIndex] = {
-      day: daysOfWeek[dayIndex],
+      day: daysOfWeek[dayIndex] || "",
       conversionRate: metric.conversionRate,
       customers: metric.newCustomers + metric.returningCustomers,
       totalProducts: metric.totalProducts,

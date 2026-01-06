@@ -1,50 +1,62 @@
-interface TopCustomersProps {
-  data: Array<{
-    id: string;
-    name: string;
-    avatar: string | null;
-    orders: number;
-    spent: number;
-  }>;
-}
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useGetTopCustomersQuery } from "@/lib/store/services/reportsApi";
 
-export function TopCustomers({ data }: TopCustomersProps) {
+const TopCustomers = () => {
+  const { data: customers, isLoading } = useGetTopCustomersQuery({ limit: 5 });
+
+  if (isLoading)
+    return (
+      <div className="h-[300px] bg-white rounded-xl p-6 border border-gray-100 animate-pulse" />
+    );
+
   return (
-    <div className="bg-white p-8 rounded-2xl shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07)]">
-      <h2 className="text-[17px] font-bold text-gray-900 mb-8">
+    <div className="rounded-xl border border-gray-100 bg-white p-6 shadow-sm">
+      <h3 className="mb-6 text-base font-semibold text-gray-900">
         Top Customers
-      </h2>
-      <div className="w-full overflow-x-auto">
-        <table className="w-full text-sm">
-          <thead className="text-[#8E92BC]">
-            <tr>
-              <th className="pb-6 font-medium text-left">Name</th>
-              <th className="pb-6 font-medium text-center">Orders</th>
-              <th className="pb-6 font-medium text-right">Spent</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-50">
-            {data.map((customer) => (
-              <tr key={customer.id}>
-                <td className="py-4 flex items-center gap-3">
-                  <div className="h-8 w-8 rounded-full bg-[#4EA674] text-white flex items-center justify-center font-bold text-[12px]">
-                    {customer.name.charAt(0)}
-                  </div>
-                  <span className="font-medium text-gray-700">
-                    {customer.name}
-                  </span>
-                </td>
-                <td className="py-4 text-center text-[#5D6679]">
-                  {customer.orders}
-                </td>
-                <td className="py-4 text-right font-bold text-[#5D6679]">
-                  ${customer.spent.toFixed(2)}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      </h3>
+
+      <div className="space-y-6">
+        <div className="flex items-center text-xs font-medium text-gray-400">
+          <span className="flex-1">Name</span>
+          <span className="w-16 text-right">Orders</span>
+          <span className="w-20 text-right">Spent</span>
+        </div>
+
+        {customers?.map((customer) => (
+          <div key={customer.id} className="flex items-center">
+            <div className="flex flex-1 items-center gap-3">
+              <Avatar className="h-9 w-9">
+                <AvatarImage src={customer.avatar} />
+                <AvatarFallback className="bg-emerald-100 text-emerald-700 font-medium text-xs">
+                  {customer.name
+                    ?.split(" ")
+                    .map((n) => n[0])
+                    .join("")
+                    .substring(0, 2)
+                    .toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
+              <span className="text-sm font-medium text-gray-700">
+                {customer.name}
+              </span>
+            </div>
+            <div className="w-16 text-right text-sm text-gray-600">
+              {customer.orders}
+            </div>
+            <div className="w-20 text-right text-sm font-medium text-gray-900">
+              ${customer.spent.toLocaleString()}
+            </div>
+          </div>
+        ))}
+
+        {!isLoading && customers?.length === 0 && (
+          <div className="text-center text-sm text-gray-500 py-4">
+            No data available
+          </div>
+        )}
       </div>
     </div>
   );
-}
+};
+
+export default TopCustomers;

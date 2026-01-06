@@ -50,11 +50,12 @@ export default function DeleteConfirmationDialog({
             Cancel
           </Button>
           <Button
+            variant="destructive"
             onClick={async () => {
               await onConfirm();
               onOpenChange(false);
             }}
-            className="flex-1 bg-red-600 hover:bg-red-700 text-white"
+            className="flex-1 hover:bg-destructive/80"
             disabled={isLoading}
           >
             {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}

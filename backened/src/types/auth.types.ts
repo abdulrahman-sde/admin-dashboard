@@ -1,5 +1,5 @@
 import type { Request } from "express";
-import type { User, Customer, UserRole, CustomerRole } from "@prisma/client";
+import type { User, UserRole, Customer } from "@prisma/client";
 import type { ApiResponse, PaginatedResponse } from "./common.types.js";
 
 // ============================================
@@ -13,17 +13,6 @@ export interface AuthRequest extends Request {
     firstName?: string;
     lastName?: string;
     role: UserRole;
-  };
-}
-
-export interface CustomerAuthRequest extends Request {
-  customer?: {
-    id: string;
-    email: string;
-    firstName?: string;
-    lastName?: string;
-    role: CustomerRole;
-    isGuest: boolean;
   };
 }
 
@@ -47,7 +36,6 @@ export interface TokenResponse<T = any> {
 
 // Specific implementations (for convenience)
 export type UserAuthResponse = TokenResponse<SafeUser>;
-export type CustomerAuthResponse = TokenResponse<SafeCustomer>;
 
 // ============================================
 // JWT Payload Types
@@ -63,18 +51,7 @@ export interface UserJWTPayload {
   type: "admin";
 }
 
-/**
- * Customer JWT Payload
- */
-export interface CustomerJWTPayload {
-  customerId: string;
-  email: string;
-  role: CustomerRole;
-  isGuest: boolean;
-  type: "customer";
-}
-
-export type JWTPayload = UserJWTPayload | CustomerJWTPayload;
+export type JWTPayload = UserJWTPayload;
 
 // Re-export common types for convenience
 export type { ApiResponse, PaginatedResponse };

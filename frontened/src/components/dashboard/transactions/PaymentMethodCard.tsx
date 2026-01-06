@@ -1,5 +1,3 @@
-"use client";
-
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -13,11 +11,7 @@ import {
 import { AddPaymentMethodModal } from "./AddPaymentMethodModal";
 import { RelevantTransactionsModal } from "./RelevantTransactionsModal";
 import { toast } from "sonner";
-import { useNavigate } from "react-router";
-import { useTransactions } from "@/hooks/transactions/useTransactions";
-
 export default function PaymentMethodCard() {
-  const navigate = useNavigate();
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isViewTransactionsOpen, setIsViewTransactionsOpen] = useState(false);
   const { data, isLoading } = useGetPaymentMethodsQuery();
@@ -50,9 +44,6 @@ export default function PaymentMethodCard() {
       toast.error("Failed to update status");
     }
   };
-
-  const { totalTransactions, dynamicStats } = useTransactions();
-  const revenue = dynamicStats[0]?.value || 0;
 
   if (isLoading) {
     return (
@@ -143,13 +134,13 @@ export default function PaymentMethodCard() {
             <div className="flex items-center justify-between text-sm">
               <span className="text-[#6B7280]">Transactions:</span>
               <span className="font-medium text-[#111827]">
-                {totalTransactions.toLocaleString()}
+                {(activeMethod?.transactionCount || 0).toLocaleString()}
               </span>
             </div>
             <div className="flex items-center justify-between text-sm">
-              <span className="text-[#6B7280]">Revenue:</span>
+              <span className="text-[#6B7280]">Global Revenue:</span>
               <span className="font-medium text-[#111827]">
-                ${revenue.toLocaleString()}
+                ${(activeMethod?.totalRevenue || 0).toFixed(2)}
               </span>
             </div>
             <button

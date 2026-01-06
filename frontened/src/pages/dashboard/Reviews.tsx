@@ -1,5 +1,3 @@
-"use client";
-
 import { useReviews } from "@/hooks/reviews/useReviews";
 import { Star, AlertCircle, User } from "lucide-react";
 import { Button } from "@/components/ui/button";

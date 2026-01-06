@@ -5,7 +5,6 @@ import RecentTransactions from "@/components/dashboard/home/RecentTransactions";
 import TopProducts from "@/components/dashboard/home/TopProducts";
 import BestSellingProduct from "@/components/dashboard/home/BestSellingProduct";
 import AddNewProduct from "@/components/dashboard/home/AddNewProduct";
-import { countrySalesData } from "@/constants/constants";
 import { useDashboardHome } from "@/hooks/dashboard/useDashboardHome";
 
 export default function DashboardHome() {
@@ -15,6 +14,7 @@ export default function DashboardHome() {
     weeklyOrdersChange,
     weeklyCancelledOrderChange,
     isFetching,
+    countrySalesGrowth,
     topProductsFormatted,
     bestSellingProductsFormatted,
   } = useDashboardHome();
@@ -74,7 +74,7 @@ export default function DashboardHome() {
           <WeeklyReport />
         </div>
         <div className="col-span-3  xl:col-span-1">
-          <CountryWiseSales data={countrySalesData} />
+          <CountryWiseSales data={countrySalesGrowth} isLoading={isFetching} />
         </div>
       </div>
 

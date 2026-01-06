@@ -32,7 +32,6 @@ import {
   Search,
   SlidersHorizontal,
   ArrowUpDown,
-  MoreVertical,
   Check,
   ArrowUp,
   ArrowDown,
@@ -136,75 +135,66 @@ export function OrdersTable({
       {/* Tabs */}
       <Tabs defaultValue="all" value={activeTab} onValueChange={onTabChange}>
         <div className="p-4 pb-3 border-b border-[#D1D5DB]">
-          <div className="flex flex-col gap-4">
-            {/* Tabs - Scrollable */}
-            <div className="overflow-x-auto no-scrollbar -mx-4 px-4">
-              <TabsList className="h-auto p-1 bg-fade-green rounded-lg border-none flex-nowrap justify-start min-w-max">
+          {/* Header Content Items - Consolidated into one line */}
+          <div className="flex flex-row flex-wrap items-center justify-between gap-y-4 gap-x-6">
+            {/* Tabs Section - Left Side */}
+            <div className="overflow-x-auto no-scrollbar max-w-full lg:max-w-max">
+              <TabsList className="h-auto p-1.5 bg-[#F2FBF0] rounded-xl border-none flex-nowrap justify-start min-w-max gap-1">
                 <TabsTrigger
                   value="all"
-                  className="px-4 py-1.5 text-sm z-30 rounded-md data-[state=active]:bg-white data-[state=active]:shadow-sm transition-all shrink-0"
+                  className="px-5 py-2 text-sm z-30 rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm transition-all shrink-0 data-[state=active]:text-foreground text-muted-foreground font-medium"
                 >
                   All order
-                  <span className="text-primary ml-1">
+                  <span className="text-[#4EA674] ml-1.5">
                     ({statusCounts?.all ?? totalOrders})
                   </span>
                 </TabsTrigger>
                 <TabsTrigger
                   value="completed"
-                  className="px-4 py-1.5 text-sm rounded-md data-[state=active]:bg-white data-[state=active]:shadow-sm transition-all shrink-0"
+                  className="px-5 py-2 text-sm rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm transition-all shrink-0 data-[state=active]:text-foreground text-muted-foreground font-medium"
                 >
                   Completed
-                  <span className="text-primary ml-1">
+                  <span className="text-[#4EA674] ml-1.5">
                     ({statusCounts?.completed ?? 0})
                   </span>
                 </TabsTrigger>
                 <TabsTrigger
                   value="pending"
-                  className="px-4 py-1.5 text-sm rounded-md data-[state=active]:bg-white data-[state=active]:shadow-sm transition-all shrink-0"
+                  className="px-5 py-2 text-sm rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm transition-all shrink-0 data-[state=active]:text-foreground text-muted-foreground font-medium"
                 >
                   Pending{" "}
-                  <span className="text-primary ml-1">
+                  <span className="text-[#4EA674] ml-1.5">
                     ({statusCounts?.pending ?? 0})
                   </span>
                 </TabsTrigger>
                 <TabsTrigger
                   value="canceled"
-                  className="px-4 py-1.5 text-sm rounded-md data-[state=active]:bg-white data-[state=active]:shadow-sm transition-all shrink-0"
+                  className="px-5 py-2 text-sm rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm transition-all shrink-0 data-[state=active]:text-foreground text-muted-foreground font-medium"
                 >
                   Canceled{" "}
-                  <span className="text-primary ml-1">
+                  <span className="text-[#4EA674] ml-1.5">
                     ({statusCounts?.cancelled ?? 0})
                   </span>
                 </TabsTrigger>
               </TabsList>
             </div>
 
-            {/* Search and Filter Row */}
-            <div className="flex items-center justify-between gap-4 flex-wrap">
-              <div className="relative flex-1 min-w-[200px]">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
-                <Input
-                  placeholder="Search order report"
-                  className="pl-9 w-full h-10 border-[#D1D5DB]"
-                  value={search}
-                  onChange={(e) => onSearchChange(e.target.value)}
-                />
-              </div>
-
-              {/* Filters - Scrollable */}
-              <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
+            {/* Controls Section - Right Side */}
+            <div className="flex items-center gap-3 flex-1 min-w-[300px] justify-end">
+              {/* Filters Group */}
+              <div className="flex items-center gap-2">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button
                       variant="outline"
-                      className={`h-10 w-10 border-[#D1D5DB] rounded-lg focus:ring-0 shadow-none text-gray-500 hover:text-primary transition-all shrink-0 ${
+                      className={`h-11 w-11 border-[#D1D5DB] rounded-xl focus:ring-0 shadow-none text-gray-500 hover:text-primary transition-all shrink-0 ${
                         paymentStatus
                           ? "border-primary bg-primary/5 text-primary"
                           : ""
                       }`}
                       size="icon"
                     >
-                      <SlidersHorizontal className="size-4" />
+                      <SlidersHorizontal className="size-5" />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-48">
@@ -253,14 +243,14 @@ export function OrdersTable({
                   <DropdownMenuTrigger asChild>
                     <Button
                       variant="outline"
-                      className={`h-10 w-10 border-[#D1D5DB] rounded-lg focus:ring-0 shadow-none text-gray-500 hover:text-primary transition-all shrink-0 ${
+                      className={`h-11 w-11 border-[#D1D5DB] rounded-xl focus:ring-0 shadow-none text-gray-500 hover:text-primary transition-all shrink-0 ${
                         sortBy && sortBy !== "createdAt"
                           ? "border-primary bg-primary/5 text-primary"
                           : ""
                       }`}
                       size="icon"
                     >
-                      <ArrowUpDown className="size-4" />
+                      <ArrowUpDown className="size-5" />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-48">
@@ -302,6 +292,17 @@ export function OrdersTable({
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
+              </div>
+
+              {/* Search Bar */}
+              <div className="relative w-full max-w-xs">
+                <Input
+                  placeholder="Search order report"
+                  className="pr-10 w-full h-11 border-none bg-[#F9F9F9] rounded-xl focus-visible:ring-1 focus-visible:ring-primary/20"
+                  value={search}
+                  onChange={(e) => onSearchChange(e.target.value)}
+                />
+                <Search className="absolute right-4 top-1/2 -translate-y-1/2 size-5 text-[#9CA3AF]" />
               </div>
             </div>
           </div>

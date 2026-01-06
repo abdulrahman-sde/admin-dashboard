@@ -17,9 +17,26 @@ export const paymentMethodsRepository = {
   },
 
   async findAll() {
-    return prisma.storePaymentMethod.findMany({
+    const methods = await prisma.storePaymentMethod.findMany({
       orderBy: [{ isDefault: "desc" }, { createdAt: "desc" }],
     });
+
+    // Enhance with transaction counts and total revenue
+    return Promise.all(
+      methods.map(async (method) => {
+        const stats = await prisma.transaction.aggregate({
+          where: { storePaymentMethodId: method.id },
+          _sum: { amount: true },
+          _count: { id: true },
+        });
+
+        return {
+          ...method,
+          transactionCount: stats._count.id || 0,
+          totalRevenue: stats._sum.amount || 0,
+        };
+      })
+    );
   },
 
   async findById(id: string) {

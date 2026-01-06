@@ -63,7 +63,14 @@ export interface ProductsQueryParams {
   isFeatured?: boolean;
   hasDiscount?: boolean;
   stockStatus?: "IN_STOCK" | "LOW_STOCK" | "OUT_OF_STOCK";
-  sortBy?: "createdAt" | "price" | "stockQuantity" | "totalSales" | "name";
+  sortBy?:
+    | "createdAt"
+    | "price"
+    | "stockQuantity"
+    | "totalSales"
+    | "name"
+    | "totalRevenue"
+    | "salesAndRevenue";
   sortOrder?: "asc" | "desc";
 }
 export type GetProductsResponse = PaginatedApiResponseWithMeta<Product[], Meta>;

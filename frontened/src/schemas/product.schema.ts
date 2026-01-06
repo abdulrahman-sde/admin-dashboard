@@ -11,7 +11,10 @@ export const productSchema = z
       .string()
       .min(10, "Description must be at least 10 characters"),
     price: z.coerce.number().positive("Price must be positive"),
-    discountPrice: z.coerce.number().positive().optional().or(z.literal(0)),
+    discountPrice: z.preprocess(
+      (val) => (val === "" ? undefined : val),
+      z.coerce.number().positive().optional()
+    ),
     stockQuantity: z.coerce.number().int().min(0).optional(),
     isUnlimitedStock: z.boolean().default(false),
     categoryId: z

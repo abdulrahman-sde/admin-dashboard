@@ -3,6 +3,7 @@ import { ArrowDown, ArrowUp, MoreVertical } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useNavigate } from "react-router";
 
 interface StatsCardProps {
   title: string;
@@ -53,12 +54,12 @@ export function StatsCard({
   label,
   change,
   previousValue,
-  onDetailsClick,
   className,
   isLoading = false,
   variant = "default",
   splitData,
 }: StatsCardProps) {
+  let navigate = useNavigate();
   if (isLoading) {
     return (
       <Card
@@ -120,7 +121,7 @@ export function StatsCard({
                   <div
                     className={cn(
                       "flex items-center text-[13.5px] font-bold",
-                      change.isPositive ? "text-[#10b981]" : "text-[#ef4444]"
+                      change.isPositive ? "text-primary" : "text-destructive"
                     )}
                   >
                     {change.isPositive ? (
@@ -144,7 +145,7 @@ export function StatsCard({
               {previousValue !== undefined && (
                 <p className="text-[14px] text-neutral-400 font-medium">
                   Previous 7days{" "}
-                  <span className="text-[#6366f1] font-bold">
+                  <span className="text-tertiary font-bold">
                     ({title.toLowerCase().includes("sales") ? "$" : ""}
                     {formatValue(previousValue)})
                   </span>
@@ -166,7 +167,7 @@ export function StatsCard({
                   <span
                     className={cn(
                       "text-[13px] font-bold",
-                      splitData.left.subValueColor || "text-[#10b981]"
+                      splitData.left.subValueColor || "text-primary"
                     )}
                   >
                     {splitData.left.subValue}
@@ -179,7 +180,7 @@ export function StatsCard({
                 {splitData?.right.label}
               </span>
               <div className="flex items-baseline gap-2">
-                <span className="text-[26px] font-bold text-[#ef4444]">
+                <span className="text-[26px] font-bold text-destructive">
                   {splitData?.right.value}
                 </span>
                 {splitData?.right.change && (
@@ -187,8 +188,8 @@ export function StatsCard({
                     className={cn(
                       "flex items-center text-[13px] font-bold",
                       splitData.right.change.isPositive
-                        ? "text-[#10b981]"
-                        : "text-[#fca5a5]"
+                        ? "text-primary"
+                        : "text-destructive/60"
                     )}
                   >
                     {splitData.right.change.isPositive ? (
@@ -211,8 +212,8 @@ export function StatsCard({
           <Button
             variant="outline"
             size="sm"
-            onClick={onDetailsClick}
-            className="text-[#6366f1] h-[34px] px-6 border-[#6366f1] border hover:bg-[#6366f1] hover:text-white transition-all duration-200 text-[14px] font-bold rounded-full bg-transparent"
+            onClick={() => navigate("/dashboard/orders")}
+            className="text-tertiary h-[34px] px-6 border-tertiary border hover:bg-tertiary hover:text-white transition-all duration-200 text-[14px] font-bold rounded-full bg-transparent"
           >
             Details
           </Button>

@@ -66,6 +66,10 @@ export default function OrderDetailsDialog({
                     <img
                       src={
                         item.productImage ||
+                        (item as any).product?.thumbnail ||
+                        (item as any).product?.images?.[0] ||
+                        (item as any).product?.image ||
+                        (item as any).image ||
                         "https://via.placeholder.com/48?text=No+Img"
                       }
                       alt={item.productName}

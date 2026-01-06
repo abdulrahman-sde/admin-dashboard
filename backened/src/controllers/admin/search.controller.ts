@@ -9,12 +9,7 @@ export const search = async (req: Request, res: Response) => {
   const query = (req.query.q as string) || "";
 
   if (!query) {
-    return res.json(
-      successResponse(
-        { products: [], categories: [], customers: [] },
-        "Empty query"
-      )
-    );
+    return res.json(successResponse([], "Empty query"));
   }
 
   // Run search queries in parallel
@@ -32,10 +27,7 @@ export const search = async (req: Request, res: Response) => {
       select: {
         id: true,
         name: true,
-        slug: true,
-        sku: true,
         images: true,
-        status: true,
       },
     }),
 
@@ -51,7 +43,6 @@ export const search = async (req: Request, res: Response) => {
       select: {
         id: true,
         name: true,
-        slug: true,
       },
     }),
 
@@ -64,26 +55,38 @@ export const search = async (req: Request, res: Response) => {
           { email: { contains: query, mode: "insensitive" } },
           { phone: { contains: query, mode: "insensitive" } },
         ],
+        deletedAt: null,
       },
       take: 5,
       select: {
         id: true,
         firstName: true,
         lastName: true,
-        email: true,
         avatar: true,
       },
     }),
   ]);
 
-  res.status(200).json(
-    successResponse(
-      {
-        products,
-        categories,
-        customers,
-      },
-      "Search results"
-    )
-  );
+  const formattedResults = [
+    ...products.map((p) => ({
+      id: p.id,
+      type: "product",
+      name: p.name,
+      pic: p.images && p.images.length > 0 ? p.images[0] : null,
+    })),
+    ...categories.map((c) => ({
+      id: c.id,
+      type: "category",
+      name: c.name,
+      pic: null,
+    })),
+    ...customers.map((c) => ({
+      id: c.id,
+      type: "customer",
+      name: `${c.firstName} ${c.lastName}`,
+      pic: c.avatar,
+    })),
+  ];
+
+  res.status(200).json(successResponse(formattedResults, "Search results"));
 };

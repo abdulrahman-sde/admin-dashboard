@@ -47,12 +47,16 @@ export const cronService = {
       transactionMetrics,
       productMetrics,
       newCustomers,
+      salesByCountry,
+      visitsByDevice,
     ] = await Promise.all([
       analyticsRepository.getOrderMetrics(startOfDay, endOfDay),
       analyticsRepository.getSessionMetrics(startOfDay, endOfDay),
       analyticsRepository.getTransactionMetrics(startOfDay, endOfDay),
       analyticsRepository.getProductMetrics(),
       analyticsRepository.getNewCustomersCount(startOfDay, endOfDay),
+      analyticsRepository.getSalesByCountry(startOfDay, endOfDay),
+      analyticsRepository.getVisitsByDevice(startOfDay, endOfDay),
     ]);
 
     const totalCustomers = await analyticsRepository.getTotalCustomersCount();
@@ -107,6 +111,10 @@ export const cronService = {
       totalProducts: productMetrics.totalProducts,
       inStockProducts: productMetrics.inStockProducts,
       outOfStockProducts: productMetrics.outOfStockProducts,
+
+      // Geographic & Device Analytics
+      salesByCountry,
+      visitsByDevice,
     };
 
     // Persistence via Repository

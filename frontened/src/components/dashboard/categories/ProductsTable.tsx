@@ -250,7 +250,9 @@ export default function ProductsTable() {
                         <div className="size-10 flex items-center justify-center rounded-lg bg-gray-50 overflow-hidden shrink-0">
                           <img
                             src={
+                              product.thumbnail ||
                               product.images?.[0] ||
+                              (product as any).image ||
                               "https://via.placeholder.com/40?text=No+Image"
                             }
                             alt={product.name}

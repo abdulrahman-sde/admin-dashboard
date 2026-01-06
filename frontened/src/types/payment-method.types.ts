@@ -15,6 +15,8 @@ export interface StorePaymentMethod {
   status: "ACTIVE" | "INACTIVE";
   createdAt: string;
   updatedAt: string;
+  transactionCount?: number;
+  totalRevenue?: number;
 }
 
 export interface PaymentMethodsResponse {

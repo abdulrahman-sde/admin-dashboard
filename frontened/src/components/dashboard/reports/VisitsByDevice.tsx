@@ -1,46 +1,57 @@
-import { Smartphone, Laptop, Tablet, GripHorizontal } from "lucide-react";
+import { Smartphone, Monitor, Tablet, Laptop } from "lucide-react";
+import { useGetDeviceAnalyticsQuery } from "@/lib/store/services/reportsApi";
 
-interface VisitsByDeviceProps {
-  data: Array<{
-    device: string;
-    percentage: number;
-  }>;
-}
+const VisitsByDevice = () => {
+  // We can pass date range if needed, or default to all-time/recent
+  const { data, isLoading } = useGetDeviceAnalyticsQuery({});
 
-export function VisitsByDevice({ data }: VisitsByDeviceProps) {
+  if (isLoading)
+    return (
+      <div className="h-[200px] bg-white rounded-xl p-6 border border-gray-100 animate-pulse" />
+    );
+
   const getIcon = (device: string) => {
     switch (device.toLowerCase()) {
       case "mobile":
-        return <Smartphone className="h-4.5 w-4.5 text-[#5D6679]" />;
-      case "laptop":
-        return <Laptop className="h-4.5 w-4.5 text-[#5D6679]" />;
+        return <Smartphone className="h-4 w-4" />;
+      case "desktop":
+        return <Laptop className="h-4 w-4" />;
       case "tablet":
-        return <Tablet className="h-4.5 w-4.5 text-[#5D6679]" />;
+        return <Tablet className="h-4 w-4" />;
       default:
-        return <GripHorizontal className="h-4.5 w-4.5 text-[#5D6679]" />;
+        return <Monitor className="h-4 w-4" />;
     }
   };
 
   return (
-    <div className="bg-white p-8 rounded-2xl shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07)]">
-      <h2 className="text-[17px] font-bold text-gray-900 mb-8">
+    <div className="rounded-xl border border-gray-100 bg-white p-6 shadow-sm">
+      <h3 className="mb-6 text-base font-semibold text-gray-900">
         Visits by Device
-      </h2>
+      </h3>
+
       <div className="space-y-6">
-        {data.map((item) => (
+        {data?.devices.map((item) => (
           <div key={item.device} className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="shrink-0">{getIcon(item.device)}</div>
-              <span className="text-[14px] font-medium text-[#8E92BC]">
+            <div className="flex items-center gap-3">
+              <span className="text-gray-400">{getIcon(item.device)}</span>
+              <span className="text-sm font-medium text-gray-700 capitalize">
                 {item.device}
               </span>
             </div>
-            <span className="text-[14px] font-bold text-gray-900">
+            <span className="text-sm font-bold text-gray-900">
               {item.percentage}%
             </span>
           </div>
         ))}
+
+        {data?.devices.length === 0 && (
+          <div className="text-center text-sm text-gray-500">
+            No device data
+          </div>
+        )}
       </div>
     </div>
   );
-}
+};
+
+export default VisitsByDevice;

@@ -10,15 +10,7 @@ import {
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
-import {
-  Search,
-  Save,
-  Plus,
-  AlertCircle,
-  Star,
-  ArrowRight,
-  ArrowLeft,
-} from "lucide-react";
+import { Search, Plus, AlertCircle, ArrowRight, ArrowLeft } from "lucide-react";
 import { ProductsTableSkeleton } from "@/components/shared/skeletons";
 import { useProducts } from "@/hooks/products/useProducts";
 import { DeleteConfirmationModal } from "@/components/shared/DeleteConfirmationModal";
@@ -155,12 +147,24 @@ export default function Products() {
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-lg overflow-hidden bg-gray-100 shrink-0">
-                        <img
-                          src={product.images[0]}
-                          alt={product.name}
-                          className="w-full h-full object-cover"
-                        />
+                      <div className="w-10 h-10 rounded-lg overflow-hidden bg-gray-100 shrink-0 border border-gray-200 flex items-center justify-center">
+                        {product.thumbnail ||
+                        product.images?.[0] ||
+                        (product as any).image ? (
+                          <img
+                            src={
+                              product.thumbnail ||
+                              product.images?.[0] ||
+                              (product as any).image
+                            }
+                            alt={product.name}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <span className="text-[10px] text-gray-400 font-medium">
+                            IMG
+                          </span>
+                        )}
                       </div>
                       <span className="font-medium text-[#111827]">
                         {product.name}

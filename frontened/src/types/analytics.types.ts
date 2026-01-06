@@ -31,6 +31,7 @@ export interface WeeklyOrderStats {
   shippedOrders: number;
   newOrders: number;
   averageOrderValue: number;
+  countrySales?: Record<string, number>;
 }
 
 export interface WeeklyCustomerStats {
@@ -156,3 +157,9 @@ interface MetricWithChange {
 }
 
 export type GetReportsResponse = ApiResponse<ReportsData>;
+export interface RealTimeStats {
+  activeUsers: number;
+  usersPerMinute: number[];
+}
+
+export type RealTimeStatsResponse = ApiResponse<RealTimeStats>;

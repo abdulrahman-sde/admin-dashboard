@@ -115,19 +115,19 @@ export default function Coupons() {
               <TabsList className="bg-transparent h-14 pt-4 flex justify-start gap-8 border-none">
                 <TabsTrigger
                   value="ALL"
-                  className="h-full rounded-none border-b-2 border-transparent data-[state=active]:border-[#48A878] data-[state=active]:bg-transparent data-[state=active]:text-[#48A878] text-[#5A607F] px-0  transition-all shadow-none"
+                  className="h-full rounded-none border-0 border-b-2 border-transparent data-[state=active]:border-[#48A878] data-[state=active]:bg-transparent data-[state=active]:text-[#48A878] text-[#5A607F] px-0  transition-all shadow-none"
                 >
                   All Coupons
                 </TabsTrigger>
                 <TabsTrigger
                   value="ACTIVE"
-                  className="h-full rounded-none border-b-2 border-transparent data-[state=active]:border-[#48A878] data-[state=active]:bg-transparent data-[state=active]:text-[#48A878] text-[#5A607F] px-0  transition-all shadow-none"
+                  className="h-full rounded-none border-0 border-b-2 border-transparent data-[state=active]:border-[#48A878] data-[state=active]:bg-transparent data-[state=active]:text-[#48A878] text-[#5A607F] px-0  transition-all shadow-none"
                 >
                   Active Coupons
                 </TabsTrigger>
                 <TabsTrigger
                   value="EXPIRED"
-                  className="h-full rounded-none border-b-2 border-transparent data-[state=active]:border-[#48A878] data-[state=active]:bg-transparent data-[state=active]:text-[#48A878] text-[#5A607F] px-0  transition-all shadow-none"
+                  className="h-full rounded-none border-0 border-b-2 border-transparent data-[state=active]:border-[#48A878] data-[state=active]:bg-transparent data-[state=active]:text-[#48A878] text-[#5A607F] px-0  transition-all shadow-none"
                 >
                   Expired Coupons
                 </TabsTrigger>

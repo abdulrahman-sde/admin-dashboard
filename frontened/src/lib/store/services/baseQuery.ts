@@ -22,7 +22,18 @@ export const baseQueryWithReauth: BaseQueryFn<
   let result = await baseQuery(args, api, extraOptions);
 
   if (result.error && result.error.status === 401) {
-    console.log("JWT expired, refreshing...");
+    const url = typeof args === "string" ? args : args.url;
+
+    // Only try to refresh if it's NOT an auth-related endpoint already
+    // (except /me, which is the one we want to recover)
+    // Actually, if it IS /me, we should try to refresh.
+    // If it is /refresh and it failed, we definitely shouldn't retry.
+
+    if (url?.includes("/auth/refresh")) {
+      return result;
+    }
+
+    console.log("JWT expired or missing, attempting refresh...");
 
     const refreshResult = await baseQuery(
       { url: "/auth/refresh", method: "POST" },
@@ -31,11 +42,11 @@ export const baseQueryWithReauth: BaseQueryFn<
     );
 
     if (refreshResult.data) {
-      console.log("Token refreshed");
+      console.log("Token refreshed successfully");
       result = await baseQuery(args, api, extraOptions);
     } else {
-      console.log("Refresh failed, redirecting to login");
-      window.location.href = "/login";
+      console.log("Refresh failed, session ended");
+      // Let the UI (AuthInitializer or hooks) handle the state
     }
   }
 

@@ -1,5 +1,3 @@
-"use client";
-
 import {
   SidebarGroup,
   SidebarGroupLabel,
@@ -17,6 +15,7 @@ export function NavDocuments({
     name: string;
     url: string;
     icon: string;
+    activeIcon?: string;
   }[];
   label?: string;
 }) {
@@ -38,7 +37,9 @@ export function NavDocuments({
               >
                 <Link to={item.url}>
                   <img
-                    src={item.icon}
+                    src={
+                      isActive && item.activeIcon ? item.activeIcon : item.icon
+                    }
                     alt={item.name}
                     className={`size-[17.5px]`}
                   />

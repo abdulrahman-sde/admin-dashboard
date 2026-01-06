@@ -10,6 +10,12 @@ export const useGetAnalytics = () => {
   let weeklyNewCustomersChange = 0;
   let weeklyVisitsChange = 0;
 
+  let countrySalesGrowth: Array<{
+    country: string;
+    sales: number;
+    change: number;
+  }> = [];
+
   const calculateChangeHelper = ({
     current,
     previous,
@@ -22,6 +28,7 @@ export const useGetAnalytics = () => {
   };
 
   if (data) {
+    // ... (existing change calculations)
     weeklySalesChange = calculateChangeHelper({
       current: data.data.orders.thisWeek.totalSales,
       previous: data.data.orders.previousWeek.totalSales,
@@ -56,6 +63,34 @@ export const useGetAnalytics = () => {
       current: data.data.customers.thisWeek.totalVisits,
       previous: data.data.customers.previousWeek.totalVisits,
     });
+
+    // Country Sales Growth
+    const thisWeekCountrySales = data.data.orders.thisWeek.countrySales || {};
+    const previousWeekCountrySales =
+      data.data.orders.previousWeek.countrySales || {};
+
+    const countries = Array.from(
+      new Set([
+        ...Object.keys(thisWeekCountrySales),
+        ...Object.keys(previousWeekCountrySales),
+      ])
+    );
+
+    countrySalesGrowth = countries.map((country) => {
+      const currentSales = thisWeekCountrySales[country] || 0;
+      const previousSales = previousWeekCountrySales[country] || 0;
+      return {
+        country,
+        sales: currentSales,
+        change: calculateChangeHelper({
+          current: currentSales,
+          previous: previousSales,
+        }),
+      };
+    });
+
+    // Sort by sales descending
+    countrySalesGrowth.sort((a, b) => b.sales - a.sales);
   }
 
   return {
@@ -67,6 +102,7 @@ export const useGetAnalytics = () => {
     weeklyCustomersChange,
     weeklyNewCustomersChange,
     weeklyVisitsChange,
+    countrySalesGrowth,
     isFetching,
   };
 };

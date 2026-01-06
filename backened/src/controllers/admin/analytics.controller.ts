@@ -19,6 +19,6 @@ export const getTopProducts = async (_req: Request, res: Response) => {
 };
 
 export const getRealTimeStats = async (_req: Request, res: Response) => {
-  // const metrics = await analyticsService.getLiveMetrics();
-  // res.json(successResponse(metrics, "Live metrics fetched successfully"));
+  const metrics = await analyticsService.getRealTimeStats();
+  res.json(successResponse(metrics, "Real-time metrics fetched successfully"));
 };

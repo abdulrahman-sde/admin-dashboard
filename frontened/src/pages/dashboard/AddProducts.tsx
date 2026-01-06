@@ -86,9 +86,20 @@ export default function AddProductsPage() {
             </div>
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto">
               <div className="flex items-center gap-3 w-full sm:w-auto flex-wrap sm:flex-nowrap">
+                {!isEditing && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => handleAction("DRAFT")}
+                    disabled={form.formState.isSubmitting}
+                    className="border-[#E5E7EB] text-gray-700 hover:bg-gray-50 flex-1 sm:flex-none whitespace-nowrap"
+                  >
+                    Save as Draft
+                  </Button>
+                )}
                 <Button
                   type="button"
-                  onClick={() => handleAction()}
+                  onClick={() => handleAction("ACTIVE")}
                   disabled={
                     form.formState.isSubmitting || (!isDirty && isEditing)
                   }
@@ -398,9 +409,20 @@ export default function AddProductsPage() {
 
                   {/* Actions Section */}
                   <div className="flex gap-4 pt-4 border-t border-gray-100">
+                    {!isEditing && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => handleAction("DRAFT")}
+                        disabled={form.formState.isSubmitting}
+                        className="border-[#E5E7EB] text-gray-700 hover:bg-gray-50"
+                      >
+                        Save as Draft
+                      </Button>
+                    )}
                     <Button
                       type="button"
-                      onClick={() => handleAction()}
+                      onClick={() => handleAction("ACTIVE")}
                       disabled={
                         form.formState.isSubmitting || (!isDirty && isEditing)
                       }

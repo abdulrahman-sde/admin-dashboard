@@ -112,15 +112,24 @@ export const errorHandler = (
   res: Response,
   next: NextFunction
 ): void => {
-  // Log error for debugging (only in development)
+  // Log error for debugging
   if (process.env.NODE_ENV === "development") {
-    console.error("Error Details:", {
-      name: err.name,
-      message: err.message,
-      stack: err.stack,
-    });
-  } else {
-    console.error("Error:", err.message);
+    const isExpectedError = err instanceof AppError || err instanceof ZodError;
+    const isUnauthorized = err instanceof AppError && err.statusCode === 401;
+
+    if (isUnauthorized) {
+      // Silence 401 logs to keep console clean
+    } else if (isExpectedError) {
+      console.log(`🔴 [${err.constructor.name}]: ${err.message}`);
+    } else {
+      console.error("💥 Unexpected Error:", {
+        name: err.name,
+        message: err.message,
+        stack: err.stack,
+      });
+    }
+  } else if (!(err instanceof AppError && err.statusCode === 401)) {
+    console.error("💥 Error:", err.message);
   }
 
   // Check if it's our custom AppError
