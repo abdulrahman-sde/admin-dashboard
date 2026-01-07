@@ -19,7 +19,7 @@ interface StatsCardProps {
   className?: string;
   isLoading?: boolean;
   variant?: "default" | "split";
-  precision?: number;
+
   splitData?: {
     left: {
       label: string;
@@ -38,10 +38,7 @@ interface StatsCardProps {
   };
 }
 
-const formatValue = (
-  val: number | string | undefined,
-  precision: number = 2
-): string => {
+const formatValue = (val: number | string | undefined): string => {
   if (val === undefined || val === null) return "0";
   if (typeof val === "string") return val;
   if (val >= 1000) {
@@ -60,12 +57,8 @@ export function StatsCard({
   className,
   isLoading = false,
   variant = "default",
-  precision,
   splitData,
 }: StatsCardProps) {
-  const defaultPrecision = title.toLowerCase().includes("sales") ? 2 : 0;
-  const activePrecision =
-    precision !== undefined ? precision : defaultPrecision;
   let navigate = useNavigate();
   if (isLoading) {
     return (
@@ -109,7 +102,7 @@ export function StatsCard({
             <div className="flex items-center flex-row gap-2 mt-1">
               <h1 className="text-[32px] font-bold text-[#0f172a] leading-tight tracking-tight">
                 {title.toLowerCase().includes("sales") ? "$" : ""}
-                {formatValue(value, activePrecision)}
+                {formatValue(value)}
               </h1>
               <div className="flex items-center gap-2 mt-2">
                 {label && (
@@ -147,7 +140,7 @@ export function StatsCard({
                   Previous 7days{" "}
                   <span className="text-tertiary font-bold">
                     ({title.toLowerCase().includes("sales") ? "$" : ""}
-                    {formatValue(previousValue, activePrecision)})
+                    {formatValue(previousValue)})
                   </span>
                 </p>
               )}

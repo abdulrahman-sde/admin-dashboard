@@ -17,12 +17,14 @@ export const login = async (req: Request, res: Response): Promise<void> => {
   res
     .cookie("accessToken", result.accessToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: true,
+      sameSite: "none",
       maxAge: 15 * 60 * 1000, // 15 minutes
     })
     .cookie("refreshToken", result.refreshToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: true,
+      sameSite: "none",
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     })
     .json(successResponse(result, "Login successful"));
@@ -64,12 +66,14 @@ export const refresh = async (req: Request, res: Response): Promise<void> => {
   res
     .cookie("accessToken", result.accessToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: true,
+      sameSite: "none",
       maxAge: 15 * 60 * 1000, // 15 minutes
     })
     .cookie("refreshToken", result.refreshToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: true,
+      sameSite: "none",
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     })
     .json(successResponse(result, "Token refreshed"));

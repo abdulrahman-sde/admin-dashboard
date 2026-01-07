@@ -18,6 +18,7 @@ app.use(
       const allowedOrigins = [
         "https://ecommerce-admin-da-git-009232-abdulrehman-codecrafters-projects.vercel.app",
         "https://ecommerce-admin-dashboard-two-beige.vercel.app",
+        "https://dealport-frontened-powy.vercel.app",
       ];
       if (allowedOrigins.includes(origin)) {
         callback(null, true);

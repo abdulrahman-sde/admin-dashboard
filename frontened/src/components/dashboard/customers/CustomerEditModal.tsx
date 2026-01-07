@@ -31,7 +31,6 @@ interface CustomerEditModalProps {
 }
 import { useCustomerEdit } from "@/hooks/customers/useCustomerEdit";
 import type { CustomerFormValues } from "@/schemas/customer.schema";
-import type { FormFieldRenderProps } from "@/types/form.types";
 
 export function CustomerEditModal({
   customer,
@@ -55,7 +54,7 @@ export function CustomerEditModal({
               <FormField<CustomerFormValues, "firstName">
                 control={form.control}
                 name="firstName"
-                render={({ field }: FormFieldRenderProps<string>) => (
+                render={({ field }) => (
                   <FormItem>
                     <FormLabel>First Name</FormLabel>
                     <FormControl>
@@ -68,7 +67,7 @@ export function CustomerEditModal({
               <FormField<CustomerFormValues, "lastName">
                 control={form.control}
                 name="lastName"
-                render={({ field }: FormFieldRenderProps<string>) => (
+                render={({ field }) => (
                   <FormItem>
                     <FormLabel>Last Name</FormLabel>
                     <FormControl>
@@ -82,7 +81,7 @@ export function CustomerEditModal({
             <FormField<CustomerFormValues, "email">
               control={form.control}
               name="email"
-              render={({ field }: FormFieldRenderProps<string>) => (
+              render={({ field }) => (
                 <FormItem>
                   <FormLabel>Email</FormLabel>
                   <FormControl>
@@ -96,7 +95,7 @@ export function CustomerEditModal({
               <FormField<CustomerFormValues, "phone">
                 control={form.control}
                 name="phone"
-                render={({ field }: FormFieldRenderProps<string>) => (
+                render={({ field }) => (
                   <FormItem>
                     <FormLabel>Phone</FormLabel>
                     <FormControl>
@@ -109,7 +108,7 @@ export function CustomerEditModal({
               <FormField<CustomerFormValues, "status">
                 control={form.control}
                 name="status"
-                render={({ field }: FormFieldRenderProps<string>) => (
+                render={({ field }) => (
                   <FormItem>
                     <FormLabel>Status</FormLabel>
                     <Select
@@ -136,7 +135,7 @@ export function CustomerEditModal({
             <FormField<CustomerFormValues, "notes">
               control={form.control}
               name="notes"
-              render={({ field }: FormFieldRenderProps<string>) => (
+              render={({ field }) => (
                 <FormItem>
                   <FormLabel>Notes</FormLabel>
                   <FormControl>

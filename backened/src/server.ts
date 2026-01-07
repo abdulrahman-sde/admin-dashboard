@@ -1,10 +1,11 @@
-import app from "./app.js";
 import dotenv from "dotenv";
+dotenv.config();
+
+import app from "./app.js";
 import { analyticsJob } from "./jobs/analytics.job.js";
 
 // Initialize Cron Jobs
 analyticsJob.init();
-dotenv.config();
 
 const PORT = process.env.PORT || 4000;
 

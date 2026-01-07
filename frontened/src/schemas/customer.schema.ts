@@ -1,6 +1,5 @@
 import { z } from "zod";
 
-
 const addressSchema = z.object({
   street: z.string().min(1, "Street Address is required"),
   address2: z.string().optional(),
@@ -10,7 +9,6 @@ const addressSchema = z.object({
   country: z.string().min(1, "Country is required"),
   phone: z.string().optional(),
 });
-
 
 export const getCustomersQuerySchema = z.object({
   page: z.coerce.number().int().positive().default(1),
@@ -25,22 +23,13 @@ export const getCustomersQuerySchema = z.object({
 
 export type GetCustomersQuery = z.infer<typeof getCustomersQuerySchema>;
 
-
 export const customerSchema = z.object({
-  firstName: z
-    .string({ required_error: "First Name is required" })
-    .min(1, "First Name is required"),
-  lastName: z
-    .string({ required_error: "Last Name is required" })
-    .min(1, "Last Name is required"),
-  email: z
-    .string({ required_error: "Email is required" })
-    .email("Invalid email address"),
+  firstName: z.string().min(1, "First Name is required"),
+  lastName: z.string().min(1, "Last Name is required"),
+  email: z.string().email("Invalid email address"),
   phone: z.string().optional(),
 
-  role: z.enum(["GUEST", "CUSTOMER", "VIP"], {
-    required_error: "Role is required",
-  }),
+  role: z.enum(["GUEST", "CUSTOMER", "VIP"]),
   isGuest: z.boolean(),
 
   notes: z.string().optional(),
@@ -51,7 +40,6 @@ export const customerSchema = z.object({
 });
 
 export type CustomerFormValues = z.infer<typeof customerSchema>;
-
 
 export const updateCustomerSchema = z.object({
   firstName: z.string().min(1).optional(),

@@ -8,7 +8,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Filter } from "lucide-react";
 import { useNavigate } from "react-router";
 import { BestSellingProductSkeleton } from "@/components/shared/skeletons";
 import { DataTableEmptyState } from "@/components/shared/DataTableEmptyState";

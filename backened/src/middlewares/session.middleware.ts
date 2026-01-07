@@ -18,8 +18,8 @@ export const sessionMiddleware = async (
 
         res.cookie("session", sessionId, {
           httpOnly: true,
-          secure: process.env.NODE_ENV === "production",
-          sameSite: "lax",
+          secure: true,
+          sameSite: "none",
           maxAge: 30 * 60 * 1000, // 30 minutes
         });
 
@@ -62,15 +62,15 @@ export const sessionMiddleware = async (
 
     res.cookie("session", session.sessionId, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
+      secure: true,
+      sameSite: "none",
       maxAge: 30 * 60 * 1000, // 30 minutes
     });
 
     res.cookie("visitorId", visitorId, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
+      secure: true,
+      sameSite: "none",
       maxAge: 365 * 24 * 60 * 60 * 1000, // 1 year
     });
 

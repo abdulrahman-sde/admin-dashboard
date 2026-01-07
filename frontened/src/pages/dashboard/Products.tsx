@@ -39,7 +39,7 @@ export default function Products() {
   const {
     isDeleteModalOpen,
     setIsDeleteModalOpen,
-    handleBulkDelete,
+    handleConfirmDelete,
     isDeleting,
   } = useProductDelete(selectedIds, resetSelection);
 
@@ -260,7 +260,7 @@ export default function Products() {
       <DeleteConfirmationModal
         open={isDeleteModalOpen}
         onOpenChange={setIsDeleteModalOpen}
-        onConfirm={handleBulkDelete}
+        onConfirm={handleConfirmDelete}
         title="Delete Products"
         description={`Are you sure you want to delete ${selectedIds.length} products? This action cannot be undone.`}
         isDeleting={isDeleting}
