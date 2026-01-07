@@ -11,7 +11,6 @@ export const createOrder = async (req: Request, res: Response) => {
   const validated = parseCreateOrderInput(req.body);
   const sessionId = req.session?.sessionId;
   const visitorId = req.session?.visitorId;
-  // Extract headers fresh from request (Hot state data in Redis doesn't store this anymore)
   const { userAgent, country, device, ip } = getNormalizedHeaders(req);
 
   const payload = {
@@ -32,10 +31,8 @@ export const createOrder = async (req: Request, res: Response) => {
 };
 
 export const getOrders = async (req: Request, res: Response) => {
-  // Validate Query Params
   const query = getOrdersQuerySchema.parse(req.query);
 
-  // Fetch from Service
   const result = await ordersService.getOrders(query);
 
   return res

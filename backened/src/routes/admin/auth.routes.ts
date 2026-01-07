@@ -6,7 +6,7 @@ const router = Router();
 
 router.post("/login", asyncHandler(authController.login));
 router.post("/register", asyncHandler(authController.register));
-router.post("/logout", asyncHandler(authController.logout));
+router.post("/logout", authenticateAdmin, asyncHandler(authController.logout));
 router.post("/refresh", asyncHandler(authController.refresh));
 router.get("/me", authenticateAdmin, asyncHandler(authController.getMe));
 router.patch(

@@ -47,12 +47,12 @@ export default function PaymentMethodCard() {
 
   if (isLoading) {
     return (
-      <Card className="animate-pulse h-[350px] bg-gray-50 border-[#E5E7EB]" />
+      <Card className="animate-pulse h-[350px] bg-gray-50 border-none shadow-sm" />
     );
   }
 
   return (
-    <Card className="border-[#E5E7EB]">
+    <Card className="border-none shadow-sm">
       <CardHeader className="flex flex-row items-center justify-between ">
         <CardTitle className="text-base font-semibold text-[#111827]">
           Payment Method
@@ -156,7 +156,7 @@ export default function PaymentMethodCard() {
         <div className="flex items-center gap-3 pt-2">
           <Button
             variant="outline"
-            className="flex-1 border-[#E5E7EB] text-[#374151]"
+            className="flex-1 border-none bg-[#F9FAFB] text-[#374151] hover:bg-[#EDF1FD]"
             onClick={() => setIsAddModalOpen(true)}
           >
             <Plus className="h-4 w-4 mr-2" />

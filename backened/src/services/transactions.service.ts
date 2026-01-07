@@ -41,7 +41,6 @@ export const transactionsService = {
         { customer: { email: { contains: search, mode: "insensitive" } } },
       ];
 
-      // Smart Name Search: All terms must be present in either firstName or lastName
       if (searchTerms.length > 0) {
         orConditions.push({
           customer: {
@@ -55,7 +54,6 @@ export const transactionsService = {
         });
       }
 
-      // Add exact ID search if it matches MongoDB ObjectId format
       if (/^[0-9a-fA-F]{24}$/.test(search)) {
         orConditions.push({ id: search });
         orConditions.push({ customerId: search });

@@ -3,9 +3,9 @@ import type { Ref } from "react";
 export type FormFieldRenderProps<T> = {
   field: {
     value: T;
-    onChange: (...event: any[]) => void;
+    onChange: (...event: unknown[]) => void;
     onBlur: () => void;
     name: string;
-    ref: Ref<any>;
+    ref: Ref<HTMLElement>;
   };
 };

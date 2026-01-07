@@ -8,7 +8,6 @@ import type {
 } from "../types/job.types.js";
 
 export const analyticsRepository = {
-  // 1. Order Metrics
   async getOrderMetrics(startOfDay: Date, endOfDay: Date) {
     const rawOrderMetrics = (await prisma.order.aggregateRaw({
       pipeline: [
@@ -20,7 +19,6 @@ export const analyticsRepository = {
             },
           },
         },
-        // Join with customers to determine new vs returning stats
         {
           $lookup: {
             from: "customers",
@@ -61,7 +59,6 @@ export const analyticsRepository = {
               { $match: { fulfillmentStatus: "SHIPPED" } },
               { $count: "count" },
             ],
-            // New Orders: Orders where customer was created today
             newOrders: [
               {
                 $match: {
@@ -72,7 +69,6 @@ export const analyticsRepository = {
               },
               { $count: "count" },
             ],
-            // Returning Customers: Distinct customers who ordered today but created before today
             returningCustomers: [
               {
                 $match: {
@@ -119,9 +115,7 @@ export const analyticsRepository = {
     };
   },
 
-  // 2. Product Metrics (Global Snapshot)
   async getProductMetrics() {
-    // Single aggregation pipeline to compute counts in one round-trip for performance
     const result = (await prisma.product.aggregateRaw({
       pipeline: [
         { $match: { deletedAt: null } },
@@ -160,7 +154,6 @@ export const analyticsRepository = {
     };
   },
 
-  // 3. Customer Metrics
   async getNewCustomersCount(startOfDay: Date, endOfDay: Date) {
     return prisma.customer.count({
       where: {
@@ -176,9 +169,7 @@ export const analyticsRepository = {
     });
   },
 
-  // 4. Session Metrics
   async getSessionMetrics(startOfDay: Date, endOfDay: Date) {
-    // Run aggregated queries in parallel for performance.
     const [
       rawSessionMetrics,
       totalPageViews,
@@ -221,7 +212,6 @@ export const analyticsRepository = {
         ],
       }),
 
-      // page views, add_to_cart, checkout_started counts from session_events
       prisma.sessionEvent.count({
         where: {
           timestamp: { gte: startOfDay, lt: endOfDay },
@@ -243,7 +233,6 @@ export const analyticsRepository = {
         },
       }),
 
-      // Converted sessions count (fallback if aggregateRaw didn't include it)
       prisma.session.count({
         where: {
           startedAt: { gte: startOfDay, lt: endOfDay },
@@ -255,7 +244,6 @@ export const analyticsRepository = {
     const sessionStats =
       (rawSessionMetrics as unknown as RawSessionMetrics[])[0] || {};
 
-    // Prefer convertedSessions from the sessions aggregate if present
     const converted = Number(
       sessionStats.convertedSessions ?? convertedSessions ?? 0
     );
@@ -284,7 +272,6 @@ export const analyticsRepository = {
     });
   },
 
-  // 5. Transaction Metrics
   async getTransactionMetrics(startOfDay: Date, endOfDay: Date) {
     const metrics = await prisma.transaction.groupBy({
       by: ["paymentStatus"],
@@ -313,9 +300,7 @@ export const analyticsRepository = {
     return result;
   },
 
-  // 6. Geographic Analytics - Country-wise Sales
   async getSalesByCountry(from: Date, to: Date) {
-    // 1. Try to fetch from DailyMetrics as it's pre-aggregated
     const metrics = await prisma.dailyMetrics.findMany({
       where: {
         date: { gte: from, lte: to },
@@ -335,13 +320,11 @@ export const analyticsRepository = {
         }
       });
 
-      // Special check: if consolidated is not empty, return it
       if (Object.keys(consolidated).length > 0) {
         return consolidated;
       }
     }
 
-    // 2. Fallback to Order collection if no pre-aggregated metrics found
     const result = (await prisma.order.aggregateRaw({
       pipeline: [
         {
@@ -371,7 +354,6 @@ export const analyticsRepository = {
     return salesByCountry;
   },
 
-  // 7. Device Analytics - Visits by Device
   async getVisitsByDevice(startOfDay: Date, endOfDay: Date) {
     const result = await prisma.session.groupBy({
       by: ["device"],
@@ -384,7 +366,6 @@ export const analyticsRepository = {
       },
     });
 
-    // Convert to object: { "mobile": 120, "desktop": 80 }
     const visitsByDevice: Record<string, number> = {};
     for (const item of result) {
       if (item.device) {
@@ -395,7 +376,6 @@ export const analyticsRepository = {
     return visitsByDevice;
   },
 
-  // 8. Upsert daily metrics
   async upsertDailyMetrics(
     date: Date,
     data: Omit<Prisma.DailyMetricsCreateInput, "date">
@@ -410,7 +390,6 @@ export const analyticsRepository = {
     });
   },
 
-  // 7. Aggregate Stats for Dashboard
   async getWeeklyOrderStats({ from, to }: { from: Date; to: Date }) {
     const [result, countrySales] = await Promise.all([
       prisma.dailyMetrics.aggregate({
@@ -432,7 +411,6 @@ export const analyticsRepository = {
       this.getSalesByCountry(from, to),
     ]);
 
-    // If no daily metrics exist, query orders directly
     if (result._sum.totalOrders === null) {
       const orders = await prisma.order.findMany({
         where: { createdAt: { gte: from, lte: to } },
@@ -490,13 +468,11 @@ export const analyticsRepository = {
       },
     });
 
-    // Get the latest record in this period for snapshot metrics like totalCustomers
     const latestMetric = await prisma.dailyMetrics.findFirst({
       where: { date: { gte: from, lte: to } },
       orderBy: { date: "desc" },
     });
 
-    // If no daily metrics exist, get current customer counts directly
     if (!latestMetric) {
       const totalCustomers = await prisma.customer.count({
         where: { deletedAt: null },
@@ -562,13 +538,11 @@ export const analyticsRepository = {
   },
 
   async getWeeklyProductStats({ from, to }: { from: Date; to: Date }) {
-    // Get the latest record in this period for snapshot metrics
     const latestMetric = await prisma.dailyMetrics.findFirst({
       where: { date: { gte: from, lte: to } },
       orderBy: { date: "desc" },
     });
 
-    // If no daily metrics exist, get current product counts directly
     if (!latestMetric) {
       const totalProducts = await prisma.product.count({
         where: { deletedAt: null },
@@ -602,28 +576,104 @@ export const analyticsRepository = {
       orderBy: { date: "asc" },
     });
 
-    return metrics;
+    const now = new Date();
+    const today = new Date(now.setUTCHours(0, 0, 0, 0));
+
+    // Check if we need to append current day or missing recent days
+    const lastMetricDate =
+      metrics.length > 0
+        ? new Date(metrics[metrics.length - 1]!.date)
+        : new Date(from);
+
+    lastMetricDate.setUTCHours(0, 0, 0, 0);
+
+    const result = [...metrics];
+    const cursor = new Date(lastMetricDate);
+    cursor.setUTCDate(cursor.getUTCDate() + 1);
+
+    while (cursor <= today && cursor <= to) {
+      const liveData = await this.getLiveDailyMetricForDate(new Date(cursor));
+      result.push(liveData as any);
+      cursor.setUTCDate(cursor.getUTCDate() + 1);
+    }
+
+    return result;
+  },
+
+  async getLiveDailyMetricForDate(date: Date) {
+    const startOfDay = new Date(date);
+    startOfDay.setUTCHours(0, 0, 0, 0);
+    const endOfDay = new Date(date);
+    endOfDay.setUTCHours(23, 59, 59, 999);
+
+    const [
+      orderMetrics,
+      sessionMetrics,
+      transactionMetrics,
+      productMetrics,
+      newCustomers,
+      salesByCountry,
+      visitsByDevice,
+    ] = await Promise.all([
+      this.getOrderMetrics(startOfDay, endOfDay),
+      this.getSessionMetrics(startOfDay, endOfDay),
+      this.getTransactionMetrics(startOfDay, endOfDay),
+      this.getProductMetrics(),
+      this.getNewCustomersCount(startOfDay, endOfDay),
+      this.getSalesByCountry(startOfDay, endOfDay),
+      this.getVisitsByDevice(startOfDay, endOfDay),
+    ]);
+
+    const totalCustomers = await this.getTotalCustomersCount();
+    const totalVisits = sessionMetrics.totalVisits;
+    const totalOrders = orderMetrics.totalOrders;
+    const conversionRate =
+      totalVisits > 0 ? (totalOrders / totalVisits) * 100 : 0;
+
+    return {
+      date: startOfDay,
+      totalVisits,
+      uniqueVisits: sessionMetrics.uniqueVisits,
+      totalPageViews: sessionMetrics.totalPageViews,
+      totalOrders,
+      totalSales: orderMetrics.totalSales,
+      completedOrders: orderMetrics.completedOrders,
+      pendingOrders: orderMetrics.pendingOrders,
+      shippedOrders: orderMetrics.shippedOrders,
+      processingOrders: orderMetrics.processingOrders,
+      cancelledOrders: orderMetrics.cancelledOrders,
+      averageOrderValue:
+        totalOrders > 0 ? orderMetrics.totalSales / totalOrders : 0,
+      completedTransactions: transactionMetrics.completedTransactions,
+      pendingTransactions: transactionMetrics.pendingTransactions,
+      failedTransactions: transactionMetrics.failedTransactions,
+      conversionRate,
+      cartRate:
+        totalVisits > 0
+          ? (sessionMetrics.addToCartCount / totalVisits) * 100
+          : 0,
+      checkoutRate:
+        totalVisits > 0
+          ? (sessionMetrics.checkoutStartedCount / totalVisits) * 100
+          : 0,
+      purchaseRate: conversionRate,
+      newCustomers,
+      returningCustomers: orderMetrics.returningCustomers,
+      totalCustomers,
+      totalProducts: productMetrics.totalProducts,
+      inStockProducts: productMetrics.inStockProducts,
+      outOfStockProducts: productMetrics.outOfStockProducts,
+      salesByCountry,
+      visitsByDevice,
+    };
   },
 
   async getRealTimeStats() {
-    // 1. Get active sessions count from Redis
     const sessionKeys = await redis.keys("session:*");
-    let activeUsers = sessionKeys.length;
+    const activeUsers = sessionKeys.length;
 
-    // Fallback: If Redis is empty, count sessions from the last 5 minutes in the DB
-    if (activeUsers === 0) {
-      const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
-      activeUsers = await prisma.session.count({
-        where: {
-          startedAt: { gte: fiveMinutesAgo },
-        },
-      });
-    }
-
-    // 2. Get users per minute for the last 30 minutes
     const thirtyMinutesAgo = new Date(Date.now() - 30 * 60 * 1000);
 
-    // Aggregate sessions started each minute in the last 30 mins
     const sessionsByMinute = await prisma.session.findMany({
       where: {
         startedAt: { gte: thirtyMinutesAgo },
@@ -646,6 +696,73 @@ export const analyticsRepository = {
     return {
       activeUsers,
       usersPerMinute: minuteCounts,
+    };
+  },
+
+  async getLiveDailyMetric() {
+    const now = new Date();
+    const startOfDay = new Date(now.setUTCHours(0, 0, 0, 0));
+    const endOfDay = new Date(now.setUTCHours(23, 59, 59, 999));
+
+    const [
+      orderMetrics,
+      sessionMetrics,
+      transactionMetrics,
+      productMetrics,
+      newCustomers,
+      salesByCountry,
+      visitsByDevice,
+    ] = await Promise.all([
+      this.getOrderMetrics(startOfDay, endOfDay),
+      this.getSessionMetrics(startOfDay, endOfDay),
+      this.getTransactionMetrics(startOfDay, endOfDay),
+      this.getProductMetrics(),
+      this.getNewCustomersCount(startOfDay, endOfDay),
+      this.getSalesByCountry(startOfDay, endOfDay),
+      this.getVisitsByDevice(startOfDay, endOfDay),
+    ]);
+
+    const totalCustomers = await this.getTotalCustomersCount();
+    const totalVisits = sessionMetrics.totalVisits;
+    const totalOrders = orderMetrics.totalOrders;
+    const conversionRate =
+      totalVisits > 0 ? (totalOrders / totalVisits) * 100 : 0;
+
+    return {
+      date: startOfDay,
+      totalVisits,
+      uniqueVisits: sessionMetrics.uniqueVisits,
+      totalPageViews: sessionMetrics.totalPageViews,
+      totalOrders,
+      totalSales: orderMetrics.totalSales,
+      completedOrders: orderMetrics.completedOrders,
+      pendingOrders: orderMetrics.pendingOrders,
+      shippedOrders: orderMetrics.shippedOrders,
+      processingOrders: orderMetrics.processingOrders,
+      cancelledOrders: orderMetrics.cancelledOrders,
+      averageOrderValue:
+        totalOrders > 0 ? orderMetrics.totalSales / totalOrders : 0,
+      completedTransactions: transactionMetrics.completedTransactions,
+      pendingTransactions: transactionMetrics.pendingTransactions,
+      failedTransactions: transactionMetrics.failedTransactions,
+      conversionRate,
+      cartRate:
+        totalVisits > 0
+          ? (sessionMetrics.addToCartCount / totalVisits) * 100
+          : 0,
+      checkoutRate:
+        totalVisits > 0
+          ? (sessionMetrics.checkoutStartedCount / totalVisits) * 100
+          : 0,
+      purchaseRate: conversionRate,
+      newCustomers,
+      returningCustomers: orderMetrics.returningCustomers,
+      totalCustomers,
+      totalProducts: productMetrics.totalProducts,
+      inStockProducts: productMetrics.inStockProducts,
+      outOfStockProducts: productMetrics.outOfStockProducts,
+      salesByCountry,
+      visitsByDevice,
     };
   },
 };

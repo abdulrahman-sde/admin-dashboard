@@ -17,16 +17,12 @@ export interface CouponValidationResult {
 }
 
 export const couponsService = {
-  /**
-   * Fetch Coupons with Filtering
-   */
   async getCoupons(query: GetCouponsQuery) {
     const { page, limit, search, status, type, sortBy, sortOrder } = query;
 
     const where: Prisma.CouponWhereInput = {};
     const andConditions: Prisma.CouponWhereInput[] = [];
 
-    // Search
     if (search) {
       where.OR = [
         { name: { contains: search, mode: "insensitive" } },
@@ -34,7 +30,6 @@ export const couponsService = {
       ];
     }
 
-    // Filters
     if (status) andConditions.push({ status });
     if (type) andConditions.push({ type });
 
@@ -71,12 +66,10 @@ export const couponsService = {
   },
 
   async createCoupon(input: CreateCouponInput) {
-    // Check Uniqueness
     const existing = await couponsRepository.findByCode(input.code);
     if (existing)
       throw new ConflictError(`Coupon code '${input.code}' already exists`);
 
-    // Format Payload
     const data: Prisma.CouponCreateInput = {
       ...input,
       appliesTo: input.appliesTo ?? undefined, // Handle optional JSON
@@ -89,7 +82,6 @@ export const couponsService = {
     const coupon = await couponsRepository.findById(id);
     if (!coupon) throw new NotFoundError("Coupon not found");
 
-    // If code is changing, check uniqueness
     if (input.code && input.code !== coupon.code) {
       const existing = await couponsRepository.findByCode(input.code);
       if (existing)
@@ -115,26 +107,20 @@ export const couponsService = {
     return deletedCount;
   },
 
-  /**
-   * Validate and calculate discount from a coupon code
-   */
   async validateAndApplyCoupon(
     couponCode: string,
     subtotal: number,
     shippingFee: number
   ): Promise<CouponValidationResult> {
-    // 1. Find coupon by code
     const coupon = await couponsRepository.findByCode(couponCode);
     if (!coupon) {
       throw new ValidationError(`No coupon found with code: ${couponCode}`);
     }
 
-    // 2. Check status
     if (coupon.status !== "ACTIVE") {
       throw new ValidationError(`Coupon '${couponCode}' is not active`);
     }
 
-    // 3. Check date validity
     const now = new Date();
     if (coupon.startDate > now) {
       throw new ValidationError(
@@ -148,30 +134,25 @@ export const couponsService = {
       );
     }
 
-    // 4. Check usage limit
     if (coupon.usageLimit !== null && coupon.usageCount >= coupon.usageLimit) {
       throw new ValidationError(
         `Coupon '${couponCode}' has reached its usage limit`
       );
     }
 
-    // 5. Calculate discount based on type
     let discountAmount = 0;
 
     switch (coupon.type) {
       case "FIXED":
       case "PRICE_DISCOUNT":
-        // Fixed amount discount
         discountAmount = Math.min(coupon.value, subtotal);
         break;
 
       case "PERCENTAGE":
-        // Percentage discount
         discountAmount = (subtotal * coupon.value) / 100;
         break;
 
       case "FREE_SHIPPING":
-        // Free shipping discount
         discountAmount = shippingFee;
         break;
 
@@ -179,7 +160,6 @@ export const couponsService = {
         throw new ValidationError(`Unsupported coupon type: ${coupon.type}`);
     }
 
-    // Ensure discount is never negative
     discountAmount = Math.max(0, discountAmount);
 
     return {

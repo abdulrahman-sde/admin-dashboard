@@ -11,12 +11,9 @@ export const sessionMiddleware = async (
 ) => {
   try {
     const sessionId = req.cookies?.session;
-    // console.log("middleware recieved session cookie (seesion id)", sessionId);
     if (sessionId) {
-      // console.log("session cookie is provided checking session from redis");
       const session = await getSession(sessionId);
       if (session) {
-        // console.log("session cache hit so setting req.session");
         updateSessionActivity(sessionId);
 
         res.cookie("session", sessionId, {
@@ -38,7 +35,6 @@ export const sessionMiddleware = async (
       }
     }
 
-    // console.log("session cookie id not provided creating a new session");
     const { userAgent, country, city, device, browser, os, ip } =
       getNormalizedHeaders(req);
     const visitorId = req.cookies?.visitorId || crypto.randomUUID();
@@ -47,7 +43,6 @@ export const sessionMiddleware = async (
       data: {
         ipAddress: ip,
         userAgent,
-        // customerId,
         country,
         sessionId: crypto.randomUUID(),
         visitorId,
@@ -59,13 +54,10 @@ export const sessionMiddleware = async (
       },
     });
 
-    console.log("newly created session", session);
-
     req.session = {
       sessionId: session.sessionId,
       visitorId,
       type: "ANONYMOUS",
-      // ipAddress, userAgent no longer needed in hot state
     };
 
     res.cookie("session", session.sessionId, {
@@ -75,7 +67,6 @@ export const sessionMiddleware = async (
       maxAge: 30 * 60 * 1000, // 30 minutes
     });
 
-    // Visitor ID should be long-lived (e.g., 1 year)
     res.cookie("visitorId", visitorId, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
@@ -86,8 +77,6 @@ export const sessionMiddleware = async (
     next();
   } catch (error) {
     console.error("Session middleware error:", error);
-    // If we can't create a session, we probably shouldn't continue to the controller if it depends on it.
-    // However, for now, let's see the error.
     next();
   }
 };

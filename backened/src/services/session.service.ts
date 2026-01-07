@@ -13,7 +13,6 @@ export const sessionService = {
       lastSeenAt: new Date(),
     });
 
-    // redis session storing
     await setSession(
       session.sessionId,
       {
@@ -21,6 +20,7 @@ export const sessionService = {
         visitorId: session.visitorId || "",
         type: session.type,
         customerId: session.customerId || undefined,
+        device: session.device || undefined,
       },
       30 * 60
     );
@@ -29,13 +29,6 @@ export const sessionService = {
   },
 
   async trackEvent(data: CreateSessionEventInput) {
-    console.log(
-      "🔍 [trackEvent] Tracking event for sessionId (UUID):",
-      data.sessionId
-    );
-
-    // Optimized: Directly create the event using the public UUID (sessionId).
-    // The Prisma schema now relates SessionEvent.sessionId to Session.sessionId (UUID).
     return await sessionRepository.createEvent({
       eventType: data.eventType,
       page: data.page,

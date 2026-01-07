@@ -22,13 +22,11 @@ export const addressSchema = z.object({
   isDefault: z.boolean().optional(),
 });
 
-// Make address strict to reject unknown keys (keeps downstream simple)
 export const strictAddressSchema = addressSchema.strict();
 
 export const orderItemInputSchema = z.object({
   productId: z.string().refine(objectIdRule, { message: "Invalid productId" }),
   quantity: z.number().int().min(1, "Quantity must be at least 1"),
-  // Do NOT accept prices, names, or images from client. Server fetches source of truth.
 });
 
 export const paymentMethodSchema = enumField(
@@ -72,7 +70,6 @@ export type CreateOrderInput = z.infer<typeof createOrderInputSchema>;
 export const getOrdersQuerySchema = paginationSchema.extend({
   search: z.string().optional(), // Search by Order Number or Customer Name/Email
 
-  // Status Filters
   fulfillmentStatus: enumField(
     ["PENDING", "PROCESSING", "SHIPPED", "DELIVERED", "CANCELED"],
     "Fulfillment Status"
@@ -83,14 +80,11 @@ export const getOrdersQuerySchema = paginationSchema.extend({
     "Payment Status"
   ).optional(),
 
-  // Date Range
   startDate: z.string().datetime().optional(),
   endDate: z.string().datetime().optional(),
 
-  // User Scope
   customerId: z.string().optional(),
 
-  // Sorting
   sortBy: enumField(
     ["createdAt", "totalAmount", "orderNumber"],
     "Sort By"

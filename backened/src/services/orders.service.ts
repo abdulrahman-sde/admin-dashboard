@@ -34,21 +34,14 @@ import { couponsService } from "./coupons.service.js";
 
 export const ordersService = {
   async createOrder(input: CreateOrderInput): Promise<OrderCreationResult> {
-    //  Fetch products & Validate Stock
-
     const productIds = input.items.map((it) => it.productId);
     const products = await ordersRepository.findProductsByIds(productIds);
     const productById = new Map(products.map((p) => [p.id, p]));
-
-    // actual order items but with the pricing details
-    // because the client may send different prices
-    // so we use the product price from the database
 
     const serverItems: ServerOrderItem[] = input.items.map((it) => {
       const prod = productById.get(it.productId);
       if (!prod) throw new NotFoundError(`Product not found: ${it.productId}`);
 
-      // Stock Validation
       if (!prod.isUnlimitedStock) {
         const available = prod.stockQuantity ?? 0;
         if (available < it.quantity) {
@@ -64,19 +57,17 @@ export const ordersService = {
         unitPrice: prod.price, // setting the price from the database
         totalPrice: prod.price * it.quantity,
         productName: prod.name,
-        productImage: prod.images?.[0] ?? undefined,
-        productSku: prod.sku ?? undefined,
+        productImage: prod.images?.[0],
+        productSku: prod.sku,
       };
     });
 
-    // 3. Calculate initial subtotal and shipping
     const subtotal = serverItems.reduce(
       (sum, item) => sum + item.totalPrice,
       0
     );
     const shippingFee = input.shippingFee ?? 0;
 
-    // 4. Apply Coupon (if provided)
     let discountAmount = input.discount ?? 0;
     let appliedCoupon: { id: string; code: string } | null = null;
 
@@ -93,7 +84,6 @@ export const ordersService = {
       };
     }
 
-    // 5. Calculate Final Pricing
     const pricing = calculateOrderPricing({
       items: serverItems,
       shippingFee,
@@ -101,7 +91,6 @@ export const ordersService = {
       discountAmount,
     });
 
-    // 6. Handle Customer (Guest vs Registered)
     let customerId = input.customerId;
     if (!customerId) {
       if (input.customer) {
@@ -119,12 +108,9 @@ export const ordersService = {
       }
     }
 
-    // 7. Generate Numbers
     const orderNumber = generateOrderNumber();
     const transactionNumber = generateTransactionNumber();
 
-    // 8. Preparing DB Records
-    // Use validated address objects directly — validators enforce shape/strictness.
     const shippingAddress = input.shippingAddress ?? undefined;
     const billingAddress = input.billingAddress ?? undefined;
 
@@ -133,24 +119,20 @@ export const ordersService = {
       customer: { connect: { id: customerId } },
       sessionId: input.sessionId,
 
-      // Pricing
       subtotal: pricing.subtotal,
       taxAmount: pricing.taxAmount,
       shippingFee: pricing.shippingFee,
       discount: pricing.discount,
       totalAmount: pricing.totalAmount,
 
-      // Coupon tracking
       couponId: appliedCoupon?.id,
       couponCode: appliedCoupon?.code,
 
-      // Status
       fulfillmentStatus: "PENDING",
       paymentStatus:
         input.paymentMethod === "CASH_ON_DELIVERY" ? "PENDING" : "COMPLETED",
       paymentMethod: input.paymentMethod as PaymentMethod,
 
-      // Address & Meta (Prisma composite fields require `set` for Mongo)
       shippingAddress: shippingAddress ? { set: shippingAddress } : undefined,
       billingAddress: billingAddress ? { set: billingAddress } : undefined,
       notes: input.notes,
@@ -159,7 +141,6 @@ export const ordersService = {
       country: input.country,
     };
 
-    // Find active payment method
     const paymentMethods = await paymentMethodsRepository.findAll();
     const activeMethod =
       paymentMethods.find((m) => m.isDefault && m.status === "ACTIVE") ||
@@ -184,14 +165,12 @@ export const ordersService = {
       }),
     };
 
-    // 9. Atomic Commit
     const { order } = await ordersRepository.createOrderRecord({
       orderData,
-      orderItems: serverItems as any,
+      orderItems: serverItems,
       transactionData,
     });
 
-    // 10. Background Updates (Fire & Forget - Denormalization)
     (async () => {
       await Promise.all([
         customerRepository.updateStats(customerId, order.totalAmount),
@@ -200,7 +179,6 @@ export const ordersService = {
         ),
       ]);
 
-      // Increment coupon usage if a coupon was applied
       if (appliedCoupon) {
         await couponsRepository.incrementUsage(appliedCoupon.id);
       }
@@ -230,7 +208,6 @@ export const ordersService = {
     const where: Prisma.OrderWhereInput = {};
     const andConditions: Prisma.OrderWhereInput[] = [];
 
-    // 1. Search Logic (Order # or Customer Info)
     if (search) {
       where.OR = [
         { orderNumber: { contains: search, mode: "insensitive" } },
@@ -246,7 +223,6 @@ export const ordersService = {
       ];
     }
 
-    // 2. Status Filters
     if (fulfillmentStatus) {
       andConditions.push({
         fulfillmentStatus: fulfillmentStatus as FulfillmentStatus,
@@ -256,13 +232,11 @@ export const ordersService = {
       andConditions.push({ paymentStatus: paymentStatus as PaymentStatus });
     }
 
-    // 3. Date Range
     const dateFilter = buildDateRangeFilter(startDate, endDate);
     if (dateFilter) {
       andConditions.push({ createdAt: dateFilter });
     }
 
-    // 4. Customer Scope
     if (customerId) {
       andConditions.push({ customerId });
     }
@@ -280,7 +254,6 @@ export const ordersService = {
       orderBy: { [sortBy]: sortOrder },
     });
 
-    // Calculate Tab Counts (For Dashboard Badges)
     const stats = await ordersRepository.getFilterCounts();
 
     return {

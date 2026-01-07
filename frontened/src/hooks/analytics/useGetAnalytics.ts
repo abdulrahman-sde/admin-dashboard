@@ -28,7 +28,6 @@ export const useGetAnalytics = () => {
   };
 
   if (data) {
-    // ... (existing change calculations)
     weeklySalesChange = calculateChangeHelper({
       current: data.data.orders.thisWeek.totalSales,
       previous: data.data.orders.previousWeek.totalSales,
@@ -64,7 +63,6 @@ export const useGetAnalytics = () => {
       previous: data.data.customers.previousWeek.totalVisits,
     });
 
-    // Country Sales Growth
     const thisWeekCountrySales = data.data.orders.thisWeek.countrySales || {};
     const previousWeekCountrySales =
       data.data.orders.previousWeek.countrySales || {};
@@ -89,7 +87,6 @@ export const useGetAnalytics = () => {
       };
     });
 
-    // Sort by sales descending
     countrySalesGrowth.sort((a, b) => b.sales - a.sales);
   }
 

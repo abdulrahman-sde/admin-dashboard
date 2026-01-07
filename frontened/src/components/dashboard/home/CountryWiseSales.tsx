@@ -2,33 +2,10 @@ import ReactCountryFlag from "react-country-flag";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { TrendingUp, TrendingDown, MoreVertical } from "lucide-react";
-import { useGetRealTimeStatsQuery } from "@/lib/store/services/analytics/analyticsApi";
-
-// Helper to get country code from name (basic mapping)
-const getCountryCode = (name: string): string => {
-  const mapping: Record<string, string> = {
-    US: "US",
-    USA: "US",
-    Brazil: "BR",
-    "United States": "US",
-    Australia: "AU",
-    India: "IN",
-    Canada: "CA",
-    UK: "GB",
-    "United Kingdom": "GB",
-    Germany: "DE",
-    France: "FR",
-    China: "CN",
-    Japan: "JP",
-  };
-  return mapping[name] || "US";
-};
-
-interface CountryGrowthItem {
-  country: string;
-  sales: number;
-  change: number;
-}
+import { useCountryWiseSales } from "@/hooks/dashboard/useCountryWiseSales";
+import type { CountryGrowthItem } from "@/types/analytics.types";
+import { cn } from "@/lib/utils";
+import bgImage from "@/assets/images/salesByCountry.svg";
 
 interface CountryWiseSalesProps {
   data: CountryGrowthItem[];
@@ -37,17 +14,17 @@ interface CountryWiseSalesProps {
 
 export default function CountryWiseSales({
   data,
-  isLoading,
+  isLoading: isExternalLoading,
 }: CountryWiseSalesProps) {
-  // Real-time polling
-  const { data: realTimeData } = useGetRealTimeStatsQuery(undefined, {
-    pollingInterval: 5000,
-  });
+  const {
+    activeUsers,
+    usersPerMinute,
+    processedCountries,
+    maxUsersPerMin,
+    isLoading: isRealTimeLoading,
+  } = useCountryWiseSales(data);
 
-  const activeUsers = realTimeData?.data?.activeUsers || 0;
-  const usersPerMinute = realTimeData?.data?.usersPerMinute || [];
-
-  if (isLoading) {
+  if (isExternalLoading || isRealTimeLoading) {
     return (
       <Card className="shadow-sm border-0 h-[400px] flex items-center justify-center">
         <div className="animate-pulse text-muted-foreground">
@@ -57,20 +34,9 @@ export default function CountryWiseSales({
     );
   }
 
-  // Calculate max values for scaling
-  const maxSales = data.length > 0 ? Math.max(...data.map((d) => d.sales)) : 1;
-  const maxUsersPerMin =
-    usersPerMinute.length > 0 ? Math.max(...usersPerMinute) : 1;
-
-  const formatValue = (val: number) => {
-    if (val >= 1000000) return `${(val / 1000000).toFixed(1)}M`;
-    if (val >= 1000) return `${(val / 1000).toFixed(1).replace(/\.0$/, "")}k`;
-    return val.toString();
-  };
-
   return (
     <Card className="shadow-sm border-0 overflow-hidden">
-      <CardContent className="p-5">
+      <CardContent className="px-5">
         {/* Real-time Users Section */}
         <div className="mb-4">
           <div className="flex items-center justify-between mb-0.5">
@@ -80,7 +46,7 @@ export default function CountryWiseSales({
             <MoreVertical className="h-5 w-5 text-neutral-300 cursor-pointer" />
           </div>
           <h2 className="text-[38px] font-bold text-[#0D0E10] tracking-tight leading-none mb-3">
-            {formatValue(activeUsers)}
+            {activeUsers}
           </h2>
 
           <p className="text-[#707D94] text-[14px] font-medium mb-2.5">
@@ -91,7 +57,7 @@ export default function CountryWiseSales({
               usersPerMinute.map((count, i) => (
                 <div
                   key={i}
-                  className="bg-primary opacity-80 rounded-[2.5px] flex-1" // Changed w-full to flex-1 for even distribution
+                  className="bg-primary opacity-80 rounded-[2.5px] flex-1"
                   style={{
                     height: `${Math.max(
                       8,
@@ -109,82 +75,87 @@ export default function CountryWiseSales({
         </div>
 
         {/* Country-wise Sales List */}
-        <div className="space-y-4 mt-6">
-          <div className="flex items-center justify-between mb-2">
-            <h3 className="font-bold text-table-header text-[17px] tracking-tight">
-              Sales by Country
-            </h3>
-            <span className="font-bold text-table-header text-[17px] tracking-tight">
-              Sales
-            </span>
-          </div>
+        <div
+          className="mt-8 relative rounded-xl border border-gray-50 overflow-hidden"
+          style={{
+            backgroundImage: `linear-gradient(rgba(255,255,255,0.92), rgba(255,255,255,0.92)), url(${bgImage})`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+          }}
+        >
+          <div className="px-5">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="font-bold text-[#151D48] text-[17px]">
+                Sales by Country
+              </h3>
+              <span className="font-semibold text-[#151D48] opacity-50 text-[13px]">
+                Sales
+              </span>
+            </div>
 
-          {data.slice(0, 5).map((item, index) => {
-            const isPositive = item.change >= 0;
-            const progress = (item.sales / maxSales) * 100;
-            const formattedSales = formatValue(item.sales);
-            const countryCode = getCountryCode(item.country);
+            <div className="space-y-5">
+              {processedCountries.map((item, index) => {
+                return (
+                  <div key={index} className="flex items-center gap-4">
+                    {/* Flag Container */}
+                    <div className="size-9 rounded-full overflow-hidden shrink-0 shadow-sm border border-gray-100">
+                      <ReactCountryFlag
+                        countryCode={item.countryCode}
+                        svg
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "cover",
+                        }}
+                      />
+                    </div>
 
-            return (
-              <div key={index} className="relative">
-                <div className="flex items-center gap-3">
-                  {/* Flag Container */}
-                  <div className="size-10 rounded-full overflow-hidden shrink-0 border-0">
-                    <ReactCountryFlag
-                      countryCode={countryCode}
-                      svg
-                      style={{
-                        width: "100%",
-                        height: "100%",
-                        objectFit: "cover",
-                      }}
-                    />
-                  </div>
+                    {/* Info Section */}
+                    <div className="w-14 shrink-0">
+                      <p className="text-[15px] font-bold text-[#151D48] leading-tight">
+                        {item.formattedSales}
+                      </p>
+                      <p className="text-[12px] text-[#737791] font-medium uppercase opacity-70">
+                        {item.country === "United States"
+                          ? "US"
+                          : item.countryCode}
+                      </p>
+                    </div>
 
-                  {/* Info + Progress Section */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between mb-1">
-                      <div className="flex items-baseline gap-2">
-                        <p className="text-[17px] font-bold text-[#101928] leading-none">
-                          {formattedSales}
-                        </p>
-                        <p className="text-[13px] text-[#8C94A3] font-medium uppercase">
-                          {countryCode}
-                        </p>
+                    {/* Progress Bar & Trend */}
+                    <div className="flex-1 flex items-center gap-3">
+                      <div className="flex-1 bg-[#EFF1F3] rounded-full h-1.5 overflow-hidden">
+                        <div
+                          className="bg-[#5C60F5] h-full rounded-full transition-all duration-700 ease-out"
+                          style={{ width: `${item.progress}%` }}
+                        />
                       </div>
 
                       {/* Trend */}
                       <div
-                        className={`flex items-center gap-0.5 text-[14px] font-bold shrink-0 ${
-                          isPositive ? "text-primary" : "text-destructive"
-                        }`}
-                      >
-                        {isPositive ? (
-                          <TrendingUp className="h-3.5 w-3.5" />
-                        ) : (
-                          <TrendingDown className="h-3.5 w-3.5" />
+                        className={cn(
+                          "flex items-center gap-0.5 text-[13px] font-bold min-w-[50px] justify-end",
+                          item.isPositive ? "text-[#4EA674]" : "text-[#EF4343]"
                         )}
-                        {Math.abs(item.change).toFixed(1)}%
+                      >
+                        {item.isPositive ? (
+                          <TrendingUp className="h-3 w-3" />
+                        ) : (
+                          <TrendingDown className="h-3 w-3" />
+                        )}
+                        <span>{Math.abs(item.change).toFixed(1)}%</span>
                       </div>
                     </div>
-
-                    {/* Progress Bar */}
-                    <div className="w-full bg-[#F5F7FA] rounded-full h-1 overflow-hidden">
-                      <div
-                        className="bg-tertiary h-full rounded-full transition-all duration-700 ease-out"
-                        style={{ width: `${progress}%` }}
-                      />
-                    </div>
                   </div>
-                </div>
-              </div>
-            );
-          })}
+                );
+              })}
+            </div>
+          </div>
         </div>
 
         <Button
           variant="outline"
-          className="w-full text-tertiary border-tertiary rounded-full h-11 text-[15px] font-bold mt-6 hover:bg-tertiary hover:text-white transition-all duration-200 border bg-transparent"
+          className="w-full text-tertiary border-tertiary rounded-full  text-[15px] font-bold mt-6 hover:bg-tertiary hover:text-white transition-all duration-200 border bg-transparent"
         >
           View Insight
         </Button>

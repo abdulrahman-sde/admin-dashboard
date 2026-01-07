@@ -43,6 +43,7 @@ import { useProducts } from "@/hooks/products/useProducts";
 import { DeleteConfirmationModal } from "@/components/shared/DeleteConfirmationModal";
 
 import { useProductDelete } from "@/hooks/products/useProductDelete";
+import type { ProductsQueryParams } from "@/types/products.types";
 
 export default function ProductsTable() {
   const navigate = useNavigate();
@@ -69,7 +70,7 @@ export default function ProductsTable() {
     setSortOrder,
   } = useProducts();
 
-  const handleSort = (field: any) => {
+  const handleSort = (field: NonNullable<ProductsQueryParams["sortBy"]>) => {
     if (sortBy === field) {
       setSortOrder(sortOrder === "asc" ? "desc" : "asc");
     } else {
@@ -81,8 +82,11 @@ export default function ProductsTable() {
   const {
     isDeleteModalOpen,
     setIsDeleteModalOpen,
-    handleBulkDelete,
+    handleConfirmDelete,
     isDeleting,
+    openBulkDelete,
+    openSingleDelete,
+    singleDeleteId,
   } = useProductDelete(selectedIds, resetSelection);
 
   return (
@@ -123,7 +127,7 @@ export default function ProductsTable() {
         <div className="flex items-center gap-2 w-full lg:w-auto">
           {selectedIds.length > 0 ? (
             <Button
-              onClick={() => setIsDeleteModalOpen(true)}
+              onClick={openBulkDelete}
               className="flex-1 lg:flex-none bg-destructive hover:bg-destructive/80"
             >
               Delete ({selectedIds.length})
@@ -134,7 +138,7 @@ export default function ProductsTable() {
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
                 <Input
                   placeholder="Search your product"
-                  className="pl-9 w-full lg:w-60 border-neutral-300"
+                  className="pl-9 w-full lg:w-60 border-none bg-[#F9FAFB] shadow-none focus:ring-0"
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                 />
@@ -144,7 +148,7 @@ export default function ProductsTable() {
                 <DropdownMenuTrigger asChild>
                   <Button
                     variant="outline"
-                    className="border-[#E5E7EB] text-muted-foreground h-10 px-3"
+                    className="border-none bg-[#F9FAFB] text-muted-foreground h-10 px-3 hover:bg-[#EDF1FD]"
                   >
                     <SlidersHorizontal className="h-4 w-4 mr-2" />
                     Sort
@@ -252,7 +256,6 @@ export default function ProductsTable() {
                             src={
                               product.thumbnail ||
                               product.images?.[0] ||
-                              (product as any).image ||
                               "https://via.placeholder.com/40?text=No+Image"
                             }
                             alt={product.name}
@@ -287,7 +290,10 @@ export default function ProductsTable() {
                         >
                           <Edit className="size-4 text-muted-foreground" />
                         </button>
-                        <button className="p-1.5 hover:bg-muted rounded transition-colors">
+                        <button
+                          onClick={() => openSingleDelete(product.id)}
+                          className="p-1.5 hover:bg-muted rounded transition-colors"
+                        >
                           <Trash2 className="size-4 text-muted-foreground" />
                         </button>
                       </div>
@@ -347,9 +353,14 @@ export default function ProductsTable() {
       <DeleteConfirmationModal
         open={isDeleteModalOpen}
         onOpenChange={setIsDeleteModalOpen}
-        onConfirm={handleBulkDelete}
-        title="Delete Products"
-        description={`Are you sure you want to delete ${selectedIds.length} products? This action cannot be undone.`}
+        onConfirm={handleConfirmDelete}
+        title={singleDeleteId ? "Delete Product" : "Delete Products"}
+        description={
+          singleDeleteId
+            ? "Are you sure you want to delete this product?"
+            : `Are you sure you want to delete ${selectedIds.length} products?` +
+              " This action cannot be undone."
+        }
         isDeleting={isDeleting}
       />
     </div>

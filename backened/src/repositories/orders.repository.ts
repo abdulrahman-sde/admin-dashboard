@@ -21,16 +21,12 @@ export const ordersRepository = {
     });
   },
 
-  // Guest customer creation: requires guest PII (email, name, phone)
   async createGuestCustomer(data: {
     firstName: string;
     lastName: string;
     email: string;
     phone: string;
   }) {
-    // If a customer with this email already exists, return it instead of trying
-    // to create a duplicate. This handles cases where a registered account
-    // already exists or a previous guest was created.
     const existing = await prisma.customer.findUnique({
       where: { email: data.email },
       select: {
@@ -80,10 +76,8 @@ export const ordersRepository = {
     transaction: Prisma.TransactionGetPayload<{}>;
   }> {
     const result = await prisma.$transaction(async (tx) => {
-      // 1. Create the Order
       const order = await tx.order.create({ data: orderData });
 
-      // 2. Attach orderId to items and create them
       const itemsWithOrderId = orderItems.map((item) => ({
         ...item,
         orderId: order.id,
@@ -93,7 +87,6 @@ export const ordersRepository = {
         await tx.orderItem.createMany({ data: itemsWithOrderId });
       }
 
-      // 3. Decrement stock
       for (const it of orderItems) {
         const prod = await tx.product.findUnique({
           where: { id: it.productId },
@@ -114,8 +107,6 @@ export const ordersRepository = {
         }
       }
 
-      // 4. Create Transaction linked to Order
-      // We explicitly set orderId because we already created the order
       const txn = await tx.transaction.create({
         data: {
           ...transactionData,
@@ -189,7 +180,6 @@ export const ordersRepository = {
     }
   ) {
     return prisma.$transaction(async (tx) => {
-      // 1. Update Order
       const order = await tx.order.update({
         where: { id: orderId },
         data: {
@@ -198,9 +188,7 @@ export const ordersRepository = {
         },
       });
 
-      // 2. If Payment Status changed, update Transaction
       if (data.paymentStatus) {
-        // Find transaction linked to this order
         const txn = await tx.transaction.findUnique({
           where: { orderId: orderId },
         });
@@ -253,4 +241,3 @@ export const ordersRepository = {
 };
 
 export default ordersRepository;
-// (no additional exports)

@@ -1,10 +1,9 @@
-import React from "react";
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import type { ChartConfig } from "@/components/ui/chart";
 import { ChartContainer, ChartTooltip } from "@/components/ui/chart";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { useGetDetailedDailyMetricsQuery } from "@/lib/store/services/analytics/analyticsApi";
+import { useCustomerOverview } from "@/hooks/dashboard/useCustomerOverview";
 
 import type {
   CustomCursorProps,
@@ -54,48 +53,15 @@ const CustomTooltip = ({ active, payload }: CustomTooltipProps) => {
 };
 
 export default function CustomerOverview() {
-  const [timeRange, setTimeRange] = React.useState("this-week");
-  const [activeTab, setActiveTab] = React.useState("activeCustomers");
-
-  const { data: analyticsData, isLoading } = useGetDetailedDailyMetricsQuery();
-
-  const metrics = React.useMemo(() => {
-    if (!analyticsData) return [];
-    return timeRange === "this-week"
-      ? analyticsData.data.customerOverview.thisWeek
-      : analyticsData.data.customerOverview.lastWeek;
-  }, [analyticsData, timeRange]);
-
-  const stats = React.useMemo(() => {
-    if (!metrics.length) {
-      return {
-        activeCustomers: 0,
-        repeatCustomers: 0,
-        shopVisitor: 0,
-        conversionRate: "0%",
-      };
-    }
-
-    const totalActive = metrics.reduce((sum, m) => sum + m.activeCustomers, 0);
-    const totalRepeat = metrics.reduce((sum, m) => sum + m.repeatCustomers, 0);
-    const totalVisitors = metrics.reduce((sum, m) => sum + m.shopVisitor, 0);
-    // Average conversion rate
-    const totalConversion = metrics.reduce(
-      (sum, m) => sum + (m.conversionRate || 0),
-      0
-    );
-    const avgConversion = totalConversion / (metrics.length || 1);
-
-    return {
-      activeCustomers: totalActive,
-      repeatCustomers: totalRepeat,
-      shopVisitor: totalVisitors,
-      conversionRate: `${(Number.isNaN(avgConversion)
-        ? 0
-        : avgConversion
-      ).toFixed(1)}%`,
-    };
-  }, [metrics]);
+  const {
+    timeRange,
+    setTimeRange,
+    activeTab,
+    setActiveTab,
+    metrics,
+    stats,
+    isLoading,
+  } = useCustomerOverview();
 
   if (isLoading) {
     return (

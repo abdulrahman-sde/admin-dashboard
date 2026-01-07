@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useAddProductDialog } from "@/hooks/products/useAddProductDialog";
+
 import {
   Dialog,
   DialogContent,
@@ -27,66 +28,20 @@ export default function AddProductDialog({
   onAdd,
   isLoading = false,
 }: AddProductDialogProps) {
-  const [productName, setProductName] = useState("");
-  const [price, setPrice] = useState("");
-  const [stock, setStock] = useState("");
-  const [description, setDescription] = useState("");
-  const [imagePreview, setImagePreview] = useState<string>("");
-  const [imageFile, setImageFile] = useState<File | null>(null);
+  const { state, setters, handlers } = useAddProductDialog({
+    onAdd,
+    onOpenChange,
+  });
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setImageFile(file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const handleAdd = async () => {
-    if (productName.trim() && price && stock) {
-      await onAdd({
-        name: productName,
-        image: imageFile,
-        price: Number(price),
-        stock: Number(stock),
-        description,
-      });
-      // Only reset and close if successful (assuming onAdd throws if failed, but here we just wait)
-      // Ideally we check success, but usually onAdd returns void or throws error.
-      // Assuming parent handles errors via toast and doesn't throw, we might close prematurely.
-      // But user said "dont close ... until added". If async finishes, it is "added" or "failed".
-      // We will assume onAdd resolves on success.
-
-      setProductName("");
-      setPrice("");
-      setStock("");
-      setDescription("");
-      setImagePreview("");
-      setImageFile(null);
-      onOpenChange(false);
-    }
-  };
-
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-  };
-
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    const file = e.dataTransfer.files[0];
-    if (file && file.type.startsWith("image/")) {
-      setImageFile(file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
+  const { productName, price, stock, description, imagePreview } = state;
+  const { setProductName, setPrice, setStock, setDescription } = setters;
+  const {
+    handleImageChange,
+    handleAdd,
+    handleDragOver,
+    handleDrop,
+    handleClearImage,
+  } = handlers;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -104,7 +59,7 @@ export default function AddProductDialog({
               value={productName}
               onChange={(e) => setProductName(e.target.value)}
               placeholder="Enter product name"
-              className="border-[#E5E7EB]"
+              className="border-none bg-[#F9FAFB] focus:ring-0"
             />
           </div>
           <div className="grid grid-cols-2 gap-4">
@@ -117,7 +72,7 @@ export default function AddProductDialog({
                 onChange={(e) => setPrice(e.target.value)}
                 placeholder="0.00"
                 min="0"
-                className="border-[#E5E7EB]"
+                className="border-none bg-[#F9FAFB] focus:ring-0"
               />
             </div>
             <div className="space-y-2">
@@ -129,7 +84,7 @@ export default function AddProductDialog({
                 onChange={(e) => setStock(e.target.value)}
                 placeholder="0"
                 min="0"
-                className="border-[#E5E7EB]"
+                className="border-none bg-[#F9FAFB] focus:ring-0"
               />
             </div>
           </div>
@@ -140,7 +95,7 @@ export default function AddProductDialog({
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Product description"
-              className="border-[#E5E7EB]"
+              className="border-none bg-[#F9FAFB] focus:ring-0"
             />
           </div>
           <div className="space-y-2">
@@ -155,7 +110,6 @@ export default function AddProductDialog({
                 accept="image/*"
                 onChange={(e) => {
                   handleImageChange(e);
-                  // Clear the value so the same file can be selected again if removed
                   e.target.value = "";
                 }}
                 className="hidden"
@@ -163,7 +117,7 @@ export default function AddProductDialog({
               />
               <label
                 htmlFor="productImageUpload"
-                className="border-2 border-dashed border-[#E5E7EB] rounded-lg p-8 text-center hover:border-[#4EA674] transition-colors cursor-pointer flex flex-col items-center justify-center min-h-40 w-full"
+                className="border-2 border-dashed border-[#F9FAFB] rounded-lg p-8 text-center hover:border-[#4EA674] transition-colors cursor-pointer flex flex-col items-center justify-center min-h-40 w-full bg-[#F9FAFB]/50"
               >
                 {imagePreview ? (
                   <div className="relative w-full">
@@ -174,12 +128,7 @@ export default function AddProductDialog({
                     />
                     <button
                       type="button"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        setImagePreview("");
-                        setImageFile(null);
-                      }}
+                      onClick={handleClearImage}
                       className="absolute -top-2 -right-2 p-1.5 bg-destructive text-white rounded-full hover:bg-destructive/80 shadow-md z-20 transition-transform active:scale-90"
                     >
                       <X className="h-4 w-4" />
@@ -202,7 +151,7 @@ export default function AddProductDialog({
             <Button
               variant="outline"
               onClick={() => onOpenChange(false)}
-              className="border-[#E5E7EB]"
+              className="border-none bg-[#F9FAFB] hover:bg-[#EDF1FD]"
             >
               Cancel
             </Button>

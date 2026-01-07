@@ -17,23 +17,17 @@ import {
 } from "lucide-react";
 import type { TransactionDetailsModalProps } from "@/types/transaction.types";
 import { Separator } from "@/components/ui/separator";
-import { getTransactionStatusColor, cn } from "@/lib/utils";
+import { cn } from "@/lib/utils";
+import { useTransactionDetails } from "@/hooks/transactions/useTransactionDetails";
 
 export function TransactionDetailsModal({
   transaction,
   open,
   onOpenChange,
 }: TransactionDetailsModalProps) {
+  const { formatMethod, statusColorClass } = useTransactionDetails(transaction);
+
   if (!transaction) return null;
-
-  const formatMethod = (method: string) => {
-    return method
-      .replace(/_/g, " ")
-      .toLowerCase()
-      .replace(/^\w/, (c) => c.toUpperCase());
-  };
-
-  const statusColorClass = getTransactionStatusColor(transaction.paymentStatus);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

@@ -32,19 +32,13 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useTransactions } from "@/hooks/transactions/useTransactions";
+import { useTransactionHistory } from "@/hooks/transactions/useTransactionHistory";
 import { TransactionsTableSkeleton } from "@/components/shared/skeletons";
-import { useState } from "react";
 import { TransactionDetailsModal } from "./TransactionDetailsModal";
-import type { Transaction } from "@/types/transaction.types";
 import { Card } from "@/components/ui/card";
 import { DataTableEmptyState } from "@/components/shared/DataTableEmptyState";
 
 export default function TransactionHistoryTable() {
-  const [selectedTransaction, setSelectedTransaction] =
-    useState<Transaction | null>(null);
-  const [modalOpen, setModalOpen] = useState(false);
-
   const {
     transactions,
     isFetching: isLoading,
@@ -57,36 +51,16 @@ export default function TransactionHistoryTable() {
     setSearch: onSearchChange,
     pagination,
     sortBy,
-    setSortBy,
     sortOrder,
-    setSortOrder,
     paymentStatus,
     setPaymentStatus,
-  } = useTransactions();
-
-  const handleViewDetails = (transaction: Transaction) => {
-    setSelectedTransaction(transaction);
-    setModalOpen(true);
-  };
-
-  const toggleSort = (field: string) => {
-    if (sortBy === field) {
-      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
-    } else {
-      setSortBy(field);
-      setSortOrder("desc");
-    }
-  };
-
-  const formatMethod = (method: string) => {
-    if (method === "CREDIT_CARD") return "CC";
-    if (method === "PAYPAL") return "PayPal";
-    if (method === "BANK_TRANSFER") return "Bank";
-    return method
-      .replace(/_/g, " ")
-      .toLowerCase()
-      .replace(/^\w/, (c) => c.toUpperCase());
-  };
+    selectedTransaction,
+    modalOpen,
+    setModalOpen,
+    handleViewDetails,
+    toggleSort,
+    formatMethod,
+  } = useTransactionHistory();
 
   return (
     <Card className="p-0 border-[#D1D5DB] bg-white">

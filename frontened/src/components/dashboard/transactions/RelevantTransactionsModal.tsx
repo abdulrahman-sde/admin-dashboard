@@ -12,7 +12,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useGetAllTransactionsQuery } from "@/lib/store/services/transactions/transactionsApi";
+import { useRelevantTransactions } from "@/hooks/transactions/useRelevantTransactions";
 import { Loader2, Receipt } from "lucide-react";
 import { getTransactionStatusColor, cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
@@ -28,18 +28,10 @@ export function RelevantTransactionsModal({
   onOpenChange,
   storePaymentMethodId,
 }: RelevantTransactionsModalProps) {
-  const { data, isLoading } = useGetAllTransactionsQuery(
-    {
-      page: 1,
-      limit: 50,
-      storePaymentMethodId,
-      sortBy: "createdAt",
-      sortOrder: "desc",
-    },
-    { skip: !open || !storePaymentMethodId }
-  );
-
-  const transactions = data?.data || [];
+  const { transactions, isLoading } = useRelevantTransactions({
+    storePaymentMethodId,
+    open,
+  });
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

@@ -2,45 +2,22 @@ import { analyticsRepository } from "../repositories/analytics.repository.js";
 import { productRepository } from "../repositories/products.repository.js";
 import { getYesterdayRange } from "../utils/date.utils.js";
 
-/**
- * Cron Service
- * Contains the business logic for background tasks and automated aggregations.
- * This service is called by scheduled jobs (triggers) in the src/jobs directory.
- */
 export const cronService = {
-  /**
-   * Orchestrates the daily analytics aggregation process.
-   */
   async runDailyAnalyticsAggregation() {
-    console.log("🔄 [Cron Service] Starting Daily Analytics Aggregation...");
-
-    // 1. Determine the time range (Yesterday 00:00 to 23:59 UTC)
     const { startOfDay, endOfDay } = getYesterdayRange();
 
     try {
-      // 2. Execute business logic for data aggregation
       await this.aggregateDailySnapshot(startOfDay, endOfDay);
-
-      // 3. Update product popularity metrics (denormalization)
       await this.syncProductPopularity(startOfDay, endOfDay);
-
-      console.log("✅ [Cron Service] Daily Analytics Aggregation Completed.");
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error(
         "❌ [Cron Service] Critical Failure in Analytics Job:",
-        error.message
+        error instanceof Error ? error.message : error
       );
     }
   },
 
-  /**
-   * Aggregates all key metrics from Repositories and saves the daily summary.
-   */
   async aggregateDailySnapshot(startOfDay: Date, endOfDay: Date) {
-    console.log(`📊 Processing Snapshot: ${startOfDay.toISOString()}`);
-
-    // Fetch all metrics in parallel for maximum performance
-    // All DB interactions are handled by repositories
     const [
       orderMetrics,
       sessionMetrics,
@@ -61,7 +38,6 @@ export const cronService = {
 
     const totalCustomers = await analyticsRepository.getTotalCustomersCount();
 
-    // Calculate rates and derived fields
     const totalVisits = sessionMetrics.totalVisits;
     const totalOrders = orderMetrics.totalOrders;
 
@@ -69,12 +45,10 @@ export const cronService = {
       totalVisits > 0 ? (totalOrders / totalVisits) * 100 : 0;
 
     const snapshotData = {
-      // Traffic
       totalVisits,
       uniqueVisits: sessionMetrics.uniqueVisits,
       totalPageViews: sessionMetrics.totalPageViews,
 
-      // Revenue & Order Volumes
       totalOrders,
       totalSales: orderMetrics.totalSales,
       completedOrders: orderMetrics.completedOrders,
@@ -85,12 +59,10 @@ export const cronService = {
       averageOrderValue:
         totalOrders > 0 ? orderMetrics.totalSales / totalOrders : 0,
 
-      // Transactions
       completedTransactions: transactionMetrics.completedTransactions,
       pendingTransactions: transactionMetrics.pendingTransactions,
       failedTransactions: transactionMetrics.failedTransactions,
 
-      // Funnel Analysis
       conversionRate,
       cartRate:
         totalVisits > 0
@@ -102,39 +74,27 @@ export const cronService = {
           : 0,
       purchaseRate: conversionRate,
 
-      // Audience
       newCustomers,
       returningCustomers: orderMetrics.returningCustomers,
       totalCustomers,
 
-      // Inventory Status
       totalProducts: productMetrics.totalProducts,
       inStockProducts: productMetrics.inStockProducts,
       outOfStockProducts: productMetrics.outOfStockProducts,
 
-      // Geographic & Device Analytics
       salesByCountry,
       visitsByDevice,
     };
 
-    // Persistence via Repository
     await analyticsRepository.upsertDailyMetrics(startOfDay, snapshotData);
-    console.log(`📈 Daily summary saved for ${startOfDay.toISOString()}`);
   },
 
-  /**
-   * Syncs product popularity (view counts) based on raw events.
-   */
   async syncProductPopularity(startOfDay: Date, endOfDay: Date) {
-    console.log("🏷️ Syncing product popularity metrics...");
-
-    // Fetch view counts via Analytics Repository
     const productViews = await analyticsRepository.getProductViewMetrics(
       startOfDay,
       endOfDay
     );
 
-    // Update each product via Product Repository
     for (const view of productViews) {
       if (!view.productId) continue;
       await productRepository.incrementViewCount(

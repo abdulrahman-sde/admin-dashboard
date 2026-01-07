@@ -13,12 +13,16 @@ import paymentMethodsRoutes from "./payment-methods.routes.js";
 import monthlyGoalsRoutes from "./monthly-goals.routes.js";
 import reportsRoutes from "./reports.routes.js";
 import aiRoutes from "./ai.routes.js";
+import { authenticateAdmin } from "../../middlewares/auth/admin.auth.js";
 
 const router = Router();
 
 router.use("/auth", authRoutes);
-router.use("/reports", reportsRoutes);
 
+// Protect all other admin routes
+router.use(authenticateAdmin);
+
+router.use("/reports", reportsRoutes);
 router.use("/categories", categoriesRoutes);
 router.use("/products", productsRoutes);
 router.use("/customers", customersRoutes);

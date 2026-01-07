@@ -20,7 +20,6 @@ export const useTransactions = () => {
     "desc"
   );
 
-  // Debounce search
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearch(search);
@@ -85,13 +84,11 @@ export const useTransactions = () => {
 
   const pages = generatePagination(currentPage, totalPages);
 
-  // Helper to calculate percentage of total
   const calculatePercentage = (value: number, total: number) => {
     if (total === 0) return 0;
     return (value / total) * 100;
   };
 
-  // Get dynamic stats using analytics data
   const getDynamicStats = () => {
     const transactionStats = stats?.transactions?.thisWeek;
     const orderStats = stats?.orders?.thisWeek;

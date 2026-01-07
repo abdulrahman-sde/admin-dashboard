@@ -92,7 +92,7 @@ export function AddPaymentMethodModal({
             <FormField
               control={form.control}
               name="name"
-              render={({ field }: { field: any }) => (
+              render={({ field }) => (
                 <FormItem>
                   <FormLabel>Method Name (Nickname)</FormLabel>
                   <FormControl>
@@ -105,7 +105,7 @@ export function AddPaymentMethodModal({
             <FormField
               control={form.control}
               name="type"
-              render={({ field }: { field: any }) => (
+              render={({ field }) => (
                 <FormItem>
                   <FormLabel>Type</FormLabel>
                   <Select
@@ -130,7 +130,7 @@ export function AddPaymentMethodModal({
               <FormField
                 control={form.control}
                 name="last4"
-                render={({ field }: { field: any }) => (
+                render={({ field }) => (
                   <FormItem>
                     <FormLabel>Last 4 Digits</FormLabel>
                     <FormControl>
@@ -143,7 +143,7 @@ export function AddPaymentMethodModal({
               <FormField
                 control={form.control}
                 name="expiryDate"
-                render={({ field }: { field: any }) => (
+                render={({ field }) => (
                   <FormItem>
                     <FormLabel>Expiry (MM/YY)</FormLabel>
                     <FormControl>
@@ -157,7 +157,7 @@ export function AddPaymentMethodModal({
             <FormField
               control={form.control}
               name="holderName"
-              render={({ field }: { field: any }) => (
+              render={({ field }) => (
                 <FormItem>
                   <FormLabel>Card Holder Name</FormLabel>
                   <FormControl>

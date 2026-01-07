@@ -106,7 +106,7 @@ export default function AddCoupon() {
                       <FormControl>
                         <Input
                           placeholder="Shipfree20"
-                          className="h-11 bg-[#F9FAFB] border border-gray-200 shadow-none focus:border-[#48A878] focus:ring-0 rounded-lg placeholder:text-muted-foreground"
+                          className="h-11 bg-[#F9FAFB] border-none shadow-none focus:ring-0 rounded-lg placeholder:text-muted-foreground"
                           {...field}
                         />
                       </FormControl>
@@ -126,7 +126,7 @@ export default function AddCoupon() {
                       <FormControl>
                         <Input
                           placeholder="Free Shipping"
-                          className="h-11 bg-[#F9FAFB] border border-gray-200 shadow-none focus:border-[#48A878] focus:ring-0 rounded-lg placeholder:text-muted-foreground"
+                          className="h-11 bg-[#F9FAFB] border-none shadow-none focus:ring-0 rounded-lg placeholder:text-muted-foreground"
                           {...field}
                         />
                       </FormControl>
@@ -215,7 +215,7 @@ export default function AddCoupon() {
                       <Input
                         type="number"
                         placeholder="Amount"
-                        className="h-11 bg-[#F9FAFB] border border-gray-200 shadow-none focus:border-[#48A878] focus:ring-0 rounded-lg placeholder:text-muted-foreground"
+                        className="h-11 bg-[#F9FAFB] border-none shadow-none focus:ring-0 rounded-lg placeholder:text-muted-foreground"
                         value={field.value ?? ""}
                         onChange={(e) =>
                           field.onChange(
@@ -253,7 +253,7 @@ export default function AddCoupon() {
                               <Button
                                 variant="outline"
                                 className={cn(
-                                  "w-full h-11 justify-between text-left font-normal bg-[#F9FAFB] border border-gray-200 shadow-none focus:border-[#48A878] focus:ring-0 rounded-lg",
+                                  "w-full h-11 justify-between text-left font-normal bg-[#F9FAFB] border-none shadow-none focus:ring-0 rounded-lg",
                                   !field.value && "text-muted-foreground"
                                 )}
                               >
@@ -297,7 +297,7 @@ export default function AddCoupon() {
                           <Input
                             type="number"
                             placeholder="e.g. 7"
-                            className="h-11 bg-[#F9FAFB] border border-gray-200 shadow-none focus:border-[#48A878] focus:ring-0 rounded-lg placeholder:text-muted-foreground"
+                            className="h-11 bg-[#F9FAFB] border-none shadow-none focus:ring-0 rounded-lg placeholder:text-muted-foreground"
                             value={field.value ?? ""}
                             onChange={(e) =>
                               field.onChange(
@@ -348,7 +348,7 @@ export default function AddCoupon() {
                         <Input
                           type="number"
                           placeholder="Amount of uses"
-                          className="h-11 bg-[#F9FAFB] border border-gray-200 shadow-none focus:border-[#48A878] focus:ring-0 rounded-lg placeholder:text-muted-foreground"
+                          className="h-11 bg-[#F9FAFB] border-none shadow-none focus:ring-0 rounded-lg placeholder:text-muted-foreground"
                           value={field.value ?? ""}
                           onChange={(e) =>
                             field.onChange(

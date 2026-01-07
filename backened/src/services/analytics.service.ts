@@ -15,12 +15,10 @@ export const analyticsService = {
   async getTwoWeekStats(): Promise<DashboardWeeklyStats> {
     const { thisWeek, previousWeek } = getTwoWeekRollingRange();
 
-    // Create a key based on the start date of this week
     const dateKey = thisWeek.from.toISOString().split("T")[0] || "current";
     const cachedData = await getWeeklyStats(dateKey);
 
     if (cachedData) {
-      console.log("Using cached data");
       return cachedData;
     }
 
@@ -63,7 +61,6 @@ export const analyticsService = {
       },
     };
 
-    // Cache the result for 1 hour
     await setWeeklyStats(dateKey, result, 3600);
 
     return result;
@@ -88,10 +85,6 @@ export const analyticsService = {
       },
     };
   },
-
-  // async getTopProducts(limit: number = 10): Promise<Product[]> {
-  //    return analyticsRepository.getTopProducts(limit);
-  // },
 
   async getRealTimeStats(): Promise<RealTimeStats> {
     const stats = await analyticsRepository.getRealTimeStats();

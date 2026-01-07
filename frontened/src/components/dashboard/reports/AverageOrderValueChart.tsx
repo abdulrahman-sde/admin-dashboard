@@ -1,30 +1,19 @@
-import { useMemo } from "react";
+import { useAverageOrderValue } from "@/hooks/reports/useAverageOrderValue";
 import { AreaChart, Area, Tooltip, ResponsiveContainer } from "recharts";
 
+import type { AvgOrderValueData } from "@/types/reports";
+
 interface AverageOrderValueChartProps {
-  data: {
-    thisMonth: number;
-    prevMonth: number;
-    trend: { time: string; value: number }[];
-  };
+  data: AvgOrderValueData;
 }
 
 export const AverageOrderValueChart = ({
   data,
 }: AverageOrderValueChartProps) => {
-  const last5DaysTrend = useMemo(() => {
-    if (!data?.trend) return [];
-    return data.trend.slice(-5);
-  }, [data.trend]);
-
-  const last5DaysAvg = useMemo(() => {
-    if (last5DaysTrend.length === 0) return 0;
-    const sum = last5DaysTrend.reduce((acc, curr) => acc + curr.value, 0);
-    return sum / last5DaysTrend.length;
-  }, [last5DaysTrend]);
+  const { last4DaysTrend, last4DaysAvg } = useAverageOrderValue(data);
 
   return (
-    <div className="rounded-xl border border-gray-100 bg-white p-6 shadow-sm h-full">
+    <div className="bg-white p-6 h-full rounded-2xl">
       <h3 className="text-base font-semibold text-gray-900">
         Average Order Value
       </h3>
@@ -37,9 +26,9 @@ export const AverageOrderValueChart = ({
           </span>
         </div>
         <div className="flex gap-2 text-sm">
-          <span className="text-gray-500">Last 5 Days</span>
+          <span className="text-gray-500">Last 4 Days</span>
           <span className="font-bold text-gray-900">
-            ${last5DaysAvg.toFixed(2)}
+            ${last4DaysAvg.toFixed(2)}
           </span>
         </div>
       </div>
@@ -47,7 +36,7 @@ export const AverageOrderValueChart = ({
       <div className="h-[200px] w-full">
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart
-            data={last5DaysTrend}
+            data={last4DaysTrend}
             margin={{ top: 10, right: 0, left: 0, bottom: 0 }}
           >
             <defs>
@@ -79,9 +68,11 @@ export const AverageOrderValueChart = ({
       </div>
 
       <div className="flex justify-between text-xs text-gray-400 mt-2 px-2">
-        {last5DaysTrend.map((item, i) => (
-          <span key={i}>{item.time}</span>
-        ))}
+        {last4DaysTrend.map(
+          (item: { time: string; value: number }, i: number) => (
+            <span key={i}>{item.time}</span>
+          )
+        )}
       </div>
     </div>
   );

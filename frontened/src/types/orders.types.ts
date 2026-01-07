@@ -15,7 +15,6 @@ export interface OrderItem {
   quantity: number;
 }
 
-// For list view
 export interface OrderListItem {
   id: string;
   orderNumber: string;

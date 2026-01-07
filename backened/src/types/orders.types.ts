@@ -5,9 +5,9 @@ export type ServerOrderItem = {
   quantity: number;
   unitPrice: number; // price fetched from DB
   totalPrice: number; // quantity * unitPrice
-  productName?: string;
+  productName: string;
   productImage?: string;
-  productSku?: string;
+  productSku: string;
 };
 
 export type CreateOrderDTO = Omit<

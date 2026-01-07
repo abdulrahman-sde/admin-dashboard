@@ -1,24 +1,12 @@
-// ============================================
-// Generic API Response Types
-// ============================================
-
-/**
- * Standard API response structure
- * Used across all endpoints for consistent response format
- */
-export interface ApiResponse<T = any> {
+export interface ApiResponse<T = unknown> {
   success: boolean;
   message?: string;
   data?: T;
-  error?: string;
+  error?: unknown;
   timestamp: string;
 }
 
-/**
- * Paginated response structure
- * Used for list endpoints with pagination
- */
-export interface PaginatedResponse<T = any> {
+export interface PaginatedResponse<T = unknown> {
   success: boolean;
   data: T[];
   message?: string;
@@ -33,9 +21,6 @@ export interface PaginatedResponse<T = any> {
   timestamp: string;
 }
 
-/**
- * Pagination parameters for requests
- */
 export interface PaginationParams {
   page: number;
   limit: number;

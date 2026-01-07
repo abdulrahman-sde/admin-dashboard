@@ -147,7 +147,7 @@ export default function Reviews() {
           size="sm"
           onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
           disabled={currentPage === 1}
-          className="h-8 border-[#E5E7EB]"
+          className="h-8 border-none bg-[#F9FAFB] hover:bg-[#EDF1FD]"
         >
           Previous
         </Button>
@@ -178,7 +178,7 @@ export default function Reviews() {
             )
           }
           disabled={currentPage === (pagination?.totalPages || 1)}
-          className="h-8 border-[#E5E7EB]"
+          className="h-8 border-none bg-[#F9FAFB] hover:bg-[#EDF1FD]"
         >
           Next
         </Button>

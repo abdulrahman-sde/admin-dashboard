@@ -4,10 +4,6 @@ import type {
   PaginationParams,
 } from "../types/common.types.js";
 
-// ============================================
-// Base Response Builder
-// ============================================
-
 const createBaseResponse = (
   success: boolean
 ): Pick<ApiResponse, "success" | "timestamp"> => ({
@@ -15,11 +11,7 @@ const createBaseResponse = (
   timestamp: new Date().toISOString(),
 });
 
-// ============================================
-// Success Responses
-// ============================================
-
-export const successResponse = <T = any>(
+export const successResponse = <T = unknown>(
   data: T,
   message = "Success"
 ): ApiResponse<T> => ({
@@ -27,10 +19,6 @@ export const successResponse = <T = any>(
   message,
   data,
 });
-
-// ============================================
-// Paginated Responses
-// ============================================
 
 export const paginatedResponse = <T>(
   data: T[],
@@ -43,16 +31,12 @@ export const paginatedResponse = <T>(
   message,
 });
 
-// ============================================
-// Error Responses
-// ============================================
-
 export const errorResponse = (
   message = "Operation failed",
-  error?: any
+  error?: unknown
 ): ApiResponse<null> => ({
   ...createBaseResponse(false),
   message,
   data: null,
-  error: error?.message || error,
+  error: error instanceof Error ? error.message : error,
 });

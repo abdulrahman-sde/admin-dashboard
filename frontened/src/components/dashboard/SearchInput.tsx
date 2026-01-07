@@ -24,7 +24,6 @@ export function SearchInput() {
     skip: !debouncedQuery || debouncedQuery.length < 2,
   });
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -72,20 +71,20 @@ export function SearchInput() {
   return (
     <div
       ref={containerRef}
-      className="relative flex items-center md:bg-background rounded-[50px] w-full md:w-[220px] lg:w-[380px] h-11 md:shadow-xs"
+      className="relative flex items-center bg-[#F9FAFB] rounded-[50px] w-full md:w-[220px] lg:w-[380px] h-[45px] border border-transparent focus-within:border-[#4EA674] transition-all"
     >
       <input
         type="text"
         value={query}
         onChange={(e) => setQuery(e.target.value)}
-        placeholder="Search data, customers, or categories"
-        className="hidden md:block w-full bg-transparent border-0 outline-none px-[27px] pr-10 text-sm placeholder:text-muted-foreground"
+        placeholder="Search data, users, or reports"
+        className="w-full bg-transparent border-0 ring-0 hover:ring-0 focus:ring-0 outline-none px-6 pr-12 text-sm placeholder:text-[#A1A7C4] placeholder:text-[15.5px] placeholder:font-normal"
       />
-      <div className="flex items-center justify-center md:absolute md:right-4 w-full md:w-auto pointer-events-none">
+      <div className="absolute right-4 flex items-center pointer-events-none">
         {isFetching ? (
           <Loader2 size={20} className="text-muted-foreground animate-spin" />
         ) : (
-          <Search size={20} className="text-muted-foreground" />
+          <Search size={18} className="text-[#8E92BC]" />
         )}
       </div>
 

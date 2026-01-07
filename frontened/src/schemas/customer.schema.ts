@@ -1,8 +1,5 @@
 import { z } from "zod";
 
-// ============================================
-// Shared Sub-Schemas
-// ============================================
 
 const addressSchema = z.object({
   street: z.string().min(1, "Street Address is required"),
@@ -14,9 +11,6 @@ const addressSchema = z.object({
   phone: z.string().optional(),
 });
 
-// ============================================
-// Query Validator (GET /customers)
-// ============================================
 
 export const getCustomersQuerySchema = z.object({
   page: z.coerce.number().int().positive().default(1),
@@ -31,9 +25,6 @@ export const getCustomersQuerySchema = z.object({
 
 export type GetCustomersQuery = z.infer<typeof getCustomersQuerySchema>;
 
-// ============================================
-// Create Validator (POST /customers)
-// ============================================
 
 export const customerSchema = z.object({
   firstName: z
@@ -47,26 +38,20 @@ export const customerSchema = z.object({
     .email("Invalid email address"),
   phone: z.string().optional(),
 
-  // Role & Status
   role: z.enum(["GUEST", "CUSTOMER", "VIP"], {
     required_error: "Role is required",
   }),
   isGuest: z.boolean(),
 
-  // Metadata
   notes: z.string().optional(),
   tags: z.array(z.string()).optional(),
 
-  // Nested Address
   address: addressSchema.optional(),
   status: z.enum(["ACTIVE", "INACTIVE", "VIP", "BLOCKED"]).default("ACTIVE"),
 });
 
 export type CustomerFormValues = z.infer<typeof customerSchema>;
 
-// ============================================
-// Update Validator (PUT /customers/:id)
-// ============================================
 
 export const updateCustomerSchema = z.object({
   firstName: z.string().min(1).optional(),

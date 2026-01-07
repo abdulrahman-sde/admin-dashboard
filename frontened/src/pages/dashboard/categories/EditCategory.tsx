@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import AddProductDialog from "@/components/dashboard/categories/AddProductDialog";
-import { MoreVertical, Edit, Trash2, Plus, Loader2 } from "lucide-react";
+import { Edit, Trash2, Plus, Loader2 } from "lucide-react";
 import { useAddCategory } from "@/hooks/categories/useAddCategory";
 import {
   Form,
@@ -23,7 +23,6 @@ import type { CategoryProduct } from "@/types/categories.types";
 export default function EditCategory() {
   const { id } = useParams<{ id: string }>();
 
-  // Use the comprehensive hook
   const {
     form,
     onSubmit,
@@ -111,7 +110,7 @@ export default function EditCategory() {
               <Button
                 variant="outline"
                 type="button"
-                className="border-[#E5E7EB] text-[#374151]"
+                className="border-none bg-[#F9FAFB] text-[#374151] hover:bg-[#EDF1FD]"
                 onClick={() => window.history.back()}
               >
                 Cancel
@@ -151,10 +150,10 @@ export default function EditCategory() {
                           <div
                             key={product.id}
                             onClick={() => setSelectedProduct(product.id)}
-                            className={`flex ps-4 items-center gap-3 p-3 rounded-lg border transition-all cursor-pointer ${
+                            className={`flex ps-4 items-center gap-3 p-3 rounded-lg border-none transition-all cursor-pointer ${
                               selectedProduct === product.id
-                                ? "border-[#4EA674] bg-[#4EA674]/5"
-                                : "border-[#E5E7EB] hover:border-[#4EA674]/50"
+                                ? "bg-[#4EA674]/5 ring-1 ring-[#4EA674]"
+                                : "bg-[#F9FAFB] hover:bg-[#EDF1FD]"
                             }`}
                           >
                             <div className="h-12 w-12  rounded bg-[#F3F4F6] flex items-center justify-center overflow-hidden shrink-0">
@@ -208,7 +207,7 @@ export default function EditCategory() {
                       type="button"
                       onClick={() => setShowAddDialog(true)}
                       variant="outline"
-                      className="w-full py-5.5 border-2 border-dashed border-[#E5E7EB] rounded-lg text-[#4EA674] hover:border-[#4EA674] hover:bg-[#4EA674]/5 transition-colors flex items-center justify-center gap-2 h-auto"
+                      className="w-full py-5.5 border-2 border-dashed border-gray-100 rounded-lg text-[#4EA674] hover:border-[#4EA674] hover:bg-[#4EA674]/5 transition-colors flex items-center justify-center gap-2 h-auto bg-[#F9FAFB]"
                     >
                       <Plus className="h-4 w-4" />
                       Add Product to Category
@@ -266,7 +265,7 @@ export default function EditCategory() {
                         <Input
                           placeholder="Women Clothes"
                           {...field}
-                          className="border-[#E5E7EB] focus:border-[#4EA674] focus:ring-[#4EA674]"
+                          className="border-none bg-[#F9FAFB] focus:bg-[#EDF1FD] focus:ring-0"
                         />
                       </FormControl>
                       <FormMessage />
@@ -276,7 +275,7 @@ export default function EditCategory() {
 
                 <div className="space-y-4">
                   <Label className="text-sm text-[#4B5563]">Image</Label>
-                  <label className="border-2 border-dashed border-[#E5E7EB] rounded-lg p-8 text-center hover:border-[#4EA674] transition-colors cursor-pointer relative h-48 flex items-center justify-center overflow-hidden">
+                  <label className="border-2 border-dashed border-gray-100 rounded-lg p-8 text-center hover:border-[#4EA674] transition-colors cursor-pointer relative h-48 flex items-center justify-center overflow-hidden bg-[#F9FAFB]">
                     <input
                       type="file"
                       accept="image/*"

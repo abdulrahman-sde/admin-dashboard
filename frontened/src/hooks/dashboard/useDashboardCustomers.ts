@@ -20,7 +20,7 @@ export const useDashboardCustomers = () => {
       subtitle: "Last 7 days",
     },
     {
-      title: "New Customers",
+      title: "New Users",
       value: stats?.customers.thisWeek.newCustomers ?? 0,
       change: {
         value: Math.abs(weeklyNewCustomersChange),
@@ -29,7 +29,7 @@ export const useDashboardCustomers = () => {
       subtitle: "Last 7 days",
     },
     {
-      title: "Visitor",
+      title: "Total Visits",
       value: stats?.customers.thisWeek.totalVisits ?? 0,
       change: {
         value: Math.abs(weeklyVisitsChange),
@@ -38,8 +38,6 @@ export const useDashboardCustomers = () => {
       subtitle: "Last 7 days",
     },
   ];
-
-  // Build dynamic customer overview data from analytics
 
   return {
     dynamicStats,

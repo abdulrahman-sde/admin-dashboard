@@ -3,15 +3,14 @@ import { AppError } from "../utils/errors.js";
 import { ZodError } from "zod";
 import { Prisma } from "@prisma/client";
 
-/**
- * Transform Prisma errors into user-friendly messages
- */
 const handlePrismaError = (err: Prisma.PrismaClientKnownRequestError) => {
   const errorMap: Record<
     string,
-    { status: number; getMessage: (err: any) => string }
+    {
+      status: number;
+      getMessage: (err: Prisma.PrismaClientKnownRequestError) => string;
+    }
   > = {
-    // Unique constraint violation
     P2002: {
       status: 409,
       getMessage: (err) => {
@@ -19,12 +18,10 @@ const handlePrismaError = (err: Prisma.PrismaClientKnownRequestError) => {
         return `A record with this ${field} already exists`;
       },
     },
-    // Record not found
     P2025: {
       status: 404,
       getMessage: () => "Record not found",
     },
-    // Foreign key constraint failed
     P2003: {
       status: 400,
       getMessage: (err) => {
@@ -32,7 +29,6 @@ const handlePrismaError = (err: Prisma.PrismaClientKnownRequestError) => {
         return `Invalid ${field} - the referenced record does not exist`;
       },
     },
-    // Required field missing
     P2012: {
       status: 400,
       getMessage: (err) => {
@@ -40,32 +36,26 @@ const handlePrismaError = (err: Prisma.PrismaClientKnownRequestError) => {
         return `Missing required field: ${field}`;
       },
     },
-    // Invalid ID format
     P2023: {
       status: 400,
       getMessage: () => "Invalid ID format",
     },
-    // Inconsistent column data
     P2024: {
       status: 400,
       getMessage: () => "Invalid data format",
     },
-    // Dependent records exist (can't delete)
     P2014: {
       status: 400,
       getMessage: () => "Cannot delete - related records exist",
     },
-    // Query interpretation error
     P2009: {
       status: 400,
       getMessage: () => "Invalid query parameters",
     },
-    // Raw query failed
     P2010: {
       status: 400,
       getMessage: () => "Query execution failed",
     },
-    // Null constraint violation
     P2011: {
       status: 400,
       getMessage: (err) => {
@@ -73,7 +63,6 @@ const handlePrismaError = (err: Prisma.PrismaClientKnownRequestError) => {
         return `${field} cannot be null`;
       },
     },
-    // Value too long
     P2000: {
       status: 400,
       getMessage: (err) => {
@@ -81,7 +70,6 @@ const handlePrismaError = (err: Prisma.PrismaClientKnownRequestError) => {
         return `Value for ${field} is too long`;
       },
     },
-    // Value out of range
     P2006: {
       status: 400,
       getMessage: (err) => {
@@ -99,7 +87,6 @@ const handlePrismaError = (err: Prisma.PrismaClientKnownRequestError) => {
     };
   }
 
-  // Unknown Prisma error
   return {
     status: 500,
     message: "A database error occurred",
@@ -112,16 +99,12 @@ export const errorHandler = (
   res: Response,
   next: NextFunction
 ): void => {
-  // Log error for debugging
   if (process.env.NODE_ENV === "development") {
     const isExpectedError = err instanceof AppError || err instanceof ZodError;
     const isUnauthorized = err instanceof AppError && err.statusCode === 401;
 
     if (isUnauthorized) {
-      // Silence 401 logs to keep console clean
-    } else if (isExpectedError) {
-      console.log(`🔴 [${err.constructor.name}]: ${err.message}`);
-    } else {
+    } else if (!isExpectedError) {
       console.error("💥 Unexpected Error:", {
         name: err.name,
         message: err.message,
@@ -132,7 +115,6 @@ export const errorHandler = (
     console.error("💥 Error:", err.message);
   }
 
-  // Check if it's our custom AppError
   if (err instanceof AppError) {
     res.status(err.statusCode).json({
       success: false,
@@ -141,7 +123,6 @@ export const errorHandler = (
     return;
   }
 
-  // Handle Zod validation errors
   if (err instanceof ZodError) {
     const fieldErrors = err.flatten().fieldErrors;
     const errorMessages = Object.values(fieldErrors).flat();
@@ -155,7 +136,6 @@ export const errorHandler = (
     return;
   }
 
-  // Handle Prisma Known Errors (simplified)
   if (err instanceof Prisma.PrismaClientKnownRequestError) {
     const { status, message } = handlePrismaError(err);
     res.status(status).json({
@@ -165,7 +145,6 @@ export const errorHandler = (
     return;
   }
 
-  // Handle Prisma Validation Errors
   if (err instanceof Prisma.PrismaClientValidationError) {
     res.status(400).json({
       success: false,
@@ -174,7 +153,6 @@ export const errorHandler = (
     return;
   }
 
-  // Handle Prisma Initialization Errors
   if (err instanceof Prisma.PrismaClientInitializationError) {
     res.status(503).json({
       success: false,
@@ -183,7 +161,6 @@ export const errorHandler = (
     return;
   }
 
-  // Handle JSON Syntax Errors
   if (err instanceof SyntaxError && "body" in err) {
     res.status(400).json({
       success: false,
@@ -192,7 +169,6 @@ export const errorHandler = (
     return;
   }
 
-  // All other errors = 500 Internal Server Error
   res.status(500).json({
     success: false,
     message:

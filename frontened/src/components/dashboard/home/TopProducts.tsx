@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useTopProductsTable } from "@/hooks/dashboard/useTopProductsTable";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
@@ -16,18 +16,11 @@ interface TopProductsProps {
 }
 
 export default function TopProducts({ data, isLoading }: TopProductsProps) {
-  const [search, setSearch] = useState("");
+  const { search, setSearch, filteredProducts } = useTopProductsTable(data);
 
   if (isLoading) {
     return <TopProductsSkeleton />;
   }
-
-  const filteredProducts =
-    data
-      ?.filter((product) =>
-        product.name.toLowerCase().includes(search.toLowerCase())
-      )
-      .slice(0, 4) || [];
 
   return (
     <Card className="shadow-sm border-0 pb-3 min-h-[480px]">

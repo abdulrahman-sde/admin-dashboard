@@ -6,6 +6,8 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { getProductImage } from "@/lib/utils";
+
 import { Button } from "@/components/ui/button";
 import type { OrderListItem } from "@/types/orders.types";
 
@@ -60,18 +62,11 @@ export default function OrderDetailsDialog({
               order.items.map((item, idx) => (
                 <div
                   key={idx}
-                  className="flex items-center gap-3 bg-white p-3 rounded-lg border border-[#F1F5F9]"
+                  className="flex items-center gap-3 bg-[#F9FAFB] p-3 rounded-lg border-none"
                 >
                   <div className="w-12 h-12 bg-[#f8fafc] rounded-lg overflow-hidden flex items-center justify-center">
                     <img
-                      src={
-                        item.productImage ||
-                        (item as any).product?.thumbnail ||
-                        (item as any).product?.images?.[0] ||
-                        (item as any).product?.image ||
-                        (item as any).image ||
-                        "https://via.placeholder.com/48?text=No+Img"
-                      }
+                      src={getProductImage(item)}
                       alt={item.productName}
                       className="w-full h-full object-cover"
                       onError={(e) => {
@@ -100,7 +95,7 @@ export default function OrderDetailsDialog({
           <Button
             variant="outline"
             onClick={() => onOpenChange(false)}
-            className="border-[#E5E7EB]"
+            className="border-none bg-[#F9FAFB] hover:bg-[#EDF1FD]"
           >
             Close
           </Button>

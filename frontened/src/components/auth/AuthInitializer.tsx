@@ -24,7 +24,6 @@ export default function AuthInitializer() {
   const isLogin = location.pathname === "/login";
   const isRegister = location.pathname === "/register";
 
-  // REDIRECT LOGIC (Production Grade)
   if (isAuthenticated) {
     if (isRoot || isLogin || isRegister) {
       return <Navigate to="/dashboard" replace />;

@@ -19,7 +19,6 @@ import {
 import { CustomerDetailSkeleton } from "@/components/shared/skeletons";
 
 import { useState } from "react";
-// import { useDeleteCustomerMutation } from "@/lib/store/services/customers/customersApi"; // Remove this
 import { CustomerEditModal } from "@/components/dashboard/customers/CustomerEditModal";
 
 import { DeleteConfirmationModal } from "@/components/shared/DeleteConfirmationModal";

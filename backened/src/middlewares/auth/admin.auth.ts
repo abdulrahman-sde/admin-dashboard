@@ -3,34 +3,24 @@ import { verifyToken } from "../../lib/jwt.js";
 import { UnauthorizedError } from "../../utils/errors.js";
 import type { AuthRequest } from "../../types/auth.types.js";
 
-/**
- * Admin Authentication Middleware
- * Verifies JWT token and ensures user is an admin
- */
 export const authenticateAdmin = async (
   req: AuthRequest,
   res: Response,
   next: NextFunction
 ): Promise<void> => {
   try {
-    let token = req.headers.authorization?.replace("Bearer ", "");
-
-    if (!token && req.cookies) {
-      token = req.cookies.accessToken;
-    }
+    let token = req.cookies.accessToken;
 
     if (!token) {
-      throw new UnauthorizedError("No token provided");
+      throw new UnauthorizedError("Unauthorized login required");
     }
 
     const payload = verifyToken(token);
 
-    // Check if token is for admin
     if (payload.type !== "admin") {
       throw new UnauthorizedError("Admin access required");
     }
 
-    // Attach user to request
     req.user = {
       id: payload.userId,
       email: payload.email,

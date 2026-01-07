@@ -13,10 +13,7 @@ export const getDetailedDailyMetrics = async (_req: Request, res: Response) => {
     successResponse(metrics, "Detailed daily metrics fetched successfully")
   );
 };
-export const getTopProducts = async (_req: Request, res: Response) => {
-  // const products = await analyticsService.getTopProducts();
-  // res.json(successResponse(products, "Top products fetched successfully"));
-};
+export const getTopProducts = async (_req: Request, res: Response) => {};
 
 export const getRealTimeStats = async (_req: Request, res: Response) => {
   const metrics = await analyticsService.getRealTimeStats();

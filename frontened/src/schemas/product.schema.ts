@@ -1,8 +1,5 @@
 import { z } from "zod";
 
-// ============================================
-// Form Schema (used for UI state)
-// ============================================
 
 export const productSchema = z
   .object({
@@ -67,9 +64,6 @@ export const productSchema = z
 
 export type ProductFormValues = z.infer<typeof productSchema>;
 
-// ============================================
-// Robust Schemas (Source of Truth)
-// ============================================
 
 export const createProductSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),

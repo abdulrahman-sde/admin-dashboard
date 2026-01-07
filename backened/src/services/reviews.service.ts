@@ -5,7 +5,6 @@ export const reviewsService = {
   async addReview(input: CreateReviewInput) {
     const { productId, customerId, rating, comment } = input;
 
-    // 1. Create the review
     const review = await reviewsRepository.create({
       product: { connect: { id: productId } },
       ...(customerId && { customer: { connect: { id: customerId } } }),
@@ -13,7 +12,6 @@ export const reviewsService = {
       comment,
     });
 
-    // 2. Update denormalized product rating
     await reviewsRepository.updateProductRatings(productId, rating);
 
     return review;

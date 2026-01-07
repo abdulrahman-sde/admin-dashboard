@@ -5,6 +5,5 @@ async function main() {
     take: 5,
     orderBy: { date: "desc" },
   });
-  console.log(JSON.stringify(metrics, null, 2));
 }
 main().finally(() => prisma.$disconnect());

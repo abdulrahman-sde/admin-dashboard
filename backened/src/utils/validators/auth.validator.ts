@@ -1,6 +1,5 @@
 import { z } from "zod";
 
-// Register Schema
 export const registerSchema = z.object({
   email: z.string().email("Invalid email address"),
   firstName: z
@@ -18,7 +17,6 @@ export const registerSchema = z.object({
   role: z.enum(["ADMIN"]).optional(),
 });
 
-// Login Schema
 export const loginSchema = z.object({
   email: z.string().email("Invalid email address"),
   password: z
@@ -27,7 +25,6 @@ export const loginSchema = z.object({
     .max(100, "Password must be at most 100 characters"),
 });
 
-// Profile Update Schema
 export const updateProfileSchema = z.object({
   firstName: z.string().min(2, "First name is too short").max(50).optional(),
   lastName: z.string().min(2, "Last name is too short").max(50).optional(),
@@ -37,7 +34,6 @@ export const updateProfileSchema = z.object({
   avatar: z.string().url("Invalid avatar URL").optional().or(z.literal("")),
 });
 
-// Change Password Schema
 export const changePasswordSchema = z
   .object({
     currentPassword: z.string().min(1, "Current password is required"),
@@ -53,7 +49,6 @@ export const changePasswordSchema = z
     path: ["confirmPassword"],
   });
 
-// Customer Auth Schemas
 export const registerCustomerSchema = z.object({
   email: z.string().email("Invalid email address"),
   password: z.string().min(6, "Password must be at least 6 characters"),
@@ -67,9 +62,6 @@ export const loginCustomerSchema = z.object({
   password: z.string().min(1, "Password is required"),
 });
 
-// ============================================
-// Zod-Inferred Types (Single Source of Truth)
-// ============================================
 
 export type RegisterInput = z.infer<typeof registerSchema>;
 export type LoginInput = z.infer<typeof loginSchema>;

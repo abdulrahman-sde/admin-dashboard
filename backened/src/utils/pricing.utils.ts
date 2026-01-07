@@ -12,14 +12,11 @@ export const calculateOrderPricing = (params: {
 
   const shipping = params.shippingFee ?? 0;
 
-  // Calculate discount
   let discount = params.discountAmount ?? 0;
   if (params.discountPercent) {
     discount = subtotal * (params.discountPercent / 100);
   }
 
-  // Calculate tax on (subtotal - discount)
-  // Assuming tax is applied after discount but before shipping
   const taxableAmount = Math.max(0, subtotal - discount);
   const tax = params.taxRate ? taxableAmount * (params.taxRate / 100) : 0;
 

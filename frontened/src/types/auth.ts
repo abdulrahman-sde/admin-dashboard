@@ -1,4 +1,3 @@
-// Auth Inputs
 export interface LoginInput {
   email: string;
   password: string;
@@ -34,6 +33,7 @@ export interface AdminUser {
   avatar?: string;
   phone?: string;
   biography?: string;
+  location?: string;
   createdAt: string;
   updatedAt: string;
   lastLoginAt?: string;
@@ -46,6 +46,7 @@ export interface UpdateProfileInput {
   phone?: string;
   biography?: string;
   avatar?: string;
+  location?: string;
 }
 
 export interface ChangePasswordInput {
@@ -54,7 +55,6 @@ export interface ChangePasswordInput {
   confirmPassword?: string;
 }
 
-// Responses
 export interface AuthResponse {
   success: boolean;
   message: string;

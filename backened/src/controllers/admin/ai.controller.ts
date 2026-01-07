@@ -19,10 +19,39 @@ export const generateDescription = asyncHandler(
 
     const result = await aiService.generateDescription(productName);
 
-    // Pipe the stream to the response
     if (result.body) {
       res.setHeader("Content-Type", "text/plain; charset=utf-8");
-      // @ts-ignore - ReadableStream/Node stream mismatch
+      const reader = result.body.getReader();
+      const pump = async () => {
+        const { done, value } = await reader.read();
+        if (done) {
+          res.end();
+          return;
+        }
+        res.write(value);
+        await pump();
+      };
+      await pump();
+    } else {
+      res.end();
+    }
+  }
+);
+
+export const refineBiography = asyncHandler(
+  async (req: Request, res: Response) => {
+    const { biography } = req.body;
+
+    if (!biography || typeof biography !== "string" || biography.length < 10) {
+      throw new ValidationError(
+        "Biography must be at least 10 characters long to refine"
+      );
+    }
+
+    const result = await aiService.refineBiography(biography);
+
+    if (result.body) {
+      res.setHeader("Content-Type", "text/plain; charset=utf-8");
       const reader = result.body.getReader();
       const pump = async () => {
         const { done, value } = await reader.read();

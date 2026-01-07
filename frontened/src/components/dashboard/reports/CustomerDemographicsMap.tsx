@@ -1,97 +1,90 @@
-import { useMemo } from "react";
 import {
   ComposableMap,
   Geographies,
   Geography,
   ZoomableGroup,
 } from "react-simple-maps";
-import { scaleLinear } from "d3-scale";
-import { useGetCustomerDemographicsQuery } from "@/lib/store/services/reportsApi";
+import { useCustomerDemographics } from "@/hooks/reports/useCustomerDemographics";
 
 const geoUrl = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
 
 const CustomerDemographicsMap = () => {
-  const { data, isLoading } = useGetCustomerDemographicsQuery();
-
-  const countrySales = useMemo(() => {
-    if (!data) return {};
-    return data.demographics.reduce((acc, curr) => {
-      acc[curr.country] = curr.sales;
-      return acc;
-    }, {} as Record<string, number>);
-  }, [data]);
-
-  const maxValue = useMemo(() => {
-    if (!data) return 0;
-    return Math.max(...data.demographics.map((d) => d.sales));
-  }, [data]);
-
-  const colorScale = scaleLinear<string>()
-    .domain([0, maxValue || 1000])
-    .range(["#F5F5F5", "#10B981"]);
+  const { sortedRegions, countrySales, getColor, isLoading } =
+    useCustomerDemographics();
 
   if (isLoading)
     return (
-      <div className="h-[300px] flex items-center justify-center">
-        Loading Map...
+      <div className="h-[500px] flex items-center justify-center bg-white rounded-2xl">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
       </div>
     );
 
   return (
-    <div className="w-full h-[500px] rounded-xl border border-gray-100 bg-white p-6 shadow-sm overflow-hidden">
-      <h3 className="mb-8 text-base font-bold text-gray-900">
+    <div className="w-full h-[500px] bg-white p-8 rounded-2xl relative">
+      <h3 className="text-xl font-bold text-[#151D48] mb-8">
         Customer Demographics
       </h3>
-      <div className="flex flex-col-reverse lg:flex-row h-full gap-8">
+
+      <div className="flex h-full gap-8">
         {/* Legend */}
-        <div className="w-full lg:w-48 shrink-0 space-y-6 overflow-y-auto">
-          {data?.demographics.map((item) => (
-            <div key={item.country} className="flex flex-col gap-1">
-              <div className="flex items-center gap-2">
+        <div className="w-48 shrink-0 flex flex-col gap-8 pt-4">
+          {sortedRegions.map((region) => (
+            <div key={region.name} className="flex flex-col gap-1.5">
+              <div className="flex items-center gap-2.5">
                 <div
-                  className="w-3.5 h-3.5 rounded-sm"
-                  style={{ backgroundColor: colorScale(item.sales) }}
+                  className="size-3.5 rounded-md"
+                  style={{ backgroundColor: region.color }}
                 />
-                <span className="text-[13px] text-[#8E92BC] font-medium">
-                  {item.country}
+                <span className="text-[15px] font-medium text-[#8E92BC]">
+                  {region.name}
                 </span>
               </div>
-              <span className="text-[19px] font-bold text-gray-900 ml-5.5">
-                {item.sales.toLocaleString()}
-              </span>
+              <p className="text-[24px] font-bold text-[#151D48] leading-tight">
+                {region.value.toLocaleString()}
+              </p>
             </div>
           ))}
         </div>
 
-        {/* Map */}
-        <div className="flex-1 relative min-h-[350px]">
+        {/* Map Container */}
+        <div className="flex-1 relative">
+          {/* Zoom Buttons */}
+          <div className="absolute top-0 right-0 z-10 flex flex-col gap-2">
+            <button className="size-9 flex items-center justify-center bg-white border border-[#E9EDF7] rounded-lg text-[#8E92BC] hover:bg-gray-50 transition-colors">
+              <span className="text-xl font-medium">+</span>
+            </button>
+            <button className="size-9 flex items-center justify-center bg-white border border-[#E9EDF7] rounded-lg text-[#8E92BC] hover:bg-gray-50 transition-colors">
+              <span className="text-xl font-medium">−</span>
+            </button>
+          </div>
+
           <ComposableMap
-            projectionConfig={{ scale: 190, rotate: [-10, 0, 0] }} // Increased scale slightly
+            projectionConfig={{ scale: 200, rotate: [-10, 0, 0] }}
             className="w-full h-full"
-            style={{ width: "100%", height: "100%" }}
           >
-            <ZoomableGroup>
+            <ZoomableGroup zoom={1} maxZoom={1}>
               <Geographies geography={geoUrl}>
-                {({ geographies }) =>
-                  geographies.map((geo) => {
-                    const countryName = geo.properties.name;
+                {({ geographies }: { geographies: any[] }) =>
+                  geographies.map((geo: any) => {
+                    const countryName = geo.properties.name as string;
                     const sales =
                       countrySales[countryName] ||
                       (countryName === "United States of America"
                         ? countrySales["United States"]
                         : 0) ||
                       0;
+                    const fill = getColor(countryName, sales);
 
                     return (
                       <Geography
                         key={geo.rsmKey}
                         geography={geo}
-                        fill={sales > 0 ? colorScale(sales) : "#F5F4F6"}
-                        stroke="#D6D6DA"
+                        fill={fill}
+                        stroke="#E9EDF7"
                         strokeWidth={0.5}
                         style={{
                           default: { outline: "none" },
-                          hover: { fill: "#34D399", outline: "none" },
+                          hover: { fill: "#6467F2", outline: "none" },
                           pressed: { outline: "none" },
                         }}
                       />

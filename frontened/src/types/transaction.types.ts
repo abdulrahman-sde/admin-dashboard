@@ -37,7 +37,6 @@ export interface Transaction {
   };
 }
 
-// For list view
 export type TransactionListItem = Transaction;
 
 export type GetAllTransactionsResponse = PaginatedApiResponse<

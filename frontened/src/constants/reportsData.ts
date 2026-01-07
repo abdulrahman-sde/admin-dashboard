@@ -14,7 +14,7 @@ export const customerGrowthData = [
 ];
 
 export const keyMetricsData = {
-  existingUsers: { value: "5.653", change: 22.45, isPositive: true },
+  returningUsers: { value: "5.653", change: 22.45, isPositive: true },
   newUsers: { value: "1.650", change: 15.34, isPositive: true },
   totalVisits: { value: "9.504", change: -18.25, isPositive: false },
   uniqueVisits: { value: "5.423", change: -10.24, isPositive: false },
@@ -139,4 +139,13 @@ export const topProductsData = [
     clicks: "5.600",
     unitsSold: 87,
   },
+];
+
+export const mockCountrySalesData = [
+  { country: "United States", sales: 34500, change: 12.5 },
+  { country: "India", sales: 28400, change: 10.1 },
+  { country: "Brazil", sales: 18200, change: -2.4 },
+  { country: "United Kingdom", sales: 12500, change: 5.7 },
+  { country: "Australia", sales: 10400, change: 3.8 },
+  { country: "Canada", sales: 6500, change: 2.1 },
 ];

@@ -1,9 +1,6 @@
 import jwt from "jsonwebtoken";
 import type { JWTPayload } from "../types/auth.types.js";
 
-/**
- * Generate access and refresh tokens for users or customers
- */
 export const generateTokens = (payload: JWTPayload) => {
   const accessToken = jwt.sign(payload, process.env.JWT_SECRET!, {
     expiresIn: "15m",
@@ -20,9 +17,6 @@ export const generateTokens = (payload: JWTPayload) => {
   return { accessToken, refreshToken };
 };
 
-/**
- * Verify and decode a JWT token
- */
 export const verifyToken = (token: string): JWTPayload => {
   return jwt.verify(token, process.env.JWT_SECRET!) as JWTPayload;
 };

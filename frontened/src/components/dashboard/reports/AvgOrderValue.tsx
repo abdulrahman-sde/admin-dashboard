@@ -29,7 +29,7 @@ export function AvgOrderValue({ data }: AvgOrderValueProps) {
               This Month
             </span>
             <span className="text-[14px] font-bold text-gray-900">
-              ${data.thisMonth.toFixed(2)}
+              ${Math.floor(data.thisMonth)}
             </span>
           </div>
           <div className="flex items-center gap-2">
@@ -37,7 +37,7 @@ export function AvgOrderValue({ data }: AvgOrderValueProps) {
               Previous Month
             </span>
             <span className="text-[14px] font-bold text-gray-900">
-              ${data.prevMonth.toFixed(2)}
+              ${Math.floor(data.prevMonth)}
             </span>
           </div>
         </div>

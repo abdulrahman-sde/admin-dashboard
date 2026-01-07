@@ -4,17 +4,15 @@ import { customerRepository } from "../repositories/customers.repository.js";
 import { productRepository } from "../repositories/products.repository.js";
 import type { DailyMetrics } from "@prisma/client";
 import { prisma } from "../lib/prisma.js";
+import { redis, getSession } from "../utils/redis.utils.js";
+import type { RedisSessionData } from "../types/session.types.js";
 
 export const reportsService = {
-  /**
-   * Get reports data for a specific date range
-   */
   async getReportsData(startDate?: string, endDate?: string) {
     if (startDate && endDate) {
       const from = new Date(startDate);
       const to = new Date(endDate);
 
-      // We only need the current range (e.g. 1 year) to derive both long-term trends AND current month stats
       const currentMetrics = await analyticsRepository.getDailyMetricsInRange({
         from,
         to,
@@ -25,37 +23,31 @@ export const reportsService = {
     return null;
   },
 
-  /**
-   * Get customer demographics (all-time data)
-   */
   async getCustomerDemographics() {
-    const allMetrics = await analyticsRepository.getDailyMetricsInRange({
-      from: new Date("2020-01-01"),
-      to: new Date(),
+    const customers = await prisma.customer.findMany({
+      where: { deletedAt: null },
+      select: { address: true },
     });
 
-    const latestMetric =
-      allMetrics.length > 0 ? allMetrics[allMetrics.length - 1] : null;
+    const countryCounts: Record<string, number> = {};
+    customers.forEach((c) => {
+      const country = c.address?.country || "Unknown";
+      countryCounts[country] = (countryCounts[country] || 0) + 1;
+    });
 
-    const salesByCountry =
-      (latestMetric?.salesByCountry as Record<string, number>) || {};
-
-    const demographics = Object.entries(salesByCountry).map(
-      ([country, sales]) => ({
+    const demographics = Object.entries(countryCounts)
+      .map(([country, sales]) => ({
         country,
         sales,
-      })
-    );
+      }))
+      .sort((a, b) => b.sales - a.sales);
 
     return {
-      totalCustomers: latestMetric?.totalCustomers || 0,
+      totalCustomers: customers.length,
       demographics,
     };
   },
 
-  /**
-   * Get top customers by total spent
-   */
   async getTopCustomers(limit: number = 5) {
     const { customers } = await customerRepository.findAll({
       skip: 0,
@@ -74,9 +66,6 @@ export const reportsService = {
     }));
   },
 
-  /**
-   * Get top products by total sales
-   */
   async getTopProducts(limit: number = 5) {
     const { products: topProducts } = await productRepository.getAll({
       skip: 0,
@@ -91,29 +80,14 @@ export const reportsService = {
       image: product.thumbnail,
       clicks: product.viewCount,
       unitsSold: product.totalSales,
-      category: (product as any).category?.name || "Uncategorized",
+      category: product.category?.name || "Uncategorized",
     }));
   },
 
-  /**
-   * Get active sessions (approximate from recent database activity)
-   */
   async getActiveSessions() {
     try {
-      const thirtyMinutesAgo = new Date(Date.now() - 30 * 60 * 1000);
-
-      const activeStats = await prisma.session.aggregate({
-        _count: { id: true },
-        where: {
-          lastSeenAt: { gte: thirtyMinutesAgo },
-        },
-      });
-
-      const deviceStats = await prisma.session.groupBy({
-        by: ["device"],
-        _count: { id: true },
-        where: { lastSeenAt: { gte: thirtyMinutesAgo } },
-      });
+      const keys = await redis.keys("session:*");
+      const activeUsers = keys.length;
 
       const deviceBreakdown: Record<string, number> = {
         mobile: 0,
@@ -121,45 +95,54 @@ export const reportsService = {
         tablet: 0,
       };
 
-      deviceStats.forEach((stat) => {
-        if (stat.device) deviceBreakdown[stat.device] = stat._count.id;
-      });
+      if (activeUsers > 0) {
+        const sessionPromises = keys.map((key: string) => {
+          const sessionId = key.replace("session:", "");
+          return getSession(sessionId);
+        });
+
+        const sessions = await Promise.all(sessionPromises);
+
+        sessions.forEach((session: RedisSessionData | null) => {
+          if (session && session.device) {
+            const device = session.device.toLowerCase();
+            if (device in deviceBreakdown) {
+              (deviceBreakdown as any)[device]++;
+            }
+          }
+        });
+      }
 
       return {
-        activeUsers: activeStats._count.id,
+        activeUsers,
         deviceBreakdown,
       };
     } catch (error) {
-      console.error("Error fetching active sessions:", error);
+      console.error("Error fetching active sessions from Redis:", error);
       return {
         activeUsers: 0,
-        deviceBreakdown: {
-          mobile: 0,
-          desktop: 0,
-          tablet: 0,
-        },
+        deviceBreakdown: { mobile: 0, desktop: 0, tablet: 0 },
       };
     }
   },
 
-  /**
-   * Get device analytics
-   */
   async getDeviceAnalytics(startDate?: string, endDate?: string) {
-    let metrics: DailyMetrics[];
+    let whereClause: any = {};
 
     if (startDate && endDate) {
-      metrics = await analyticsRepository.getDailyMetricsInRange({
-        from: new Date(startDate),
-        to: new Date(endDate),
-      });
-    } else {
-      // Default to last 30 days
-      const to = new Date();
-      const from = new Date();
-      from.setDate(to.getDate() - 30);
-      metrics = await analyticsRepository.getDailyMetricsInRange({ from, to });
+      whereClause = {
+        startedAt: {
+          gte: new Date(startDate),
+          lte: new Date(endDate),
+        },
+      };
     }
+
+    const deviceStats = await prisma.session.groupBy({
+      by: ["device"],
+      _count: { id: true },
+      where: whereClause,
+    });
 
     const deviceTotals: Record<string, number> = {
       mobile: 0,
@@ -167,18 +150,23 @@ export const reportsService = {
       tablet: 0,
     };
 
-    for (const metric of metrics) {
-      const visitsByDevice =
-        (metric.visitsByDevice as Record<string, number>) || {};
-      for (const [device, count] of Object.entries(visitsByDevice)) {
-        deviceTotals[device] = (deviceTotals[device] || 0) + count;
-      }
-    }
+    let total = 0;
 
-    const total = Object.values(deviceTotals).reduce(
-      (sum, count) => sum + count,
-      0
-    );
+    deviceStats.forEach((stat) => {
+      const device = stat.device ? stat.device.toLowerCase() : "desktop"; // Default to desktop if missing
+      const count = stat._count.id;
+      if (deviceTotals[device] !== undefined) {
+        deviceTotals[device] = (deviceTotals[device] || 0) + count;
+      } else {
+        // Fallback for others or map 'phone' -> mobile
+        if (device.includes("mobile") || device.includes("phone"))
+          deviceTotals["mobile"] = (deviceTotals["mobile"] || 0) + count;
+        else if (device.includes("tablet") || device.includes("ipad"))
+          deviceTotals["tablet"] = (deviceTotals["tablet"] || 0) + count;
+        else deviceTotals["desktop"] = (deviceTotals["desktop"] || 0) + count;
+      }
+      total += count;
+    });
 
     return {
       devices: Object.entries(deviceTotals).map(([device, count]) => ({
@@ -195,26 +183,35 @@ export const reportsService = {
     from: Date,
     to: Date
   ) {
-    // 1. Growth Data: Use the FULL provided range (likely 12 months)
-    const customerGrowthData = this.groupDataByMonth(current);
+    // Growth data respects the provided from/to range
+    const customerGrowthData = this.groupDataByMonth(current, from, to);
 
-    // 2. Card/Snapshot Data: Use "Current Month" vs "Previous Month" logic
-    // Sort to be sure
-    const sorted = [...current].sort(
+    const now = new Date();
+    // Use the actual current month for key metrics
+    const currentMonthStart = new Date(
+      Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1)
+    );
+    const prevMonthStart = new Date(
+      Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - 1, 1)
+    );
+
+    // Fetch metrics needed for MoM comparison and AOV trend
+    const rangeStart = new Date(prevMonthStart);
+    const wideRangeMetrics = await analyticsRepository.getDailyMetricsInRange({
+      from: rangeStart,
+      to: now,
+    });
+
+    // Also fetch lifetime visits from all metrics
+    const allMetrics = await prisma.dailyMetrics.aggregate({
+      _sum: { totalVisits: true },
+    });
+    const lifetimeVisits = allMetrics._sum.totalVisits || 0;
+
+    const sorted = [...wideRangeMetrics].sort(
       (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
     );
 
-    // Identify the "Current Month" bucket based on the 'to' date or last available date
-    const lastEntry = sorted[sorted.length - 1];
-    const anchorDate = lastEntry ? new Date(lastEntry.date) : new Date();
-    const currentMonthStart = new Date(
-      Date.UTC(anchorDate.getUTCFullYear(), anchorDate.getUTCMonth(), 1)
-    );
-    const prevMonthStart = new Date(
-      Date.UTC(anchorDate.getUTCFullYear(), anchorDate.getUTCMonth() - 1, 1)
-    );
-
-    // Filter metrics
     const thisMonthMetrics = sorted.filter(
       (m) => new Date(m.date) >= currentMonthStart
     );
@@ -223,7 +220,7 @@ export const reportsService = {
       return d >= prevMonthStart && d < currentMonthStart;
     });
 
-    // For comparison, use same number of days (e.g. 1st-5th vs 1st-5th)
+    // For comparison, use same number of days from previous month if it's the current ongoing month
     const daysElapsed = thisMonthMetrics.length;
     const prevMonthMetrics = prevMonthMetricsFull.slice(0, daysElapsed);
 
@@ -265,7 +262,7 @@ export const reportsService = {
     };
 
     const keyMetrics = {
-      existingUsers: {
+      returningUsers: {
         value: currAgg.existingUsers.toLocaleString(),
         change: calculateChange(currAgg.existingUsers, prevAgg.existingUsers),
         isPositive: currAgg.existingUsers >= prevAgg.existingUsers,
@@ -276,7 +273,7 @@ export const reportsService = {
         isPositive: currAgg.newUsers >= prevAgg.newUsers,
       },
       totalVisits: {
-        value: currAgg.totalVisits.toLocaleString(),
+        value: lifetimeVisits.toLocaleString(),
         change: calculateChange(currAgg.totalVisits, prevAgg.totalVisits),
         isPositive: currAgg.totalVisits >= prevAgg.totalVisits,
       },
@@ -287,9 +284,8 @@ export const reportsService = {
       },
     };
 
-    // Sales Goal
-    const monthKey = `${anchorDate.getUTCFullYear()}-${String(
-      anchorDate.getUTCMonth() + 1
+    const monthKey = `${now.getUTCFullYear()}-${String(
+      now.getUTCMonth() + 1
     ).padStart(2, "0")}`;
     const monthlyGoal = await monthlyGoalsRepository.findByMonth(monthKey);
     const goalValue = monthlyGoal?.goalAmount || 20000;
@@ -301,7 +297,6 @@ export const reportsService = {
       left: Math.max(0, goalValue - currAgg.totalSales),
     };
 
-    // Conversion Rate
     const conversionRate = {
       percentage: Math.round(currAgg.avgConversionRate),
       cart: Math.round(currAgg.avgCartRate),
@@ -309,17 +304,22 @@ export const reportsService = {
       purchase: Math.round(currAgg.avgPurchaseRate),
     };
 
-    // Average Order Value
+    // AOV trend for last 4 days
+    const last4DaysMetrics = sorted.slice(-4);
+    const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
     const avgOrderValue = {
       thisMonth:
         currAgg.totalOrders > 0 ? currAgg.totalSales / currAgg.totalOrders : 0,
       prevMonth:
         prevAgg.totalOrders > 0 ? prevAgg.totalSales / prevAgg.totalOrders : 0,
-      // Trend uses DAILY data for the current month
-      trend: thisMonthMetrics.map((m) => ({
-        time: m.date.toISOString().split("T")[0],
-        value: m.averageOrderValue || 0,
-      })),
+      trend: last4DaysMetrics.map((m) => {
+        const d = new Date(m.date);
+        return {
+          time: dayNames[d.getUTCDay()],
+          value: m.averageOrderValue || 0,
+        };
+      }),
     };
 
     return {
@@ -331,7 +331,7 @@ export const reportsService = {
     };
   },
 
-  groupDataByMonth(metrics: DailyMetrics[]) {
+  groupDataByMonth(metrics: DailyMetrics[], from: Date, to: Date) {
     const months = [
       "Jan",
       "Feb",
@@ -347,20 +347,30 @@ export const reportsService = {
       "Dec",
     ];
 
-    const result: any[] = [];
-    const now = new Date();
-    const currentUTCMonth = now.getUTCMonth();
-    const currentUTCYear = now.getUTCFullYear();
+    interface MonthlyGrowthData {
+      month: string;
+      newCustomers: number;
+      returningCustomers: number;
+      _key: string;
+    }
 
-    // Last 12 months
-    for (let i = 11; i >= 0; i--) {
-      const targetMonth = currentUTCMonth - i;
-      const d = new Date(Date.UTC(currentUTCYear, targetMonth, 1));
+    const result: MonthlyGrowthData[] = [];
+
+    // Calculate number of months between from and to
+    const startY = from.getUTCFullYear();
+    const startM = from.getUTCMonth();
+    const endY = to.getUTCFullYear();
+    const endM = to.getUTCMonth();
+
+    const numMonths = (endY - startY) * 12 + (endM - startM);
+
+    for (let i = numMonths; i >= 0; i--) {
+      const d = new Date(Date.UTC(endY, endM - i, 1));
       const mIdx = d.getUTCMonth();
       const y = d.getUTCFullYear();
 
       result.push({
-        month: months[mIdx],
+        month: months[mIdx] as string,
         newCustomers: 0,
         returningCustomers: 0,
         _key: `${y}-${mIdx}`,

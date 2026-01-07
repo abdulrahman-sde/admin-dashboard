@@ -17,16 +17,13 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-import { MessageSquare, Trash2 } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CustomersTableSkeleton } from "@/components/shared/skeletons";
 import { useCustomers } from "@/hooks/customers";
 import { getCustomerStatusColor } from "@/lib/utils";
-import { useDeleteCustomerMutation } from "@/lib/store/services/customers/customersApi";
-import { toast } from "sonner";
-
+import { useCustomerDelete } from "@/hooks/customers/useCustomerDelete";
 import { DeleteConfirmationModal } from "@/components/shared/DeleteConfirmationModal";
-import { useState } from "react";
 
 export function CustomerTable() {
   const {
@@ -39,24 +36,13 @@ export function CustomerTable() {
     handleRowClick,
   } = useCustomers();
 
-  const [deleteCustomer] = useDeleteCustomerMutation();
-  const [deleteId, setDeleteId] = useState<string | null>(null);
-
-  const confirmDelete = async () => {
-    if (!deleteId) return;
-    try {
-      await deleteCustomer(deleteId).unwrap();
-      toast.success("Customer deleted successfully");
-      setDeleteId(null);
-    } catch (error) {
-      toast.error("Failed to delete customer");
-    }
-  };
-
-  const handleDeleteClick = (e: React.MouseEvent, id: string) => {
-    e.stopPropagation();
-    setDeleteId(id);
-  };
+  const {
+    isDeleteModalOpen,
+    setIsDeleteModalOpen,
+    handleDelete,
+    deleteId,
+    handleDeleteClick,
+  } = useCustomerDelete();
 
   return (
     <>
@@ -218,9 +204,9 @@ export function CustomerTable() {
         </div>
       </Card>
       <DeleteConfirmationModal
-        open={!!deleteId}
-        onOpenChange={(open) => !open && setDeleteId(null)}
-        onConfirm={confirmDelete}
+        open={isDeleteModalOpen}
+        onOpenChange={setIsDeleteModalOpen}
+        onConfirm={() => handleDelete(deleteId)}
         title="Delete Customer"
         description="Are you sure you want to delete this customer? This action cannot be undone."
       />

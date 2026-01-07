@@ -34,7 +34,6 @@ export const createProductSchema = z.object({
   colors: z.array(z.string()).optional(), // Simple colors
   status: enumField(["ACTIVE", "INACTIVE", "DRAFT"], "Status").optional(),
   isFeatured: z.boolean().optional(),
-  // Availability window
   expirationStart: z.preprocess(
     (val) => (val ? new Date(val as string) : undefined),
     z.date().optional()
@@ -81,7 +80,6 @@ export const updateProductSchema = z.object({
   colors: z.array(z.string()).optional(), // Simple colors
   status: enumField(["ACTIVE", "INACTIVE", "DRAFT"], "Status").optional(),
   isFeatured: z.boolean().optional(),
-  // Availability window
   expirationStart: z.preprocess(
     (val) => (val ? new Date(val as string) : undefined),
     z.date().optional()
@@ -92,15 +90,12 @@ export const updateProductSchema = z.object({
   ),
 });
 
-// New Robust Query Schema
 export const getProductsQuerySchema = paginationSchema.extend({
   search: z.string().optional(),
 
-  // Filters
   categoryId: z.string().optional(),
   status: enumField(["ACTIVE", "INACTIVE", "DRAFT"], "Status").optional(),
 
-  // Specific Filters
   isFeatured: z.preprocess(
     (v) => v === "true" || v === true,
     z.boolean().optional()
@@ -114,7 +109,6 @@ export const getProductsQuerySchema = paginationSchema.extend({
     "Stock Status"
   ).optional(),
 
-  // Sorting
   sortBy: enumField(
     ["createdAt", "price", "stockQuantity", "totalSales", "salesAndRevenue"],
     "Sort By"
@@ -124,14 +118,10 @@ export const getProductsQuerySchema = paginationSchema.extend({
 
 export type GetProductsQuery = z.infer<typeof getProductsQuerySchema>;
 
-// ============================================
-// Zod-Inferred Types (Single Source of Truth)
-// ============================================
 
 export type CreateProductInput = z.infer<typeof createProductSchema>;
 export type UpdateProductInput = z.infer<typeof updateProductSchema>;
 export type ProductQueryInput = GetProductsQuery;
-// Bulk delete validator
 export const bulkDeleteProductsSchema = z.object({
   ids: z.array(z.string().min(1)).min(1),
 });

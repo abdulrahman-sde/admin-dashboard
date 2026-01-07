@@ -70,13 +70,11 @@ export const categoriesService = {
   },
 
   async deleteCategory(id: string) {
-    // Check if category exists
     const category = await categoryRepository.findById(id);
     if (!category) {
       throw new NotFoundError("Category not found");
     }
 
-    // Check if category has products
     if ((category as any)._count && (category as any)._count.products > 0) {
       throw new BadRequestError(
         `Cannot delete category with ${

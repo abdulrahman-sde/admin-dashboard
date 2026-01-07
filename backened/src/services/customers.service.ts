@@ -25,7 +25,6 @@ export const customersService = {
       ];
     }
 
-    // 2. Filters
     if (status)
       andConditions.push({ status: { equals: status as CustomerStatus } });
 
@@ -35,7 +34,6 @@ export const customersService = {
 
     const skip = (page - 1) * limit;
 
-    // Execute Main Query
     const { customers, total } = await customerRepository.findAll({
       skip,
       take: limit,
@@ -114,7 +112,6 @@ export const customersService = {
         }
       : undefined;
 
-    // 3. Create
     return await customerRepository.create({
       firstName: input.firstName,
       lastName: input.lastName,

@@ -1,3 +1,4 @@
+import type { Prisma } from "@prisma/client";
 import { monthlyGoalsRepository } from "../repositories/monthly-goals.repository.js";
 
 export const monthlyGoalsService = {
@@ -6,14 +7,17 @@ export const monthlyGoalsService = {
     goalAmount: number;
     createdBy?: string;
   }) {
-    // prevent duplicate month entries
     const existing = await monthlyGoalsRepository.findByMonth(data.month);
     if (existing) throw new Error("Monthly goal for this month already exists");
 
     return monthlyGoalsRepository.create(data);
   },
 
-  async getMonthlyGoals(params: { skip: number; take: number; where?: any }) {
+  async getMonthlyGoals(params: {
+    skip: number;
+    take: number;
+    where?: Prisma.MonthlyGoalWhereInput;
+  }) {
     return monthlyGoalsRepository.findAll(params);
   },
 

@@ -6,10 +6,6 @@ import type {
 
 const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
-/**
- * Formats raw metrics specifically for the Customer Overview section.
- * Contains: Active Customers, Repeat Customers, and Shop Visitors.
- */
 export const formatCustomerOverviewMetrics = (
   metrics: DailyMetrics[]
 ): CustomerOverviewMetric[] => {
@@ -35,10 +31,6 @@ export const formatCustomerOverviewMetrics = (
   return formatted;
 };
 
-/**
- * Formats raw metrics specifically for the Reports section.
- * Contains: Conversion Rate, Customers Count, Product Stats, and Revenue.
- */
 export const formatReportMetrics = (
   metrics: DailyMetrics[]
 ): ReportMetric[] => {

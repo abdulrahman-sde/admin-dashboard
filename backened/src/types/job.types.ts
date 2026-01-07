@@ -47,7 +47,6 @@ export interface RawProductMetrics {
 export interface RawSessionMetrics {
   totalVisits?: number;
   uniqueVisits?: number;
-  // Counts derived during session aggregation
   convertedSessions?: number;
   addToCartCount?: number;
   checkoutStartedCount?: number;

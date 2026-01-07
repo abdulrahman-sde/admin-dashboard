@@ -13,8 +13,6 @@ export const useAddCoupon = () => {
 
   const form = useForm<AddCouponFormValues>({
     resolver: zodResolver(addCouponSchema),
-    // leave `value` unset so the form shows an empty field (use placeholder in UI)
-    // cast to any because AddCouponFormValues requires some fields — initial empties are intentional
     defaultValues: {
       code: "",
       name: "",

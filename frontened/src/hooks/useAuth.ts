@@ -22,7 +22,6 @@ export const useAuth = () => {
     isLoading: isCheckingAuth,
     isSuccess: isUserSuccess,
   } = useGetMeQuery(undefined, {
-    // Poll every 5 minutes to ensure token is valid/refreshed implicitly or user still exists
     pollingInterval: 5 * 60 * 1000,
   });
 

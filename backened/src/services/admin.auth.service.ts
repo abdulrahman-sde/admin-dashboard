@@ -26,11 +26,6 @@ export const adminAuthService = {
       throw new UnauthorizedError("Account is not active");
     }
 
-    // Update last login
-    await userRepository.update(user.id, {
-      lastLoginAt: new Date(),
-    });
-
     const tokens = generateTokens({
       userId: user.id,
       email: user.email,
@@ -38,7 +33,12 @@ export const adminAuthService = {
       type: "admin",
     });
 
-    const { password: _, ...safeUser } = user;
+    await userRepository.update(user.id, {
+      refreshToken: tokens.refreshToken,
+      lastLoginAt: new Date(),
+    });
+
+    const { password: _, refreshToken: __, ...safeUser } = user;
 
     return {
       user: safeUser,
@@ -71,7 +71,11 @@ export const adminAuthService = {
       type: "admin",
     });
 
-    const { password: _, ...safeUser } = user;
+    await userRepository.update(user.id, {
+      refreshToken: tokens.refreshToken,
+    });
+
+    const { password: _, refreshToken: __, ...safeUser } = user;
 
     return {
       user: safeUser,
@@ -93,8 +97,8 @@ export const adminAuthService = {
 
     const user = await userRepository.findById(payload.userId);
 
-    if (!user) {
-      throw new UnauthorizedError("User not found");
+    if (!user || user.refreshToken !== token) {
+      throw new UnauthorizedError("Invalid or expired refresh token");
     }
 
     if (user.status !== "ACTIVE") {
@@ -108,7 +112,17 @@ export const adminAuthService = {
       type: "admin",
     });
 
+    await userRepository.update(user.id, {
+      refreshToken: tokens.refreshToken,
+    });
+
     return tokens;
+  },
+
+  async logoutUser(userId: string) {
+    await userRepository.update(userId, {
+      refreshToken: null,
+    });
   },
 
   async getUserProfile(id: string) {

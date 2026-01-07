@@ -1,23 +1,17 @@
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
+import { useConversionRate } from "@/hooks/reports/useConversionRate";
+
+import type { ConversionRateData } from "@/types/reports";
 
 interface ConversionRateChartProps {
-  data: {
-    percentage: number;
-    cart: number;
-    checkout: number;
-    purchase: number;
-  };
+  data: ConversionRateData;
 }
 
 export const ConversionRateChart = ({ data }: ConversionRateChartProps) => {
-  const chartData = [
-    { name: "Converted", value: data.percentage },
-    { name: "Lost", value: 100 - data.percentage },
-  ];
-  const COLORS = ["#10B981", "#F3F4F6"]; // Emerald-500
+  const { chartData, COLORS } = useConversionRate(data);
 
   return (
-    <div className="rounded-xl border border-gray-100 bg-white p-6 shadow-sm h-full flex flex-col justify-between">
+    <div className="bg-white p-6 h-full flex flex-col justify-between rounded-2xl">
       <h3 className="text-base font-semibold text-gray-900">Conversion Rate</h3>
 
       <div className="relative h-40 w-full">

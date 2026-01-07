@@ -8,10 +8,10 @@ export default function CategoryCard({ category }: CategoryCardProps) {
   return (
     <Card
       onClick={() => navigate(`/dashboard/categories/edit/${category.id}`)}
-      className="group cursor-pointer rounded-lg border border-[#E5E7EB] bg-white h-20 transition-none overflow-hidden shadow-none w-full border-solid"
+      className="group cursor-pointer rounded-lg border-none bg-white h-20 transition-none overflow-hidden shadow-sm w-full"
     >
       <CardContent className="p-3 h-full flex items-center gap-4">
-        <div className="h-14 w-14 rounded-lg bg-gray-50/50 border border-[#E5E7EB] flex items-center justify-center overflow-hidden shrink-0">
+        <div className="h-14 w-14 rounded-lg bg-[#F9FAFB] border-none flex items-center justify-center overflow-hidden shrink-0">
           {category.image ? (
             <img
               src={category.image}

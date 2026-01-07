@@ -38,14 +38,12 @@ export const productsService = {
       ];
     }
 
-    // 2. Filters
     if (categoryId) andConditions.push({ categoryId });
     if (status) andConditions.push({ status: status as ProductStatus });
 
     if (isFeatured) andConditions.push({ isFeatured: true });
     if (hasDiscount) andConditions.push({ discountPrice: { gt: 0 } });
 
-    // 3. Stock Status Logic
     if (stockStatus) {
       if (stockStatus === "OUT_OF_STOCK") {
         andConditions.push({
@@ -71,15 +69,21 @@ export const productsService = {
 
     const { skip, take } = getSkipTake({ page, limit });
 
-    // Build orderBy parameter. Support combined sales+revenue sorting
-    let orderByParam: any = undefined;
+    let orderByParam:
+      | Prisma.ProductOrderByWithRelationInput
+      | Prisma.ProductOrderByWithRelationInput[]
+      | undefined = undefined;
     if (sortBy === "salesAndRevenue") {
-      orderByParam = [{ totalSales: sortOrder }, { totalRevenue: sortOrder }];
+      orderByParam = [
+        { totalSales: sortOrder as Prisma.SortOrder },
+        { totalRevenue: sortOrder as Prisma.SortOrder },
+      ];
     } else if (sortBy) {
-      orderByParam = { [sortBy]: sortOrder };
+      orderByParam = {
+        [sortBy]: sortOrder as Prisma.SortOrder,
+      } as Prisma.ProductOrderByWithRelationInput;
     }
 
-    // Execute queries in parallel
     const [productsResult, stats] = await Promise.all([
       productRepository.getAll({
         skip,

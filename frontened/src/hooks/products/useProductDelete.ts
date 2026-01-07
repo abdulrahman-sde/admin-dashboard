@@ -1,31 +1,54 @@
 import { useState } from "react";
 import { toast } from "sonner";
-import { useBulkDeleteProductsMutation } from "@/lib/store/services/products/productsApi";
+import {
+  useBulkDeleteProductsMutation,
+  useDeleteProductMutation,
+} from "@/lib/store/services/products/productsApi";
 
 export const useProductDelete = (
   selectedIds: string[],
   resetSelection: () => void
 ) => {
-  const [bulkDeleteProducts, { isLoading: isDeleting }] =
+  const [bulkDeleteProducts, { isLoading: isBulkDeleting }] =
     useBulkDeleteProductsMutation();
+  const [deleteProduct, { isLoading: isSingleDeleting }] =
+    useDeleteProductMutation();
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [singleDeleteId, setSingleDeleteId] = useState<string | null>(null);
 
-  const handleBulkDelete = async () => {
+  const handleConfirmDelete = async () => {
     try {
-      await bulkDeleteProducts(selectedIds).unwrap();
-      toast.success("Products deleted successfully");
-      resetSelection();
+      if (singleDeleteId) {
+        await deleteProduct(singleDeleteId).unwrap();
+        setSingleDeleteId(null);
+      } else {
+        await bulkDeleteProducts(selectedIds).unwrap();
+        resetSelection();
+      }
+      toast.success("Deleted successfully");
       setIsDeleteModalOpen(false);
     } catch (error) {
-      console.error("Failed to delete products:", error);
-      toast.error("Failed to delete products");
+      toast.error("Failed to delete");
     }
+  };
+
+  const openBulkDelete = () => {
+    setSingleDeleteId(null);
+    setIsDeleteModalOpen(true);
+  };
+
+  const openSingleDelete = (id: string) => {
+    setSingleDeleteId(id);
+    setIsDeleteModalOpen(true);
   };
 
   return {
     isDeleteModalOpen,
     setIsDeleteModalOpen,
-    handleBulkDelete,
-    isDeleting,
+    handleConfirmDelete,
+    isDeleting: isBulkDeleting || isSingleDeleting,
+    openBulkDelete,
+    openSingleDelete,
+    singleDeleteId,
   };
 };

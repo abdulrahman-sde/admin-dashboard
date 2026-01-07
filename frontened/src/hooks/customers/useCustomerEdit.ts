@@ -29,7 +29,6 @@ export const useCustomerEdit = ({
     },
   });
 
-  // Reset form when customer changes
   useEffect(() => {
     if (customer) {
       form.reset({

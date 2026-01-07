@@ -4,6 +4,26 @@ export interface MetricItem {
   isPositive: boolean;
 }
 
+export interface SalesGoalData {
+  percentage: number;
+  soldFor: number;
+  monthGoal: number;
+  left: number;
+}
+
+export interface ConversionRateData {
+  percentage: number;
+  cart: number;
+  checkout: number;
+  purchase: number;
+}
+
+export interface AvgOrderValueData {
+  thisMonth: number;
+  prevMonth: number;
+  trend: { time: string; value: number }[];
+}
+
 export interface ReportsData {
   customerGrowthData: {
     month: string;
@@ -11,28 +31,14 @@ export interface ReportsData {
     returningCustomers: number;
   }[];
   keyMetrics: {
-    existingUsers: MetricItem;
+    returningUsers: MetricItem;
     newUsers: MetricItem;
     totalVisits: MetricItem;
     uniqueVisits: MetricItem;
   };
-  salesGoal: {
-    percentage: number;
-    soldFor: number;
-    monthGoal: number;
-    left: number;
-  };
-  conversionRate: {
-    percentage: number;
-    cart: number;
-    checkout: number;
-    purchase: number;
-  };
-  avgOrderValue: {
-    thisMonth: number;
-    prevMonth: number;
-    trend: { time: string; value: number }[];
-  };
+  salesGoal: SalesGoalData;
+  conversionRate: ConversionRateData;
+  avgOrderValue: AvgOrderValueData;
 }
 
 export interface DemographicData {

@@ -215,8 +215,6 @@ export type CustomerDetail = {
   tags: string[];
 };
 
-// Category Types
-// Moved to categories.types.ts and products.types.ts
 
 export type TransactionStat = {
   title: string;

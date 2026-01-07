@@ -9,7 +9,6 @@ import type {
 
 export const productsApi = api.injectEndpoints({
   endpoints: (builder) => ({
-    // Get all products with filters
 
     getProducts: builder.query<GetProductsResponse, ProductsQueryParams>({
       query: (params) => ({
@@ -28,14 +27,12 @@ export const productsApi = api.injectEndpoints({
           : [{ type: "Products", id: "LIST" }],
     }),
 
-    // Get single product
 
     getProduct: builder.query<ApiResponse<Product>, string>({
       query: (id) => `/products/${id}`,
       providesTags: (_result, _error, id) => [{ type: "Product", id }],
     }),
 
-    // Add product
 
     addProduct: builder.mutation<ApiResponse<Product>, CreateProductInput>({
       query: (body) => ({
@@ -46,7 +43,6 @@ export const productsApi = api.injectEndpoints({
       invalidatesTags: [{ type: "Products", id: "LIST" }],
     }),
 
-    // Update product
 
     updateProduct: builder.mutation<
       ApiResponse<Product>,
@@ -63,7 +59,6 @@ export const productsApi = api.injectEndpoints({
       ],
     }),
 
-    // Delete product
     deleteProduct: builder.mutation<ApiResponse<null>, string>({
       query: (id) => ({
         url: `/products/${id}`,
@@ -75,7 +70,6 @@ export const productsApi = api.injectEndpoints({
       ],
     }),
 
-    // Bulk delete products
     bulkDeleteProducts: builder.mutation<ApiResponse<null>, string[]>({
       query: (ids) => ({
         url: "/products/bulk-delete",
@@ -85,7 +79,6 @@ export const productsApi = api.injectEndpoints({
       invalidatesTags: [{ type: "Products", id: "LIST" }],
     }),
 
-    // Update product stock
     updateProductStock: builder.mutation<
       ApiResponse<Product>,
       { id: string; stock: number }

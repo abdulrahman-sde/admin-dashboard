@@ -16,7 +16,6 @@ export const useCoupons = () => {
   );
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
-  // Debounce search
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearch(search);

@@ -44,7 +44,6 @@ export default function Register() {
     try {
       await register(formData);
     } catch (err: any) {
-      // Error is handled by hook state
     }
   };
 

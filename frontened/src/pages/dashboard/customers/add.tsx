@@ -89,9 +89,9 @@ export default function AddCustomer() {
                 <Input
                   id="firstName"
                   {...register("firstName")}
-                  className={`h-11 border-[#E5E7EB] focus:ring-[#4EA674] focus:border-[#4EA674] ${
-                    errors.firstName ? "border-destructive" : ""
-                  }`}
+                  className={
+                    errors.firstName ? "aria-invalid:border-destructive" : ""
+                  }
                 />
                 {errors.firstName && (
                   <p className="text-xs text-destructive">
@@ -109,9 +109,9 @@ export default function AddCustomer() {
                 <Input
                   id="lastName"
                   {...register("lastName")}
-                  className={`h-11 border-[#E5E7EB] focus:ring-[#4EA674] focus:border-[#4EA674] ${
-                    errors.lastName ? "border-destructive" : ""
-                  }`}
+                  className={
+                    errors.lastName ? "aria-invalid:border-destructive" : ""
+                  }
                 />
                 {errors.lastName && (
                   <p className="text-xs text-destructive">
@@ -132,9 +132,9 @@ export default function AddCustomer() {
                   id="email"
                   type="email"
                   {...register("email")}
-                  className={`h-11 border-[#E5E7EB] focus:ring-[#4EA674] focus:border-[#4EA674] ${
-                    errors.email ? "border-destructive" : ""
-                  }`}
+                  className={
+                    errors.email ? "aria-invalid:border-destructive" : ""
+                  }
                 />
                 {errors.email && (
                   <p className="text-xs text-destructive">
@@ -153,9 +153,9 @@ export default function AddCustomer() {
                   id="phone"
                   type="tel"
                   {...register("phone")}
-                  className={`h-11 border-[#E5E7EB] focus:ring-[#4EA674] focus:border-[#4EA674] ${
-                    errors.phone ? "border-destructive" : ""
-                  }`}
+                  className={
+                    errors.phone ? "aria-invalid:border-destructive" : ""
+                  }
                 />
                 {errors.phone && (
                   <p className="text-xs text-destructive">
@@ -191,7 +191,7 @@ export default function AddCustomer() {
                 <Input
                   id="address"
                   {...register("address.street")}
-                  className={`h-11 border-[#E5E7EB] focus:ring-[#4EA674] focus:border-[#4EA674] ${
+                  className={`h-11 border-none bg-[#F9FAFB] focus:ring-0 ${
                     errors.address?.street ? "border-destructive" : ""
                   }`}
                 />
@@ -211,7 +211,7 @@ export default function AddCustomer() {
                 <Input
                   id="apartment"
                   {...register("address.address2")}
-                  className="h-11 border-[#E5E7EB] focus:ring-[#4EA674] focus:border-[#4EA674]"
+                  className="h-11 border-none bg-[#F9FAFB] focus:ring-0"
                 />
               </div>
             </div>
@@ -226,7 +226,7 @@ export default function AddCustomer() {
                 <Input
                   id="city"
                   {...register("address.city")}
-                  className={`h-11 border-[#E5E7EB] focus:ring-[#4EA674] focus:border-[#4EA674] ${
+                  className={`h-11 border-none bg-[#F9FAFB] focus:ring-0 ${
                     errors.address?.city ? "border-destructive" : ""
                   }`}
                 />
@@ -249,7 +249,7 @@ export default function AddCustomer() {
                 >
                   <SelectTrigger
                     id="country"
-                    className={`h-11 border-[#E5E7EB] focus:ring-[#4EA674] focus:border-[#4EA674] ${
+                    className={`h-11 border-none bg-[#F9FAFB] focus:ring-0 ${
                       errors.address?.country ? "border-destructive" : ""
                     }`}
                   >
@@ -281,7 +281,7 @@ export default function AddCustomer() {
                 <Input
                   id="postalCode"
                   {...register("address.postalCode")}
-                  className={`h-11 border-[#E5E7EB] focus:ring-[#4EA674] focus:border-[#4EA674] ${
+                  className={`h-11 border-none bg-[#F9FAFB] focus:ring-0 ${
                     errors.address?.postalCode ? "border-destructive" : ""
                   }`}
                 />
@@ -304,7 +304,7 @@ export default function AddCustomer() {
                   id="addressPhone"
                   type="tel"
                   {...register("address.phone")}
-                  className={`h-11 border-[#E5E7EB] focus:ring-[#4EA674] focus:border-[#4EA674] ${
+                  className={`h-11 border-none bg-[#F9FAFB] focus:ring-0 ${
                     errors.address?.phone ? "border-destructive" : ""
                   }`}
                 />
@@ -342,7 +342,7 @@ export default function AddCustomer() {
                 id="notes"
                 {...register("notes")}
                 placeholder="Add notes about customer"
-                className="min-h-[140px] border-[#E5E7EB] focus:ring-[#4EA674] focus:border-[#4EA674] bg-[#F9FAFB] placeholder:text-[#9CA3AF]"
+                className="min-h-[140px] border-none bg-[#F9FAFB] focus:ring-0 placeholder:text-[#9CA3AF]"
               />
             </div>
           </CardContent>

@@ -10,7 +10,7 @@ const TopCustomers = () => {
     );
 
   return (
-    <div className="rounded-xl border border-gray-100 bg-white p-6 shadow-sm">
+    <div className="bg-white p-6 rounded-2xl">
       <h3 className="mb-6 text-base font-semibold text-gray-900">
         Top Customers
       </h3>

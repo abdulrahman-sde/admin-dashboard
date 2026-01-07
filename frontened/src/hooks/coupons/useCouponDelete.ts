@@ -6,10 +6,6 @@ export const useCouponDelete = (
   selectedIds: string[],
   resetSelection: () => void
 ) => {
-  // Use the mutation from the API. Note: ensure useDeleteCouponMutation is exported/available.
-  // Based on checking the file previously, it might be named useDeleteCouponMutation or need to be accessed via couponsApi.useDeleteCouponMutation.
-  // Just in case, I'll use the one from api slice if exported, or the property on the default export.
-  // But wait, in the component it was `couponsApi.useDeleteCouponMutation()`.
 
   const [deleteCoupon] = couponsApi.useDeleteCouponMutation();
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);

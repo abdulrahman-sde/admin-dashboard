@@ -52,19 +52,19 @@ export function SalesGoal({ data }: SalesGoalProps) {
         <div className="flex justify-between items-center text-sm font-medium">
           <span className="text-[#8E92BC]">Sold for:</span>
           <span className="text-gray-900 font-bold">
-            ${(data.soldFor / 1000).toFixed(3)}
+            ${Math.floor(data.soldFor / 1000).toLocaleString()}k
           </span>
         </div>
         <div className="flex justify-between items-center text-sm font-medium">
           <span className="text-[#8E92BC]">Month goal:</span>
           <span className="text-gray-900 font-bold">
-            ${(data.monthGoal / 1000).toFixed(3)}
+            ${Math.floor(data.monthGoal / 1000).toLocaleString()}k
           </span>
         </div>
         <div className="flex justify-between items-center text-sm font-medium">
           <span className="text-[#8E92BC]">Left:</span>
           <span className="text-gray-900 font-bold">
-            ${(data.left / 1000).toFixed(3)}
+            ${Math.floor(data.left / 1000).toLocaleString()}k
           </span>
         </div>
       </div>

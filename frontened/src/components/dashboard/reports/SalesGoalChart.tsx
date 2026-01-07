@@ -1,23 +1,17 @@
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
+import { useSalesGoal } from "@/hooks/reports/useSalesGoal";
+
+import type { SalesGoalData } from "@/types/reports";
 
 interface SalesGoalChartProps {
-  data: {
-    percentage: number;
-    soldFor: number;
-    monthGoal: number;
-    left: number;
-  };
+  data: SalesGoalData;
 }
 
 export const SalesGoalChart = ({ data }: SalesGoalChartProps) => {
-  const chartData = [
-    { name: "Achieved", value: Math.min(data.soldFor, data.monthGoal) },
-    { name: "Remaining", value: Math.max(0, data.monthGoal - data.soldFor) },
-  ];
-  const COLORS = ["#F59E0B", "#F3F4F6"]; // Amber-500
+  const { chartData, COLORS } = useSalesGoal(data);
 
   return (
-    <div className="rounded-xl border border-gray-100 bg-white p-6 shadow-sm h-full flex flex-col justify-between">
+    <div className="bg-white p-6 h-full flex flex-col justify-between rounded-2xl">
       <h3 className="text-base font-semibold text-gray-900 ">Sales Goal</h3>
 
       <div className="relative h-40 w-full">

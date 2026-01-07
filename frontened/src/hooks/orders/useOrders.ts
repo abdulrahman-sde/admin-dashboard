@@ -14,7 +14,6 @@ export const useOrders = () => {
   const [sortBy, setSortBy] = useState<string>("createdAt");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
 
-  // Debounce search
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearch(search);
@@ -42,7 +41,6 @@ export const useOrders = () => {
   const totalPages = data?.pagination?.totalPages || 1;
   const totalOrders = data?.pagination?.total || 0;
 
-  // Generate page numbers for pagination with ellipses
   const getPages = () => {
     const pages: (number | string)[] = [];
     const maxVisible = 7;
@@ -69,7 +67,6 @@ export const useOrders = () => {
     return pages;
   };
 
-  // Get counts by status for tabs
   const getStatusCounts = () => {
     if (data?.meta) {
       return {
@@ -115,13 +112,11 @@ export const useOrders = () => {
     setPage(1);
   };
 
-  // Helper to calculate percentage of total
   const calculatePercentage = (value: number, total: number) => {
     if (total === 0) return 0;
     return (value / total) * 100;
   };
 
-  // Get dynamic stats for the top cards using analytics data
   const getDynamicStats = () => {
     const orderStats = stats?.orders?.thisWeek;
     if (!orderStats) {

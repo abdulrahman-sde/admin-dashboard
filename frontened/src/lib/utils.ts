@@ -4,21 +4,15 @@ import { twMerge } from "tailwind-merge";
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
-// Helper Function logic (usually put in utils or component)
 export function generatePagination(currentPage: number, totalPages: number) {
-  // If total pages is small, show all
   if (totalPages <= 7) {
     return Array.from({ length: totalPages }, (_, i) => i + 1);
   }
 
-  // If current page is near the start (e,g. 1, 2, 3)
-  // Show 1, 2, 3, 4, ..., 20
   if (currentPage <= 3) {
     return [1, 2, 3, 4, "...", totalPages];
   }
 
-  // If current page is near the end (e.g. 18, 19, 20)
-  // Show 1, ..., 17, 18, 19, 20
   if (currentPage >= totalPages - 2) {
     return [
       1,
@@ -30,8 +24,6 @@ export function generatePagination(currentPage: number, totalPages: number) {
     ];
   }
 
-  // If somewhere in the middle (e.g. 10)
-  // Show 1, ..., 9, 10, 11, ..., 20
   return [
     1,
     "...",
@@ -43,7 +35,6 @@ export function generatePagination(currentPage: number, totalPages: number) {
   ];
 }
 
-// Status color utilities
 export function getCustomerStatusColor(status: string) {
   switch (status) {
     case "ACTIVE":
@@ -86,4 +77,16 @@ export function getTransactionStatusColor(status: string) {
     default:
       return "text-gray-500";
   }
+}
+
+export function getProductImage(item: any): string {
+  if (!item) return "https://via.placeholder.com/48?text=No+Img";
+  return (
+    item.productImage ||
+    item.product?.thumbnail ||
+    item.product?.images?.[0] ||
+    item.product?.image ||
+    item.image ||
+    "https://via.placeholder.com/48?text=No+Img"
+  );
 }

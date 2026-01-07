@@ -7,5 +7,5 @@ export interface SuccessResponse<T> {
 export interface ErrorResponse {
   success: boolean;
   message: string;
-  errors?: any;
+  errors?: unknown;
 }

@@ -20,6 +20,7 @@ export interface Product {
   isUnlimitedStock: boolean;
   images: string[];
   thumbnail: string;
+  image?: string;
   categoryId: string;
   tags: string[];
   colors: string[];

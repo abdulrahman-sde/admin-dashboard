@@ -25,7 +25,6 @@ export function useProducts(params: ProductsQueryParams = {}) {
   );
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
-  // Debounce search
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearch(search);
@@ -34,7 +33,6 @@ export function useProducts(params: ProductsQueryParams = {}) {
     return () => clearTimeout(timer);
   }, [search]);
 
-  // Build query params based on active tab BEFORE the API call
   const queryParams: ProductsQueryParams = {
     ...params,
     page: currentPage,

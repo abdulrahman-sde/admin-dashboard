@@ -1,10 +1,9 @@
-import React from "react";
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import type { ChartConfig } from "@/components/ui/chart";
 import { ChartContainer, ChartTooltip } from "@/components/ui/chart";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { useGetDetailedDailyMetricsQuery } from "@/lib/store/services/analytics/analyticsApi";
+import { useWeeklyReport } from "@/hooks/dashboard/useWeeklyReport";
 
 const chartConfig = {
   active: {
@@ -41,44 +40,15 @@ const CustomCursor = (props: CustomCursorProps) => {
 };
 
 export default function WeeklyReport() {
-  const [timeRange, setTimeRange] = React.useState("this-week");
-  const [activeTab, setActiveTab] = React.useState("revenue");
-
-  const { data: analyticsData, isLoading } = useGetDetailedDailyMetricsQuery();
-
-  const metrics = React.useMemo(() => {
-    if (!analyticsData) return [];
-    return timeRange === "this-week"
-      ? analyticsData.data.report.thisWeek
-      : analyticsData.data.report.lastWeek;
-  }, [analyticsData, timeRange]);
-
-  const stats = React.useMemo(() => {
-    if (!metrics.length) {
-      return {
-        customers: 0,
-        totalProducts: 0,
-        stockProducts: 0,
-        outOfStock: 0,
-        revenue: 0,
-      };
-    }
-
-    const totalCustomers = metrics.reduce((sum, m) => sum + m.customers, 0);
-    const totalRevenue = metrics.reduce((sum, m) => sum + m.revenue, 0);
-    const latest = metrics[metrics.length - 1];
-
-    return {
-      customers: totalCustomers,
-      totalProducts: latest.totalProducts,
-      stockProducts: latest.stockProducts,
-      outOfStock: latest.outOfStock,
-      revenue: totalRevenue.toLocaleString(undefined, {
-        minimumFractionDigits: 1,
-        maximumFractionDigits: 1,
-      }),
-    };
-  }, [metrics]);
+  const {
+    timeRange,
+    setTimeRange,
+    activeTab,
+    setActiveTab,
+    metrics,
+    stats,
+    isLoading,
+  } = useWeeklyReport();
 
   if (isLoading) {
     return (
@@ -186,7 +156,7 @@ export default function WeeklyReport() {
                 tickLine={false}
                 tick={{ fill: "#707D94", fontSize: 12 }}
                 tickFormatter={(v) =>
-                  v >= 1000 ? `${(v / 1000).toFixed(1)}k` : v
+                  v >= 1000 ? `${Math.ceil(v / 1000)}k` : v
                 }
               />
               <ChartTooltip

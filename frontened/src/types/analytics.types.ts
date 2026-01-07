@@ -55,7 +55,6 @@ export interface WeeklyProductStats {
 
 export type GetAnalyticsResponse = ApiResponse<DashboardWeeklyStats>;
 
-// Daily metrics returned from the backend
 export interface DailyMetric {
   date: string; // ISO date
   totalVisits: number;
@@ -110,7 +109,7 @@ export interface ReportsData {
     returningCustomers: number;
   }>;
   keyMetrics: {
-    existingUsers: MetricWithChange;
+    returningUsers: MetricWithChange;
     newUsers: MetricWithChange;
     totalVisits: MetricWithChange;
     uniqueVisits: MetricWithChange;
@@ -163,3 +162,9 @@ export interface RealTimeStats {
 }
 
 export type RealTimeStatsResponse = ApiResponse<RealTimeStats>;
+
+export interface CountryGrowthItem {
+  country: string;
+  sales: number;
+  change: number;
+}

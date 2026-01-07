@@ -1,17 +1,12 @@
 import { z } from "zod";
 import { paginationSchema, enumField } from "./helpers.js";
 
-// ============================================
-// Query Validator (GET /customers)
-// ============================================
 
 export const getCustomersQuerySchema = paginationSchema.extend({
   search: z.string().optional(), // Search by Name, Email, Phone
 
-  // Filters
   status: enumField(["ACTIVE", "INACTIVE", "VIP"], "Status").optional(),
 
-  // Sorting
   sortBy: enumField(
     ["createdAt", "totalSpent", "totalOrders", "firstName"],
     "Sort By"
@@ -21,9 +16,6 @@ export const getCustomersQuerySchema = paginationSchema.extend({
 
 export type GetCustomersQuery = z.infer<typeof getCustomersQuerySchema>;
 
-// ============================================
-// Create Validator (POST /customers)
-// ============================================
 
 const addressSchema = z.object({
   street: z.string().min(1, "Street Address is required"),
@@ -58,9 +50,6 @@ export const createCustomerSchema = z.object({
 
 export type CreateCustomerInput = z.infer<typeof createCustomerSchema>;
 
-// ============================================
-// Update Validator (PUT /customers/:id)
-// ============================================
 
 export const updateCustomerSchema = z.object({
   firstName: z.string().min(1).optional(),
@@ -72,16 +61,12 @@ export const updateCustomerSchema = z.object({
   notes: z.string().optional(),
   tags: z.array(z.string()).optional(),
 
-  // Address updates could go here too, but usually handled separately or embedded
   isGuest: z.boolean().optional(),
   address: addressSchema.partial().optional(),
 });
 
 export type UpdateCustomerInput = z.infer<typeof updateCustomerSchema>;
 
-// ============================================
-// Params Validator (Delete/Get /customers/:id)
-// ============================================
 
 export const customerParamsSchema = z.object({
   id: z

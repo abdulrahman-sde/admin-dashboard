@@ -11,7 +11,6 @@ export const siteHeaderHeadings = {
   admin: "Admin role",
 };
 
-// Dashboard Stats Data
 export const dashboardStats = [
   {
     title: "Total Sales",
@@ -40,7 +39,6 @@ export const dashboardStats = [
   },
 ];
 
-// Recent Orders Data
 export const recentOrders = [
   {
     id: "12345",
@@ -84,7 +82,6 @@ export const recentOrders = [
   },
 ];
 
-// Top Products Data
 export const topProducts = [
   {
     id: 1,
@@ -128,7 +125,6 @@ export const topProducts = [
   },
 ];
 
-// Customer Data
 export const customersData = [
   {
     id: 1,
@@ -177,7 +173,6 @@ export const customersData = [
   },
 ];
 
-// Sales Chart Data
 export const salesChartData = [
   { month: "Jan", sales: 45000, orders: 320 },
   { month: "Feb", sales: 52000, orders: 380 },
@@ -193,7 +188,6 @@ export const salesChartData = [
   { month: "Dec", sales: 89500, orders: 620 },
 ];
 
-// Weekly Report Data
 export const weeklyReportData = {
   thisWeek: {
     chartData: {
@@ -309,7 +303,6 @@ export const weeklyReportData = {
   },
 };
 
-// Country Sales Data
 export const countrySalesData = {
   totalUsers: "21.5K",
   usersPerMinute: [
@@ -344,7 +337,6 @@ export const countrySalesData = {
   ],
 };
 
-// Recent Transactions Data
 export const recentTransactionsData = {
   transactions: [
     {
@@ -392,7 +384,6 @@ export const recentTransactionsData = {
   ],
 };
 
-// Top Products Data
 export const topProductsData = {
   products: [
     {
@@ -422,7 +413,6 @@ export const topProductsData = {
   ],
 };
 
-// Best Selling Product Data
 export const bestSellingProductData = {
   products: [
     {
@@ -456,7 +446,6 @@ export const bestSellingProductData = {
   ],
 };
 
-// Add New Product Data
 export const addNewProductData = {
   categories: [
     { name: "Electronic", icon: "" },
@@ -470,7 +459,6 @@ export const addNewProductData = {
   ],
 };
 
-// Orders Stats Data
 export const ordersStatsData = [
   {
     title: "Total Orders",
@@ -498,7 +486,6 @@ export const ordersStatsData = [
   },
 ];
 
-// Orders Table Data
 export const ordersTableData = [
   {
     id: "#ORD0001",
@@ -612,7 +599,6 @@ export const ordersTableData = [
   },
 ];
 
-// Customer Stats Data
 export const customerStatsData = [
   {
     title: "Total Customers",
@@ -634,7 +620,6 @@ export const customerStatsData = [
   },
 ];
 
-// Customer Overview Data
 export const customerOverviewData = {
   thisWeek: {
     chartData: {
@@ -730,7 +715,6 @@ export const customerOverviewData = {
   },
 };
 
-// Customer Table Data
 export const customerTableData = [
   {
     id: "#CUST001",
@@ -814,7 +798,6 @@ export const customerTableData = [
   },
 ];
 
-// Customer Detail Data
 export const customerDetailData = {
   id: "CUST001",
   name: "Randhir Kumar",
@@ -867,7 +850,6 @@ export const customerDetailData = {
   tags: ["Vip Customer", "Europe"],
 };
 
-// Categories Data
 export const categoriesData = [
   {
     id: "1",
@@ -911,7 +893,6 @@ export const categoriesData = [
   },
 ];
 
-// Products List Data
 export const productsListData = [
   {
     id: 1,
@@ -1025,7 +1006,6 @@ export const productsListData = [
   },
 ];
 
-// Category Products Data (for edit/create category page)
 export const categoryProductsData = [
   {
     id: 1,
@@ -1045,7 +1025,6 @@ export const categoryProductsData = [
   { id: 8, name: "Women Black Dress", image: "/products/black-dress-2.png" },
 ];
 
-// Transaction Stats Data
 export const transactionStatsData = [
   {
     title: "Total Revenue",
@@ -1073,7 +1052,6 @@ export const transactionStatsData = [
   },
 ];
 
-// Payment Card Data
 export const paymentCardData = {
   cardNumber: "2345",
   cardHolder: "Noman Mansoor",
@@ -1083,7 +1061,6 @@ export const paymentCardData = {
   revenue: "$50,000",
 };
 
-// Transaction History Data
 export const transactionHistoryData = [
   {
     id: 1,

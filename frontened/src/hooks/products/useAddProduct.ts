@@ -84,6 +84,7 @@ export const useProductForm = (productId?: string) => {
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
+          credentials: "include",
           body: JSON.stringify({ productName }),
         }
       );
@@ -110,7 +111,6 @@ export const useProductForm = (productId?: string) => {
           shouldValidate: false,
         });
       }
-      // Final update
       setDescription(text);
       form.setValue("description", text, {
         shouldDirty: true,
@@ -191,7 +191,6 @@ export const useProductForm = (productId?: string) => {
     try {
       data.description = description;
 
-      // Only upload if we have actual File objects
       const hasNewImages = (data.images || []).some(
         (img) => img instanceof File
       );

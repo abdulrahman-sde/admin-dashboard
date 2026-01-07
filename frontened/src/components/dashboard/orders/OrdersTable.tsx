@@ -298,7 +298,7 @@ export function OrdersTable({
               <div className="relative w-full max-w-xs">
                 <Input
                   placeholder="Search order report"
-                  className="pr-10 w-full h-11 border-none bg-[#F9F9F9] rounded-xl focus-visible:ring-1 focus-visible:ring-primary/20"
+                  className="pr-10 w-full h-11 border-none bg-[#F9FAFB] rounded-xl focus:ring-0 shadow-none"
                   value={search}
                   onChange={(e) => onSearchChange(e.target.value)}
                 />
@@ -481,6 +481,3 @@ export function OrdersTable({
     </Card>
   );
 }
-
-// Append dialog render inside the same file so it's available to the component
-// We render it through hooks state defined in the component scope above

@@ -15,7 +15,6 @@ export const useReviews = () => {
 
   const totalPages = pagination?.totalPages || 1;
 
-  // Generate page numbers for pagination
   const getPages = () => {
     const pages = [];
     for (let i = 1; i <= totalPages; i++) {

@@ -39,6 +39,12 @@ export const register = async (req: Request, res: Response): Promise<void> => {
 };
 
 export const logout = async (req: Request, res: Response): Promise<void> => {
+  const userId = (req as AuthRequest).user?.id;
+
+  if (userId) {
+    await adminAuthService.logoutUser(userId);
+  }
+
   res
     .clearCookie("accessToken")
     .clearCookie("refreshToken")

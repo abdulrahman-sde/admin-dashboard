@@ -264,7 +264,7 @@ export default function AddProductsPage() {
                                   <Button
                                     variant="outline"
                                     className={cn(
-                                      "w-full justify-between text-left font-normal h-11 border-[#E5E7EB] bg-[#F9FAFB]",
+                                      "w-full justify-between text-left font-normal h-11 border-none bg-[#F9FAFB]",
                                       !field.value && "text-muted-foreground"
                                     )}
                                   >
@@ -302,7 +302,7 @@ export default function AddProductsPage() {
                                   <Button
                                     variant="outline"
                                     className={cn(
-                                      "w-full justify-between text-left font-normal h-11 border-[#E5E7EB] bg-[#F9FAFB]",
+                                      "w-full justify-between text-left font-normal h-11 border-none bg-[#F9FAFB]",
                                       !field.value && "text-muted-foreground"
                                     )}
                                   >

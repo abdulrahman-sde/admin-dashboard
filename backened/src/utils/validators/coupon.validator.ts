@@ -1,9 +1,6 @@
 import { z } from "zod";
 import { paginationSchema, enumField } from "./helpers.js";
 
-// ============================================
-// Shared Enums
-// ============================================
 export const CouponTypeEnum = z.enum([
   "FIXED",
   "PERCENTAGE",
@@ -12,9 +9,6 @@ export const CouponTypeEnum = z.enum([
 ]);
 export const CouponStatusEnum = z.enum(["ACTIVE", "INACTIVE", "EXPIRED"]);
 
-// ============================================
-// Create Coupon Schema
-// ============================================
 export const createCouponSchema = z.object({
   code: z
     .string()
@@ -39,20 +33,13 @@ export const createCouponSchema = z.object({
 
 export type CreateCouponInput = z.infer<typeof createCouponSchema>;
 
-// ============================================
-// Update Coupon Schema
-// ============================================
 export const updateCouponSchema = createCouponSchema.partial().extend({
-  // Can explicitly set usageLimit or endDate to null to remove limits
   usageLimit: z.number().int().positive().nullable().optional(),
   endDate: z.coerce.date().nullable().optional(),
 });
 
 export type UpdateCouponInput = z.infer<typeof updateCouponSchema>;
 
-// ============================================
-// Query Schema
-// ============================================
 export const getCouponsQuerySchema = paginationSchema.extend({
   search: z.string().optional(),
 
@@ -68,7 +55,6 @@ export const getCouponsQuerySchema = paginationSchema.extend({
 
 export type GetCouponsQuery = z.infer<typeof getCouponsQuerySchema>;
 
-// Bulk delete validator
 export const bulkDeleteCouponsSchema = z.object({
   ids: z.array(z.string().min(1)).min(1),
 });

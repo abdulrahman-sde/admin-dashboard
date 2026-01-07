@@ -3,7 +3,6 @@ import type { Prisma } from "@prisma/client";
 
 export const paymentMethodsRepository = {
   async create(data: Prisma.StorePaymentMethodCreateInput) {
-    // If setting as default, unset others first
     if (data.isDefault) {
       await prisma.storePaymentMethod.updateMany({
         where: {},
@@ -21,7 +20,6 @@ export const paymentMethodsRepository = {
       orderBy: [{ isDefault: "desc" }, { createdAt: "desc" }],
     });
 
-    // Enhance with transaction counts and total revenue
     return Promise.all(
       methods.map(async (method) => {
         const stats = await prisma.transaction.aggregate({

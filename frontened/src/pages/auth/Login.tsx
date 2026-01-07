@@ -32,8 +32,6 @@ export default function Login() {
     try {
       await login({ email, password });
     } catch (err: any) {
-      // Error is handled by hook state, but we catch here to stop propagation if needed
-      // or to set specific input errors if we mapped them
     }
   };
 

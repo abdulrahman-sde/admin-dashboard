@@ -35,7 +35,6 @@ export const useAddCategory = (categoryId?: string) => {
       skip: !categoryId,
     });
 
-  // Fetch products associated with this category using the products API
   const { data: categoryProductsData } = useGetProductsQuery(
     {
       categoryId: categoryId || "",
@@ -46,7 +45,6 @@ export const useAddCategory = (categoryId?: string) => {
     }
   );
 
-  // Extract products from the separate products query
   const products: CategoryProduct[] = categoryProductsData?.data
     ? categoryProductsData.data.map((p) => ({
         id: p.id,
@@ -60,7 +58,6 @@ export const useAddCategory = (categoryId?: string) => {
   const categoryData = existingCategory?.data || null;
 
   const form = useForm<CategoryFormValues>({
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     resolver: zodResolver(categorySchema) as any,
     defaultValues: {
       name: "",
@@ -220,7 +217,6 @@ export const useAddCategory = (categoryId?: string) => {
     data: { name: string; price?: number; stock?: number }
   ) => {
     try {
-      // Convert stock to stockQuantity for the API
       const { stock, ...rest } = data;
       const apiPayload = {
         ...rest,

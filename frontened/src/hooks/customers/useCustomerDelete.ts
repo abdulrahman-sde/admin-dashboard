@@ -8,38 +8,33 @@ export const useCustomerDelete = (customerId?: string) => {
   const [deleteCustomer, { isLoading: isDeleting }] =
     useDeleteCustomerMutation();
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
 
   const handleDelete = async (id?: string | React.MouseEvent | unknown) => {
     const targetId = typeof id === "string" ? id : customerId;
 
     if (!targetId) {
-      console.error("Delete attempt failed: No targetId found", {
-        id,
-        customerId,
-      });
       toast.error("Cannot delete: Invalid customer ID");
       return;
     }
 
-    // Safety check for object stringification
-    if (targetId.toString() === "[object Object]") {
-      console.error("Delete attempt blocked: ID is [object Object]", {
-        id,
-        customerId,
-      });
-      toast.error("Cannot delete: Invalid ID format");
-      return;
-    }
     try {
       await deleteCustomer(targetId).unwrap();
       toast.success("Customer deleted successfully");
+      setIsDeleteModalOpen(false);
+      setDeleteId(null);
       if (customerId) {
         navigate("/dashboard/customers");
       }
     } catch (error) {
-      console.error("Failed to delete customer:", error);
       toast.error("Failed to delete customer");
     }
+  };
+
+  const handleDeleteClick = (e: React.MouseEvent, id: string) => {
+    e.stopPropagation();
+    setDeleteId(id);
+    setIsDeleteModalOpen(true);
   };
 
   return {
@@ -47,5 +42,8 @@ export const useCustomerDelete = (customerId?: string) => {
     setIsDeleteModalOpen,
     handleDelete,
     isDeleting,
+    deleteId,
+    setDeleteId,
+    handleDeleteClick,
   };
 };

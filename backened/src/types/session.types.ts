@@ -5,9 +5,9 @@ export interface RedisSessionData {
   visitorId: string;
   type: SessionType;
   customerId?: string; // Essential for authenticated actions
+  device?: string;
 }
 
-// Extend Express Request to include session
 declare global {
   namespace Express {
     interface Request {

@@ -9,7 +9,6 @@ export const addCouponSchema = z.object({
   endDate: z.date().optional().nullable(),
   durationDays: z.number().optional().nullable(),
   usageLimit: z.number().optional().nullable(),
-  // coupon applies globally by default
   noEndDate: z.boolean(),
   noUsageLimit: z.boolean(),
 });

@@ -2,9 +2,6 @@ import type { Request, Response } from "express";
 import { prisma } from "../../lib/prisma.js";
 import { successResponse } from "../../utils/response.js";
 
-/**
- * Global Search Controller (Admin)
- */
 export const search = async (req: Request, res: Response) => {
   const query = (req.query.q as string) || "";
 
@@ -12,9 +9,7 @@ export const search = async (req: Request, res: Response) => {
     return res.json(successResponse([], "Empty query"));
   }
 
-  // Run search queries in parallel
   const [products, categories, customers] = await Promise.all([
-    // 1. Search Products (Name, Slug, SKU)
     prisma.product.findMany({
       where: {
         OR: [
@@ -31,7 +26,6 @@ export const search = async (req: Request, res: Response) => {
       },
     }),
 
-    // 2. Search Categories (Name, Slug)
     prisma.category.findMany({
       where: {
         OR: [
@@ -46,7 +40,6 @@ export const search = async (req: Request, res: Response) => {
       },
     }),
 
-    // 3. Search Customers (Name, Email, Phone)
     prisma.customer.findMany({
       where: {
         OR: [

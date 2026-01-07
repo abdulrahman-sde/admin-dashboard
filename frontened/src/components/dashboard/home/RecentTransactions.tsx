@@ -9,17 +9,20 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Filter } from "lucide-react";
-import { useTransactions } from "@/hooks/transactions";
-import { useState } from "react";
-import { useNavigate } from "react-router";
+import { useRecentTransactionsTable } from "@/hooks/dashboard/useRecentTransactionsTable";
 import { RecentTransactionsSkeleton } from "@/components/shared/skeletons";
 import { DataTableEmptyState } from "@/components/shared/DataTableEmptyState";
 
 export default function RecentTransactions() {
-  const { transactions, isFetching, setPaymentStatus, paymentStatus } =
-    useTransactions();
-  const [showFilter, setShowFilter] = useState(false);
-  const navigate = useNavigate();
+  const {
+    transactions,
+    isFetching,
+    paymentStatus,
+    showFilter,
+    handleFilterToggle,
+    applyFilter,
+    navigateToDetails,
+  } = useRecentTransactionsTable();
   return (
     <Card className="shadow-sm border-0">
       <CardHeader className="flex flex-row items-center justify-between ">
@@ -29,7 +32,7 @@ export default function RecentTransactions() {
             variant="default"
             size="sm"
             className="bg-primary text-white hover:bg-primary/90 gap-2"
-            onClick={() => setShowFilter((s) => !s)}
+            onClick={handleFilterToggle}
           >
             <Filter className="h-4 w-4" />
             Filter
@@ -40,10 +43,7 @@ export default function RecentTransactions() {
                 className={`block w-full text-left px-2 py-1 rounded ${
                   !paymentStatus ? "bg-slate-100" : ""
                 }`}
-                onClick={() => {
-                  setPaymentStatus(undefined);
-                  setShowFilter(false);
-                }}
+                onClick={() => applyFilter(undefined)}
               >
                 All
               </button>
@@ -51,10 +51,7 @@ export default function RecentTransactions() {
                 className={`block w-full text-left px-2 py-1 rounded ${
                   paymentStatus === "COMPLETED" ? "bg-slate-100" : ""
                 }`}
-                onClick={() => {
-                  setPaymentStatus("COMPLETED");
-                  setShowFilter(false);
-                }}
+                onClick={() => applyFilter("COMPLETED")}
               >
                 Paid
               </button>
@@ -62,10 +59,7 @@ export default function RecentTransactions() {
                 className={`block w-full text-left px-2 py-1 rounded ${
                   paymentStatus === "PENDING" ? "bg-slate-100" : ""
                 }`}
-                onClick={() => {
-                  setPaymentStatus("PENDING");
-                  setShowFilter(false);
-                }}
+                onClick={() => applyFilter("PENDING")}
               >
                 Pending
               </button>
@@ -73,10 +67,7 @@ export default function RecentTransactions() {
                 className={`block w-full text-left px-2 py-1 rounded ${
                   paymentStatus === "FAILED" ? "bg-slate-100" : ""
                 }`}
-                onClick={() => {
-                  setPaymentStatus("FAILED");
-                  setShowFilter(false);
-                }}
+                onClick={() => applyFilter("FAILED")}
               >
                 Failed
               </button>
@@ -107,7 +98,7 @@ export default function RecentTransactions() {
                   message="No transactions found"
                 />
               ) : (
-                transactions.slice(0, 6).map((transaction, index) => (
+                transactions.map((transaction, index) => (
                   <TableRow key={index} className="[&_td]:text-[13.5px]">
                     <TableCell>{index + 1}.</TableCell>
                     <TableCell className="font-medium">
@@ -149,7 +140,7 @@ export default function RecentTransactions() {
           <Button
             variant="outline"
             className="text-tertiary border-tertiary rounded-3xl px-6"
-            onClick={() => navigate("/dashboard/transactions")}
+            onClick={navigateToDetails}
           >
             Details
           </Button>

@@ -1,6 +1,5 @@
 import { z } from "zod";
 
-// Create Category Schema
 export const createCategorySchema = z.object({
   name: z
     .string()
@@ -23,7 +22,6 @@ export const createCategorySchema = z.object({
   sortOrder: z.number().int().min(0).optional(),
 });
 
-// Update Category Schema
 export const updateCategorySchema = z.object({
   name: z
     .string()
@@ -43,7 +41,6 @@ export const updateCategorySchema = z.object({
   sortOrder: z.number().int().min(0).optional(),
 });
 
-// Query Parameters Schema
 export const categoryQuerySchema = z.object({});
 
 export type CreateCategoryInput = z.infer<typeof createCategorySchema>;

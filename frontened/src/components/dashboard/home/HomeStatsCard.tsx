@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { ArrowDown, ArrowUp, MoreVertical } from "lucide-react";
+import { ArrowDown, ArrowUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -19,7 +19,7 @@ interface StatsCardProps {
   className?: string;
   isLoading?: boolean;
   variant?: "default" | "split";
-  // Props for split variant
+  precision?: number;
   splitData?: {
     left: {
       label: string;
@@ -38,13 +38,16 @@ interface StatsCardProps {
   };
 }
 
-const formatValue = (val: number | string | undefined): string => {
+const formatValue = (
+  val: number | string | undefined,
+  precision: number = 2
+): string => {
   if (val === undefined || val === null) return "0";
   if (typeof val === "string") return val;
   if (val >= 1000) {
-    return (val / 1000).toFixed(1).replace(/\.0$/, "") + "K";
+    return Math.floor(val / 1000) + "K";
   }
-  return val.toString();
+  return Math.floor(Number(val)).toString();
 };
 
 export function StatsCard({
@@ -57,8 +60,12 @@ export function StatsCard({
   className,
   isLoading = false,
   variant = "default",
+  precision,
   splitData,
 }: StatsCardProps) {
+  const defaultPrecision = title.toLowerCase().includes("sales") ? 2 : 0;
+  const activePrecision =
+    precision !== undefined ? precision : defaultPrecision;
   let navigate = useNavigate();
   if (isLoading) {
     return (
@@ -95,13 +102,6 @@ export function StatsCard({
           <h3 className="text-[17px] font-bold text-[#1e293b]">{title}</h3>
           <p className="text-[14px] text-neutral-400 font-medium">{subtitle}</p>
         </div>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-8 w-8 text-neutral-400 -mt-1 -mr-2"
-        >
-          <MoreVertical className="h-5 w-5" />
-        </Button>
       </CardHeader>
       <CardContent className="px-4">
         {variant === "default" ? (
@@ -109,7 +109,7 @@ export function StatsCard({
             <div className="flex items-center flex-row gap-2 mt-1">
               <h1 className="text-[32px] font-bold text-[#0f172a] leading-tight tracking-tight">
                 {title.toLowerCase().includes("sales") ? "$" : ""}
-                {formatValue(value)}
+                {formatValue(value, activePrecision)}
               </h1>
               <div className="flex items-center gap-2 mt-2">
                 {label && (
@@ -135,7 +135,7 @@ export function StatsCard({
                         strokeWidth={3}
                       />
                     )}
-                    {change.value.toFixed(1)}%
+                    {Math.floor(change.value)}%
                   </div>
                 )}
               </div>
@@ -147,7 +147,7 @@ export function StatsCard({
                   Previous 7days{" "}
                   <span className="text-tertiary font-bold">
                     ({title.toLowerCase().includes("sales") ? "$" : ""}
-                    {formatValue(previousValue)})
+                    {formatValue(previousValue, activePrecision)})
                   </span>
                 </p>
               )}
@@ -200,7 +200,7 @@ export function StatsCard({
                         strokeWidth={3}
                       />
                     )}
-                    {splitData.right.change.value.toFixed(1)}%
+                    {Math.floor(splitData.right.change.value)}%
                   </div>
                 )}
               </div>

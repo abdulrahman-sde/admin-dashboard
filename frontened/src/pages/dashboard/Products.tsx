@@ -62,7 +62,7 @@ export default function Products() {
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#9CA3AF]" />
               <Input
                 placeholder="Search products"
-                className="pl-10 w-full sm:w-64 border-[#E5E7EB] text-sm"
+                className="pl-10 w-full sm:w-64 border-none bg-[#ffff] border-neutral-400 shadow-2xl text-sm shadow-none focus:ring-0"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
               />
@@ -76,19 +76,11 @@ export default function Products() {
             <Plus className="h-4 w-4 sm:mr-2" />
             <span className="hidden sm:inline">Add Product</span>
           </Button>
-          {/* <Button
-            variant="outline"
-            disabled={true}
-            className="border-[#E5E7EB] hidden md:flex "
-          >
-            <Save className="h-4 w-4 mr-2" />
-            Save to draft
-          </Button> */}
         </div>
       </div>
 
       {/* Table - Scrollable */}
-      <div className="bg-white rounded-lg overflow-x-auto no-scrollbar min-h-[300px] border border-[#E5E7EB]">
+      <div className="bg-white rounded-lg overflow-x-auto no-scrollbar min-h-[300px] border-none shadow-sm">
         <Table className="min-w-[800px]">
           <TableHeader className=" bg-white ">
             <TableRow className="[&_th]:pt-8 [&_th]:pb-3 text-[14px] [&_th]:text-muted-foreground">
@@ -150,12 +142,12 @@ export default function Products() {
                       <div className="w-10 h-10 rounded-lg overflow-hidden bg-gray-100 shrink-0 border border-gray-200 flex items-center justify-center">
                         {product.thumbnail ||
                         product.images?.[0] ||
-                        (product as any).image ? (
+                        product.image ? (
                           <img
                             src={
                               product.thumbnail ||
                               product.images?.[0] ||
-                              (product as any).image
+                              product.image
                             }
                             alt={product.name}
                             className="w-full h-full object-cover"

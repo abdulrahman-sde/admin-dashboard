@@ -6,6 +6,10 @@ import type {
 } from "../utils/validators/product.validator.js";
 import type { ProductStatsResult } from "../types/products.types.js";
 
+export type ProductWithCategory = Product & {
+  category?: { name: string };
+};
+
 export const productRepository = {
   getAll: async ({
     skip,
@@ -16,8 +20,10 @@ export const productRepository = {
     skip: number;
     take: number;
     where?: Prisma.ProductWhereInput;
-    orderBy?: Prisma.ProductOrderByWithRelationInput;
-  }): Promise<{ products: Product[]; total: number }> => {
+    orderBy?:
+      | Prisma.ProductOrderByWithRelationInput
+      | Prisma.ProductOrderByWithRelationInput[];
+  }): Promise<{ products: ProductWithCategory[]; total: number }> => {
     const [products, total] = await Promise.all([
       prisma.product.findMany({
         skip,
@@ -145,7 +151,6 @@ export const productRepository = {
       ],
     });
 
-    // Type the raw facet result
     const facetResult = (result as any)[0];
 
     return {

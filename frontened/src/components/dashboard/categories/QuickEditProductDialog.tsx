@@ -68,7 +68,7 @@ export default function QuickEditProductDialog({
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Enter product name"
-              className="border-[#E5E7EB]"
+              className="border-none bg-[#F9FAFB] focus:bg-[#EDF1FD] focus:ring-0"
             />
           </div>
           <div className="grid grid-cols-2 gap-4">
@@ -81,7 +81,7 @@ export default function QuickEditProductDialog({
                 onChange={(e) => setPrice(e.target.value)}
                 placeholder="0.00"
                 min="0"
-                className="border-[#E5E7EB]"
+                className="border-none bg-[#F9FAFB] focus:bg-[#EDF1FD] focus:ring-0"
               />
             </div>
             <div className="space-y-2">
@@ -93,7 +93,7 @@ export default function QuickEditProductDialog({
                 onChange={(e) => setStock(e.target.value)}
                 placeholder="0"
                 min="0"
-                className="border-[#E5E7EB]"
+                className="border-none bg-[#F9FAFB] focus:bg-[#EDF1FD] focus:ring-0"
               />
             </div>
           </div>
@@ -101,7 +101,7 @@ export default function QuickEditProductDialog({
             <Button
               variant="outline"
               onClick={() => onOpenChange(false)}
-              className="border-[#E5E7EB]"
+              className="border-none bg-[#F9FAFB] hover:bg-[#EDF1FD]"
             >
               Cancel
             </Button>
