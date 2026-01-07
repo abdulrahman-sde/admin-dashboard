@@ -4,7 +4,7 @@
 
 ---
 
-## � System Architecture
+## System Architecture
 
 The project is architected with a strict separation of concerns, ensuring that the administrative dashboard and the public storefront can scale independently while sharing a unified data engine.
 
@@ -19,7 +19,7 @@ The project is architected with a strict separation of concerns, ensuring that t
 
 ---
 
-## 🛣 Dual-Routing Logic: Admin vs. Storefront
+## Dual-Routing Logic: Admin vs. Storefront
 
 The backend implements two distinct routing systems, each tailored to specific security and performance requirements.
 
@@ -87,7 +87,7 @@ The MongoDB schema uses intentional data duplication to ensure lightning-fast re
 
 ---
 
-## 🔒 Security & Data Integrity
+## Security & Data Integrity
 
 - **JWT Rotation Flow**: Implements a secure Access/Refresh token pattern. Refresh tokens are rotated on usage, minimizing the impact of potential leaks.
 - **Cookie Security**: All sensitive tokens are stored in **HTTP-only, Secure** cookies with `SameSite: None` configuration, enabling secure cross-site communication between Vercel and Railway.
@@ -121,7 +121,7 @@ The MongoDB schema uses intentional data duplication to ensure lightning-fast re
 
 ---
 
-## 🏁 How to Get Started
+## How to Get Started
 
 ### **Prerequisites**
 
@@ -139,7 +139,3 @@ The MongoDB schema uses intentional data duplication to ensure lightning-fast re
 5.  **Start Development**: Run `npm run dev` in both terminals.
 
 ---
-
-## 📜 Summary of Implementation
-
-This project was approached with a **"Performance-First"** mindset. Every feature—from the intelligent session tracking to the background data aggregation—is designed to handle the scale of a real-world e-commerce environment. By leveraging a modern tech stack and thoughtful architectural patterns, DealPort provides a seamless experience for both administrators and customers.
