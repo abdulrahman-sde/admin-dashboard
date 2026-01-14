@@ -22,7 +22,7 @@ export function NavDocuments({
   const location = useLocation();
 
   return (
-    <SidebarGroup className="group-data-[collapsible=icon]:hidden mb-[-15px]">
+    <SidebarGroup className="mb-[-15px]">
       <SidebarGroupLabel className="text-[15px]">{label}</SidebarGroupLabel>
       <SidebarMenu>
         {items.map((item) => {
@@ -41,7 +41,7 @@ export function NavDocuments({
                       isActive && item.activeIcon ? item.activeIcon : item.icon
                     }
                     alt={item.name}
-                    className={`size-[17.5px]`}
+                    className={`size-[17.5px] group-data-[collapsible=icon]:size-8 transition-all`}
                   />
 
                   <span>{item.name}</span>

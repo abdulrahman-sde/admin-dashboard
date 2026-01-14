@@ -74,13 +74,13 @@ export default function AddProductsPage() {
   }
 
   return (
-    <div className="p-2 space-y-8 ">
+    <div className="space-y-8">
       <Form {...form}>
         <form onSubmit={onSubmit}>
           {/* Header */}
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-8">
             <div className="flex items-center gap-3">
-              <h1 className="text-2xl font-semibold text-[#111827]">
+              <h1 className="text-[22px] font-semibold text-[#111827]">
                 {isEditing ? "Edit Product" : "Add New Product"}
               </h1>
             </div>

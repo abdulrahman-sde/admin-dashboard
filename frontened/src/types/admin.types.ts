@@ -5,9 +5,11 @@ export const profileSchema = z.object({
   lastName: z.string().min(2, "Last name must be at least 2 characters"),
   email: z.string().email("Invalid email address"),
   phone: z.string().optional(),
+  dateOfBirth: z.string().optional(),
   biography: z.string().optional(),
   avatar: z.string().optional(),
   location: z.string().optional(),
+  creditCard: z.string().optional(),
 });
 
 export const passwordSchema = z

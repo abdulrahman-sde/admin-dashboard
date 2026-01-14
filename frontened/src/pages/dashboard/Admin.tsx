@@ -5,17 +5,20 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Textarea } from "@/components/ui/textarea";
 import {
   Edit,
-  Share2,
-  Copy,
-  EyeOff,
   Eye,
+  EyeOff,
   Calendar,
   Wand2,
   Loader2,
   CheckCircle2,
-  Upload,
+  ChevronDown,
+  Copy,
+  Plus,
+  Share2,
 } from "lucide-react";
 import { useAdminProfile } from "@/hooks/dashboard/useAdminProfile";
+import googleIcon from "@/assets/icons/google.png";
+import facebookIcon from "@/assets/icons/facebook.png";
 
 export default function Admin() {
   const {
@@ -45,70 +48,125 @@ export default function Admin() {
 
   const firstName = user?.firstName || "Admin";
   const lastName = user?.lastName || "User";
+  const initials = `${firstName[0] || ""}${lastName[0] || ""}`;
+  const profileImage = user?.avatar || "https://github.com/shadcn.png";
   const fullName = `${firstName} ${lastName}`;
   const email = user?.email || "admin@example.com";
-  const profileImage = user?.avatar || "https://github.com/shadcn.png";
-  const initials = `${firstName[0] || ""}${lastName[0] || ""}`;
 
   return (
-    <div className="bg-[#F8F9FB] -m-4 sm:-m-6 p-4 sm:p-10 space-y-[22px] min-h-screen overflow-x-hidden">
-      <h1 className="text-2xl font-bold text-[#151D48]">About section</h1>
-
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-[22px]">
+    <div className="bg-[#F8F9FB] min-h-screen overflow-x-hidden font-sans">
+      <div className="mb-6">
+        <h1 className="text-[22px] font-semibold text-[#151D48]">
+          About section
+        </h1>
+      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
         {/* Left Column */}
-        <div className="lg:col-span-4 space-y-[22px]">
+        <div className="lg:col-span-4 space-y-6">
           {/* Profile Card */}
-          <div className="bg-white rounded-2xl p-6">
-            <div className="flex flex-row items-center justify-between mb-4">
-              <h3 className="text-lg font-bold text-[#151D48]">Profile</h3>
-              <div className="flex gap-2 text-gray-400">
+          <div className="bg-white rounded-[12px] p-6 shadow-sm">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="font-semibold text-[#151D48] text-[20px]">
+                Profile
+              </h3>
+              <div className="flex gap-2">
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="h-8 w-8 hover:text-primary"
+                  disabled
+                  className="h-8 w-8 p-0 text-gray-400 hover:text-[#48A878] disabled:opacity-50"
                 >
                   <Edit className="h-4 w-4" />
                 </Button>
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="h-8 w-8 hover:text-primary"
+                  disabled
+                  className="h-8 w-8 p-0 text-gray-400 hover:text-[#48A878] disabled:opacity-50"
                 >
                   <Share2 className="h-4 w-4" />
                 </Button>
               </div>
             </div>
+
             <div className="flex flex-col items-center">
-              <div className="mb-4 relative">
-                <Avatar className="h-24 w-24 border-4 border-white shadow-sm">
-                  <AvatarImage src={profileImage} alt={fullName} />
-                  <AvatarFallback>{initials}</AvatarFallback>
+              <div className="relative mb-4">
+                <Avatar className="h-32 w-32 border-4 border-white shadow-sm">
+                  <AvatarImage src={profileImage} alt="Profile" />
+                  <AvatarFallback className="text-3xl">
+                    {initials}
+                  </AvatarFallback>
                 </Avatar>
               </div>
-              <h2 className="text-lg font-bold text-[#151D48]">{fullName}</h2>
-              <div className="flex items-center gap-2 text-sm text-[#737791] mt-1 mb-6">
-                <span>{email}</span>
+
+              <h2 className="text-xl font-bold text-[#151D48] mb-1">
+                {fullName}
+              </h2>
+              <div className="flex items-center gap-2 text-[#737791] mb-6">
+                <span className="text-sm">{email}</span>
                 <Copy
-                  className="h-3 w-3 cursor-pointer hover:text-primary"
+                  className="h-4 w-4 cursor-pointer text-gray-400 hover:text-[#48A878]"
                   onClick={copyEmail}
                 />
               </div>
+
+              <h4 className="text-[#151D48] font-medium text-sm mb-3">
+                Linked with Social media
+              </h4>
+              <div className="flex gap-4 mb-6">
+                <div className="flex items-center gap-1 text-[#4285F4] font-medium text-sm">
+                  <img src={googleIcon} alt="Google" className="w-5 h-5" />
+                  <span className="text-xs">Linked</span>
+                </div>
+                <div className="flex items-center gap-1 text-[#1877F2] font-medium text-sm">
+                  <img src={facebookIcon} alt="Facebook" className="w-5 h-5" />
+                  <span className="text-xs">Linked</span>
+                </div>
+                <div className="flex items-center gap-1 text-black font-medium text-sm">
+                  <svg
+                    className="w-5 h-5"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                  >
+                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                  </svg>
+                  <span className="text-xs">Linked</span>
+                </div>
+              </div>
+
+              <Button
+                variant="outline"
+                className="gap-2 text-[#737791] border-gray-200 w-full rounded-[12px] h-11"
+              >
+                <Plus className="h-5 w-5" />
+                Social media
+              </Button>
             </div>
           </div>
 
           {/* Change Password Card */}
-          <div className="bg-white rounded-2xl p-6">
-            <div className="flex flex-row items-center justify-between mb-4">
+          <div className="bg-white rounded-[12px] p-6 shadow-sm">
+            <div className="flex justify-between items-center mb-6">
               <h3 className="text-lg font-bold text-[#151D48]">
                 Change Password
               </h3>
+              <a
+                href="#"
+                className="text-[#4285F4] text-sm flex items-center gap-1 hover:underline"
+              >
+                Need help{" "}
+                <span className="inline-flex items-center justify-center rounded-full border-2 border-[#4285F4] w-5 h-5 text-xs font-medium">
+                  ?
+                </span>
+              </a>
             </div>
+
             <form
               onSubmit={passwordForm.handleSubmit(onPasswordSubmit)}
               className="space-y-4"
             >
-              <div className="space-y-1.5">
-                <Label className="text-sm font-medium text-[#151D48]">
+              <div className="space-y-2">
+                <Label className="text-[#151D48] font-medium text-sm">
                   Current Password
                 </Label>
                 <div className="relative">
@@ -116,29 +174,33 @@ export default function Admin() {
                     {...passwordForm.register("currentPassword")}
                     type={showCurrentPassword ? "text" : "password"}
                     placeholder="Enter password"
-                    className="pr-10"
+                    className="bg-transparent border-gray-200 h-12 pr-10 rounded-[12px]"
                   />
                   <button
-                    onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
                     type="button"
+                    onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#48A878]"
                   >
                     {showCurrentPassword ? (
-                      <Eye className="h-4 w-4" />
+                      <EyeOff className="h-5 w-5" />
                     ) : (
-                      <EyeOff className="h-4 w-4" />
+                      <Eye className="h-5 w-5" />
                     )}
                   </button>
                 </div>
                 {passwordForm.formState.errors.currentPassword && (
-                  <p className="text-xs text-destructive">
+                  <p className="text-xs text-destructive mt-1">
                     {passwordForm.formState.errors.currentPassword.message}
                   </p>
                 )}
               </div>
 
-              <div className="space-y-1.5">
-                <Label className="text-sm font-medium text-[#151D48]">
+              <a href="#" className="text-[#4285F4] text-sm block">
+                Forgot Current Password? Click here
+              </a>
+
+              <div className="space-y-2">
+                <Label className="text-[#151D48] font-medium text-sm">
                   New Password
                 </Label>
                 <div className="relative">
@@ -146,29 +208,29 @@ export default function Admin() {
                     {...passwordForm.register("newPassword")}
                     type={showNewPassword ? "text" : "password"}
                     placeholder="Enter password"
-                    className="pr-10"
+                    className="bg-transparent border-gray-200 h-12 pr-10 rounded-[12px]"
                   />
                   <button
-                    onClick={() => setShowNewPassword(!showNewPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
                     type="button"
+                    onClick={() => setShowNewPassword(!showNewPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#48A878]"
                   >
                     {showNewPassword ? (
-                      <Eye className="h-4 w-4" />
+                      <EyeOff className="h-5 w-5" />
                     ) : (
-                      <EyeOff className="h-4 w-4" />
+                      <Eye className="h-5 w-5" />
                     )}
                   </button>
                 </div>
                 {passwordForm.formState.errors.newPassword && (
-                  <p className="text-xs text-destructive">
+                  <p className="text-xs text-destructive mt-1">
                     {passwordForm.formState.errors.newPassword.message}
                   </p>
                 )}
               </div>
 
-              <div className="space-y-1.5">
-                <Label className="text-sm font-medium text-[#151D48]">
+              <div className="space-y-2">
+                <Label className="text-[#151D48] font-medium text-sm">
                   Re-enter Password
                 </Label>
                 <div className="relative">
@@ -176,22 +238,22 @@ export default function Admin() {
                     {...passwordForm.register("confirmPassword")}
                     type={showConfirmPassword ? "text" : "password"}
                     placeholder="Enter password"
-                    className="pr-10"
+                    className="bg-transparent border-gray-200 h-12 pr-10 rounded-[12px]"
                   />
                   <button
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
                     type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#48A878]"
                   >
                     {showConfirmPassword ? (
-                      <Eye className="h-4 w-4" />
+                      <EyeOff className="h-5 w-5" />
                     ) : (
-                      <EyeOff className="h-4 w-4" />
+                      <Eye className="h-5 w-5" />
                     )}
                   </button>
                 </div>
                 {passwordForm.formState.errors.confirmPassword && (
-                  <p className="text-xs text-destructive">
+                  <p className="text-xs text-destructive mt-1">
                     {passwordForm.formState.errors.confirmPassword.message}
                   </p>
                 )}
@@ -199,8 +261,8 @@ export default function Admin() {
 
               <Button
                 type="submit"
+                className="w-full bg-[#48A878] hover:bg-[#3d9165] text-white h-12 mt-4 rounded-[12px]"
                 disabled={isChangingPassword}
-                className="w-full bg-[#48A878] hover:bg-[#3d9165] text-white mt-4 h-11"
               >
                 {isChangingPassword ? (
                   <Loader2 className="h-4 w-4 animate-spin mr-2" />
@@ -211,220 +273,243 @@ export default function Admin() {
           </div>
         </div>
 
-        {/* Right Column - Profile Update */}
-        <div className="lg:col-span-8">
-          <div className="bg-white rounded-2xl p-6">
-            <form onSubmit={profileForm.handleSubmit(onProfileSubmit)}>
-              <div className="flex flex-row items-center justify-between mb-6 pb-6 border-b border-gray-50">
-                <h3 className="text-lg font-bold text-[#151D48]">
-                  Profile Update
-                </h3>
+        {/* Right Column */}
+        <div className="lg:col-span-8 space-y-6">
+          <div className="bg-white rounded-[12px] p-8 shadow-sm">
+            <div className="flex justify-between items-center mb-8">
+              <h3 className="text-[20px] font-semibold text-[#151D48]">
+                Profile Update
+              </h3>
+              {!isEditMode ? (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setIsEditMode(true)}
+                  className="h-8 w-8 p-0 text-gray-400 hover:text-[#48A878]"
+                >
+                  <Edit className="h-4 w-4" />
+                </Button>
+              ) : (
                 <div className="flex gap-2">
-                  {isEditMode && (
-                    <>
-                      <Button
-                        type="button"
-                        onClick={() => {
-                          setIsEditMode(false);
-                          profileForm.reset();
-                        }}
-                        variant="outline"
-                        className="gap-2 border-gray-200"
-                      >
-                        Cancel
-                      </Button>
-                      <Button
-                        type="submit"
-                        disabled={isUpdatingProfile || !hasChanges}
-                        className="gap-2 bg-[#48A878] hover:bg-[#3d9165] text-white disabled:opacity-50"
-                      >
-                        {isUpdatingProfile ? (
-                          <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                        ) : (
-                          <CheckCircle2 className="h-3.5 w-3.5" />
-                        )}
-                        Update
-                      </Button>
-                    </>
-                  )}
-                  {!isEditMode && (
-                    <Button
-                      type="button"
-                      onClick={() => setIsEditMode(true)}
-                      variant="outline"
-                      className="gap-2 border-gray-200"
-                    >
-                      <Edit className="h-3.5 w-3.5" />
-                      Edit
-                    </Button>
-                  )}
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setIsEditMode(false);
+                      profileForm.reset();
+                    }}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    onClick={profileForm.handleSubmit(onProfileSubmit)}
+                    disabled={isUpdatingProfile || !hasChanges}
+                    className="bg-[#48A878] hover:bg-[#3d9165] text-white"
+                  >
+                    {isUpdatingProfile ? (
+                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                    ) : (
+                      <CheckCircle2 className="h-4 w-4 mr-2" />
+                    )}
+                    Save
+                  </Button>
                 </div>
-              </div>
-              <div className="space-y-6">
-                <div className="flex items-center gap-6">
-                  <Avatar className="h-16 w-16">
-                    <AvatarImage
-                      src={profileForm.watch("avatar") || profileImage}
-                      alt={fullName}
-                    />
-                    <AvatarFallback>{initials}</AvatarFallback>
+              )}
+            </div>
+
+            <form onSubmit={profileForm.handleSubmit(onProfileSubmit)}>
+              <div className="flex flex-col space-y-6">
+                {/* Profile Image Section */}
+                <div className="flex items-center gap-4 mb-4">
+                  <Avatar className="h-20 w-20 border-4 border-white shadow-sm">
+                    <AvatarImage src={profileImage} alt="Profile" />
+                    <AvatarFallback className="text-2xl">
+                      {initials}
+                    </AvatarFallback>
                   </Avatar>
                   <div className="flex gap-3">
-                    <input
-                      type="file"
-                      ref={fileInputRef}
-                      onChange={handleImageUpload}
-                      accept="image/*"
-                      className="hidden"
-                    />
                     <Button
                       type="button"
-                      className="bg-[#48A878] hover:bg-[#3d9165] text-white h-9 px-4"
                       onClick={() => fileInputRef.current?.click()}
-                      disabled={isUploadingImage || !isEditMode}
+                      disabled={isUploadingImage}
+                      className="bg-[#48A878] hover:bg-[#3d9165] text-white h-10 px-4 rounded-[12px]"
                     >
                       {isUploadingImage ? (
                         <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                      ) : (
-                        <Upload className="h-4 w-4 mr-2" />
-                      )}
+                      ) : null}
                       Upload New
                     </Button>
                     <Button
                       type="button"
                       variant="outline"
-                      className="h-9 px-4 text-[#737791] border-gray-200 bg-white"
-                      onClick={() =>
-                        profileForm.setValue("avatar", "", {
-                          shouldDirty: true,
-                        })
-                      }
-                      disabled={!isEditMode}
+                      className="h-10 px-4 rounded-[12px] border-gray-200 text-gray-700 hover:bg-gray-50"
                     >
                       Delete
                     </Button>
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={handleImageUpload}
+                    />
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Form Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-6">
+                  {/* Row 1 - Names */}
                   <div className="space-y-2">
-                    <Label className="text-sm font-medium text-[#737791]">
+                    <Label className="text-[14px] font-medium text-[#151D48]">
                       First Name
                     </Label>
-                    <Input
-                      {...profileForm.register("firstName")}
-                      className="font-semibold text-[#151D48]"
-                      readOnly={!isEditMode}
-                    />
-                    {profileForm.formState.errors.firstName && (
-                      <p className="text-xs text-destructive">
-                        {profileForm.formState.errors.firstName.message}
-                      </p>
-                    )}
+                    <div className="h-[48px]">
+                      <Input
+                        {...profileForm.register("firstName")}
+                        className="h-full bg-[#F9FAFB] border-gray-200 focus-visible:ring-[#48A878] text-[14px] font-medium text-[#151D48] rounded-[12px]"
+                        readOnly={!isEditMode}
+                      />
+                    </div>
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-sm font-medium text-[#737791]">
+                    <Label className="text-[14px] font-medium text-[#151D48]">
                       Last Name
                     </Label>
-                    <Input
-                      {...profileForm.register("lastName")}
-                      className="font-semibold text-[#151D48]"
-                      readOnly={!isEditMode}
-                    />
-                    {profileForm.formState.errors.lastName && (
-                      <p className="text-xs text-destructive">
-                        {profileForm.formState.errors.lastName.message}
-                      </p>
-                    )}
+                    <div className="h-[48px]">
+                      <Input
+                        {...profileForm.register("lastName")}
+                        className="h-full bg-[#F9FAFB] border-gray-200 focus-visible:ring-[#48A878] text-[14px] font-medium text-[#151D48] rounded-[12px]"
+                        readOnly={!isEditMode}
+                      />
+                    </div>
                   </div>
 
+                  {/* Row 2 - Password & Phone */}
                   <div className="space-y-2">
-                    <Label className="text-sm font-medium text-[#737791]">
-                      Status
+                    <Label className="text-[14px] font-medium text-[#151D48]">
+                      Password
                     </Label>
-                    <Input
-                      value={user?.status || "ACTIVE"}
-                      readOnly
-                      className="font-semibold text-[#151D48] opacity-70 cursor-not-allowed"
-                    />
+                    <div className="relative h-[48px]">
+                      <Input
+                        type="password"
+                        value="••••••••••"
+                        className="h-full bg-[#F9FAFB] border-gray-200 focus-visible:ring-[#48A878] text-[14px] font-medium text-[#151D48] pr-10 rounded-[12px]"
+                        disabled
+                      />
+                      <button
+                        type="button"
+                        disabled
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 disabled:opacity-50"
+                      >
+                        <Eye className="h-5 w-5" />
+                      </button>
+                    </div>
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-sm font-medium text-[#737791]">
+                    <Label className="text-[14px] font-medium text-[#151D48]">
                       Phone Number
                     </Label>
-                    <Input
-                      {...profileForm.register("phone")}
-                      placeholder="No phone added"
-                      className="font-semibold text-[#151D48]"
-                      readOnly={!isEditMode}
-                    />
+                    <div className="relative h-[48px]">
+                      <div className="absolute left-3 top-1/2 -translate-y-1/2 flex items-center gap-2 border-r border-gray-200 pr-3 pointer-events-none z-10">
+                        <span className="text-lg">🇺🇸</span>
+                        <ChevronDown className="h-4 w-4 text-gray-400" />
+                      </div>
+                      <Input
+                        {...profileForm.register("phone")}
+                        className="h-full bg-[#F9FAFB] border-gray-200 focus-visible:ring-[#48A878] text-[14px] font-medium text-[#151D48] pl-[76px] rounded-[12px]"
+                        placeholder="(406) 555-0120"
+                        readOnly={!isEditMode}
+                      />
+                    </div>
                   </div>
 
+                  {/* Row 3 - Email & Date of Birth */}
                   <div className="space-y-2">
-                    <Label className="text-sm font-medium text-[#737791]">
+                    <Label className="text-[14px] font-medium text-[#151D48]">
                       E-mail
                     </Label>
-                    <Input
-                      {...profileForm.register("email")}
-                      className="font-semibold text-[#151D48]"
-                      readOnly
-                    />
-                    {profileForm.formState.errors.email && (
-                      <p className="text-xs text-destructive">
-                        {profileForm.formState.errors.email.message}
-                      </p>
-                    )}
+                    <div className="h-[48px]">
+                      <Input
+                        {...profileForm.register("email")}
+                        className="h-full bg-[#F9FAFB] border-gray-200 focus-visible:ring-[#48A878] text-[14px] font-medium text-[#151D48] rounded-[12px]"
+                        disabled
+                      />
+                    </div>
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-sm font-medium text-[#737791]">
-                      Member Since
+                    <Label className="text-[14px] font-medium text-[#151D48]">
+                      Date of Birth
                     </Label>
-                    <div className="relative">
+                    <div className="relative h-[48px]">
                       <Input
-                        value={
-                          user?.createdAt
-                            ? new Date(user.createdAt).toLocaleDateString(
-                                "en-US",
-                                {
-                                  day: "numeric",
-                                  month: "long",
-                                  year: "numeric",
-                                }
-                              )
-                            : ""
-                        }
-                        className="font-semibold text-[#151D48] pl-3 pr-10 opacity-70 cursor-not-allowed"
-                        readOnly
+                        {...profileForm.register("dateOfBirth")}
+                        className="h-full bg-[#F9FAFB] border-gray-200 focus-visible:ring-[#48A878] text-[14px] font-medium text-[#151D48] pr-10 rounded-[12px]"
+                        readOnly={!isEditMode}
+                        type="date"
                       />
-                      <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                      <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 pointer-events-none" />
                     </div>
                   </div>
                 </div>
 
+                {/* Location - Full width */}
                 <div className="space-y-2">
-                  <Label className="text-sm font-medium text-[#737791]">
+                  <Label className="text-[14px] font-medium text-[#151D48]">
                     Location
                   </Label>
-                  <Input
-                    {...profileForm.register("location")}
-                    placeholder="2972 Westheimer Rd. Santa Ana, Illinois 85486"
-                    className="font-semibold text-[#151D48]"
-                    readOnly={!isEditMode}
-                  />
+                  <div className="h-[48px]">
+                    <Input
+                      {...profileForm.register("location")}
+                      className="h-full bg-[#F9FAFB] border-gray-200 focus-visible:ring-[#48A878] text-[14px] font-medium text-[#151D48] rounded-[12px]"
+                      readOnly={!isEditMode}
+                    />
+                  </div>
                 </div>
 
+                {/* Credit Card - Full width */}
                 <div className="space-y-2">
-                  <Label className="text-sm font-medium text-[#737791]">
+                  <Label className="text-[14px] font-medium text-[#151D48]">
+                    Credit Card
+                  </Label>
+                  <div className="relative h-[48px]">
+                    <div className="absolute left-3 top-1/2 -translate-y-1/2 flex items-center gap-2 pointer-events-none z-10">
+                      <div className="flex -space-x-2">
+                        <div className="w-5 h-5 rounded-full bg-[#EB001B] opacity-80" />
+                        <div className="w-5 h-5 rounded-full bg-[#F79E1B] opacity-80" />
+                      </div>
+                    </div>
+                    <Input
+                      {...profileForm.register("creditCard")}
+                      className="h-full bg-[#F9FAFB] border-gray-200 focus-visible:ring-[#48A878] text-[14px] font-medium text-[#151D48] pl-12 pr-10 rounded-[12px]"
+                      placeholder="843-4359-4444"
+                      readOnly={!isEditMode}
+                    />
+                    <div className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
+                      <ChevronDown className="h-4 w-4" />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Biography - Full width */}
+                <div className="space-y-2">
+                  <Label className="text-[14px] font-medium text-[#151D48]">
                     Biography
                   </Label>
                   <div className="relative">
                     <Textarea
                       {...profileForm.register("biography")}
                       placeholder="Enter a biography about you"
-                      className="min-h-[120px] resize-none pr-10"
+                      className="min-h-[120px] resize-none pr-10 border-gray-200 focus-visible:ring-[#48A878] text-[14px] font-medium text-[#151D48] bg-[#F9FAFB] border-0 rounded-[12px]"
                       readOnly={!isEditMode}
                     />
                     <div className="absolute right-3 bottom-3 flex gap-2 text-gray-400">
+                      <button
+                        type="button"
+                        onClick={() => setIsEditMode(true)}
+                        disabled={isEditMode}
+                        className="hover:text-[#48A878] disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        <Edit className="h-5 w-5" />
+                      </button>
                       <button
                         type="button"
                         onClick={handleRefineBiography}
@@ -432,16 +517,13 @@ export default function Admin() {
                         className="hover:text-[#48A878] disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         {isRefiningBio ? (
-                          <Loader2 className="h-4 w-4 animate-spin" />
+                          <Loader2 className="h-5 w-5 animate-spin" />
                         ) : (
-                          <Wand2 className="h-4 w-4" />
+                          <Wand2 className="h-5 w-5" />
                         )}
                       </button>
                     </div>
                   </div>
-                  <p className="text-xs text-gray-500">
-                    Click the magic wand to refine your biography with AI
-                  </p>
                 </div>
               </div>
             </form>

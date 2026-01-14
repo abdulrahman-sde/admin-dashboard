@@ -32,8 +32,10 @@ export interface AdminUser {
   status: UserStatus;
   avatar?: string;
   phone?: string;
+  dateOfBirth?: string;
   biography?: string;
   location?: string;
+  creditCard?: string;
   createdAt: string;
   updatedAt: string;
   lastLoginAt?: string;
@@ -44,9 +46,11 @@ export interface UpdateProfileInput {
   lastName?: string;
   email?: string;
   phone?: string;
+  dateOfBirth?: string;
   biography?: string;
   avatar?: string;
   location?: string;
+  creditCard?: string;
 }
 
 export interface ChangePasswordInput {

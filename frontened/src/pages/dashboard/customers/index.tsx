@@ -11,7 +11,7 @@ export default function Users() {
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <h1 className="text-2xl font-bold">Customers</h1>
+        <h1 className="text-[22px] font-semibold">Customers</h1>
         <Link to="/dashboard/customers/add" className="w-full sm:w-auto">
           <Button className="w-full sm:w-auto bg-[#4EA674] hover:bg-[#3d8a5e]">
             Add Customer

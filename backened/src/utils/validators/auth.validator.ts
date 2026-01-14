@@ -30,7 +30,10 @@ export const updateProfileSchema = z.object({
   lastName: z.string().min(2, "Last name is too short").max(50).optional(),
   email: z.string().email("Invalid email").optional(),
   phone: z.string().optional(),
+  dateOfBirth: z.string().optional().or(z.literal("")),
   biography: z.string().max(1000).optional(),
+  location: z.string().max(200).optional(),
+  creditCard: z.string().max(20).optional(),
   avatar: z.string().url("Invalid avatar URL").optional().or(z.literal("")),
 });
 
@@ -61,7 +64,6 @@ export const loginCustomerSchema = z.object({
   email: z.string().email("Invalid email address"),
   password: z.string().min(1, "Password is required"),
 });
-
 
 export type RegisterInput = z.infer<typeof registerSchema>;
 export type LoginInput = z.infer<typeof loginSchema>;

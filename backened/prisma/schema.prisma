@@ -28,8 +28,10 @@ model User {
   status       UserStatus @default(ACTIVE)
   avatar       String?
   phone        String?
+  dateOfBirth  DateTime?
   biography    String?
   location     String?
+  creditCard   String?
   refreshToken String?
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt

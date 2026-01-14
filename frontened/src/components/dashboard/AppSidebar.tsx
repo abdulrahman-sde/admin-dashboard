@@ -5,10 +5,9 @@ import {
   SidebarContent,
   SidebarFooter,
   SidebarHeader,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
+  useSidebar,
 } from "@/components/ui/sidebar";
+import togglerIcon from "@/assets/icons/toggler.svg";
 import homeIcon from "@/assets/icons/home.svg";
 import orderIcon from "@/assets/icons/orders.svg";
 import usersIcon from "@/assets/icons/users.svg";
@@ -19,8 +18,6 @@ import reportsIcon from "@/assets/icons/reports.svg";
 import addProductIcon from "@/assets/icons/add.svg";
 import productIcon from "@/assets/icons/products.svg";
 import adminIcon from "@/assets/icons/user.svg";
-import { Link } from "react-router";
-import logoImage from "@/assets/images/logo.svg";
 import { useAuth } from "@/hooks/useAuth";
 
 import activeHomeIcon from "@/assets/icons/activeHomeIcon.svg";
@@ -33,6 +30,8 @@ import activeReportsIcon from "@/assets/icons/activeReportsIcon.svg";
 import activeAddProductIcon from "@/assets/icons/activeAddProductIcon.svg";
 import activeProductIcon from "@/assets/icons/activeProductIcon.svg";
 import activeAdminIcon from "@/assets/icons/activeAdminIcon.svg";
+import { Link } from "react-router";
+import logoImage from "@/assets/images/logo.svg";
 const data = {
   user: {
     name: "Dealport",
@@ -109,6 +108,7 @@ const data = {
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { user } = useAuth();
+  const { toggleSidebar } = useSidebar();
 
   const userData = user
     ? {
@@ -125,18 +125,17 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       className="bg-white border-r pr-1 border-gray-100 "
     >
       <SidebarHeader className="bg-white">
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton
-              asChild
-              className="data-[slot=sidebar-menu-button]:p-1.5!"
-            >
-              <Link to={"/dashboard"}>
-                <img src={logoImage} alt="Logo" />
-              </Link>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
+        <div className="flex items-center justify-between px-2 py-2">
+          <Link to={"/dashboard"}>
+            <img src={logoImage} alt="Logo" />
+          </Link>
+          <button
+            onClick={toggleSidebar}
+            className="flex items-center justify-center w-8 h-8 hover:bg-gray-100 rounded-md transition-colors"
+          >
+            <img src={togglerIcon} alt="Toggle sidebar" className="w-5 h-5" />
+          </button>
+        </div>
       </SidebarHeader>
       <SidebarContent className="bg-white">
         <NavDocuments label="Main menu" items={data.navMain} />

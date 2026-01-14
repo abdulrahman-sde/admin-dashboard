@@ -14,7 +14,7 @@ export function SearchInput() {
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      setDebouncedQuery(query);
+      setDebouncedQuery(query.trim());
     }, 400);
 
     return () => clearTimeout(timer);
@@ -54,6 +54,7 @@ export function SearchInput() {
   }) => {
     setIsOpen(false);
     setQuery("");
+    setDebouncedQuery("");
 
     switch (result.type) {
       case "product":
@@ -71,18 +72,18 @@ export function SearchInput() {
   return (
     <div
       ref={containerRef}
-      className="relative flex items-center bg-[#F9FAFB] rounded-[50px] w-full md:w-[220px] lg:w-[380px] h-[45px] border border-transparent focus-within:border-[#4EA674] transition-all"
+      className="relative flex items-center bg-[#F5F6FA] rounded-full overflow-hidden w-full md:w-[220px] lg:w-[380px] h-[45px] border-0 ring-0 focus-within:ring-0 shadow-none transition-all"
     >
       <input
-        type="text"
+        type="search"
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         placeholder="Search data, users, or reports"
-        className="w-full bg-transparent border-0 ring-0 hover:ring-0 focus:ring-0 outline-none px-6 pr-12 text-sm placeholder:text-[#A1A7C4] placeholder:text-[15.5px] placeholder:font-normal"
+        className="w-full h-full bg-transparent! border-0! shadow-none! ring-0! outline-none! px-5 pr-12 text-sm placeholder:text-[#A1A7C4] placeholder:text-[14px] placeholder:font-normal appearance-none focus:border-0! focus:shadow-none! focus:ring-0! focus:outline-none! focus-visible:border-0! focus-visible:shadow-none! focus-visible:ring-0! focus-visible:outline-none! focus-visible:ring-offset-0"
       />
       <div className="absolute right-4 flex items-center pointer-events-none">
         {isFetching ? (
-          <Loader2 size={20} className="text-muted-foreground animate-spin" />
+          <Loader2 size={18} className="text-muted-foreground animate-spin" />
         ) : (
           <Search size={18} className="text-[#8E92BC]" />
         )}

@@ -44,10 +44,12 @@ export default function Products() {
   } = useProductDelete(selectedIds, resetSelection);
 
   return (
-    <div className="space-y-6 px-2">
+    <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <h1 className="text-2xl font-semibold text-[#111827]">Product List</h1>
+        <h1 className="text-[22px] font-semibold text-[#111827]">
+          Product List
+        </h1>
         <div className="flex flex-wrap items-center gap-2 sm:gap-3 w-full sm:w-auto">
           {selectedIds.length > 0 ? (
             <Button

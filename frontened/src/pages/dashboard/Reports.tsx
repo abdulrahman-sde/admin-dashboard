@@ -29,7 +29,7 @@ export default function Reports() {
 
   if (isLoading) {
     return (
-      <div className="bg-[#F8F9FB] -m-4 sm:-m-6 p-4 sm:p-10 space-y-8 min-h-screen">
+      <div className="bg-[#F8F9FB] space-y-8 min-h-screen">
         <div className="flex items-center justify-between">
           <Skeleton className="h-7 w-32 rounded-lg" />
           <Skeleton className="h-10 w-28 rounded-lg" />
@@ -52,10 +52,10 @@ export default function Reports() {
   }
 
   return (
-    <div className="bg-[#F8F9FB] -m-4 sm:-m-6 p-4 sm:p-10 space-y-[22px]  min-h-screen overflow-x-hidden">
+    <div className="bg-[#F8F9FB] space-y-[22px] min-h-screen overflow-x-hidden">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-bold text-gray-900">Reports</h1>
+        <h1 className="text-[22px] font-semibold text-gray-900">Reports</h1>
         <Button
           onClick={handleExport}
           className="bg-[#10B981] hover:bg-[#059669] text-white px-6 py-2 rounded-lg gap-2 font-medium cursor-pointer"

@@ -25,9 +25,11 @@ export const useAdminProfile = () => {
       lastName: user?.lastName || "",
       email: user?.email || "",
       phone: user?.phone || "",
+      dateOfBirth: user?.dateOfBirth?.split("T")[0] || "",
       biography: user?.biography || "",
       avatar: user?.avatar || "",
       location: user?.location || "",
+      creditCard: user?.creditCard || "",
     },
   });
 
@@ -47,9 +49,11 @@ export const useAdminProfile = () => {
         lastName: user.lastName,
         email: user.email,
         phone: user.phone || "",
+        dateOfBirth: user.dateOfBirth?.split("T")[0] || "",
         biography: user.biography || "",
         avatar: user.avatar || "",
         location: user.location || "",
+        creditCard: user.creditCard || "",
       });
     }
   }, [user, profileForm]);

@@ -148,7 +148,12 @@ export const adminAuthService = {
       }
     }
 
-    const updatedUser = await userRepository.update(id, input);
+    const updateData: any = { ...input };
+    if (updateData.dateOfBirth === "") {
+      updateData.dateOfBirth = null;
+    }
+
+    const updatedUser = await userRepository.update(id, updateData);
     const { password: _, ...safeUser } = updatedUser;
     return safeUser;
   },

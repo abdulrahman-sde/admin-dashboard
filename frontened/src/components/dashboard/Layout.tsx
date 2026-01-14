@@ -17,7 +17,7 @@ export default function Layout() {
       <SidebarInset>
         <SiteHeader />
 
-        <div className="bg-background px-4 pt-8 pb-6">
+        <div className="bg-background px-6 pt-6 pb-6">
           <Outlet />
         </div>
       </SidebarInset>

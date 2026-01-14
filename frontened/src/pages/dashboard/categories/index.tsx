@@ -16,7 +16,9 @@ export default function Categories() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <h2 className="text-2xl font-semibold text-[#111827]">Discover</h2>
+          <h1 className="text-[22px] font-semibold text-[#111827]">
+            Categories
+          </h1>
         </div>
         <div className="flex flex-wrap items-center gap-2 sm:gap-3">
           <Button
