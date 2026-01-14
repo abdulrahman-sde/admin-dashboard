@@ -2,7 +2,6 @@ import type { Request } from "express";
 import type { User, UserRole, Customer } from "@prisma/client";
 import type { ApiResponse, PaginatedResponse } from "./common.types.js";
 
-
 export interface AuthRequest extends Request {
   user?: {
     id: string;
@@ -13,19 +12,16 @@ export interface AuthRequest extends Request {
   };
 }
 
-
-
 export type SafeUser = Omit<User, "password">;
 export type SafeCustomer = Omit<Customer, "password">;
 
-export interface TokenResponse<T = any> {
+export interface TokenResponse<T> {
   data: T;
   accessToken: string;
   refreshToken: string;
 }
 
 export type UserAuthResponse = TokenResponse<SafeUser>;
-
 
 export interface UserJWTPayload {
   userId: string;

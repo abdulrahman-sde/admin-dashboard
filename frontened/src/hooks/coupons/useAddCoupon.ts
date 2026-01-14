@@ -24,7 +24,7 @@ export const useAddCoupon = () => {
       usageLimit: null,
       noEndDate: false,
       noUsageLimit: false,
-    } as any,
+    },
   });
 
   const onSubmit = form.handleSubmit(async (data) => {

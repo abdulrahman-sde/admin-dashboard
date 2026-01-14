@@ -26,9 +26,10 @@ export const sessionMiddleware = async (
         await updateSessionActivity(sessionId);
 
         req.session = {
-          sessionId: session?.sessionId,
-          visitorId: session?.visitorId,
-          type: session?.type,
+          sessionId: session.sessionId,
+          visitorId: session.visitorId,
+          type: session.type,
+          customerId: session.customerId,
         };
 
         return next();

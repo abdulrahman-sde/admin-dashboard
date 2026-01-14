@@ -8,6 +8,14 @@ import { useCustomerDemographics } from "@/hooks/reports/useCustomerDemographics
 
 const geoUrl = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
 
+interface GeographyType {
+  rsmKey: string;
+  properties: {
+    name: string;
+    [key: string]: string | number;
+  };
+}
+
 const CustomerDemographicsMap = () => {
   const { sortedRegions, countrySales, getColor, isLoading } =
     useCustomerDemographics();
@@ -64,8 +72,8 @@ const CustomerDemographicsMap = () => {
           >
             <ZoomableGroup zoom={1} maxZoom={1}>
               <Geographies geography={geoUrl}>
-                {({ geographies }: { geographies: any[] }) =>
-                  geographies.map((geo: any) => {
+                {({ geographies }: { geographies: GeographyType[] }) =>
+                  geographies.map((geo) => {
                     const countryName = geo.properties.name as string;
                     const sales =
                       countrySales[countryName] ||

@@ -5,5 +5,5 @@ export const CreateSessionEventSchema = z.object({
   sessionId: z.string().uuid("Invalid Session ID format"),
   page: z.string().optional(),
   productId: z.string().optional(),
-  metadata: z.record(z.string(), z.any()).optional(),
+  metadata: z.record(z.string(), z.unknown()).optional(),
 });

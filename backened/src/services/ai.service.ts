@@ -1,5 +1,4 @@
-import { google } from "@ai-sdk/google";
-import { generateText, streamText } from "ai";
+import { streamText } from "ai";
 import { openai } from "@ai-sdk/openai";
 
 export const aiService = {

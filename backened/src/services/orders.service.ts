@@ -269,8 +269,8 @@ export const ordersService = {
   },
   async updateOrder(id: string, input: UpdateOrderInput) {
     const updated = await ordersRepository.updateStatus(id, {
-      fulfillmentStatus: input.fulfillmentStatus as any, // Type casting to satisfy Prisma enum compatibility
-      paymentStatus: input.paymentStatus as any,
+      fulfillmentStatus: input.fulfillmentStatus as FulfillmentStatus,
+      paymentStatus: input.paymentStatus as PaymentStatus,
     });
 
     return updated;

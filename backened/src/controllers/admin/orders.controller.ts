@@ -5,6 +5,7 @@ import {
   getOrdersQuerySchema,
   updateOrderSchema,
 } from "../../utils/validators/order.validator.js";
+import { ValidationError } from "../../utils/errors.js";
 
 export const listOrders = async (req: Request, res: Response) => {
   const query = getOrdersQuerySchema.parse(req.query);
@@ -19,7 +20,7 @@ export const listOrders = async (req: Request, res: Response) => {
 
 export const updateOrder = async (req: Request, res: Response) => {
   const { id } = req.params;
-  if (!id) throw new Error("Order ID is required");
+  if (!id) throw new ValidationError("Order ID is required");
   const validated = updateOrderSchema.parse(req.body);
 
   const order = await ordersService.updateOrder(id, validated);

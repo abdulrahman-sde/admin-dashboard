@@ -4,6 +4,7 @@ import type {
 } from "../types/session.types.js";
 import { sessionRepository } from "../repositories/session.repository.js";
 import { setSession } from "../utils/redis.utils.js";
+import type { Prisma } from "@prisma/client";
 
 export const sessionService = {
   async createSession({ data }: { data: CreateSessionInput }) {
@@ -33,7 +34,7 @@ export const sessionService = {
       eventType: data.eventType,
       page: data.page,
       productId: data.productId,
-      metadata: data.metadata || {},
+      metadata: (data.metadata || {}) as unknown as Prisma.InputJsonValue,
       sessionId: data.sessionId,
     });
   },

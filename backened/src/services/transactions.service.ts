@@ -63,7 +63,7 @@ export const transactionsService = {
     }
 
     const dateFilter = buildDateRangeFilter(startDate, endDate);
-    if (dateFilter) and.push({ createdAt: dateFilter as any });
+    if (dateFilter) and.push({ createdAt: dateFilter });
 
     if (and.length) where.AND = and;
 

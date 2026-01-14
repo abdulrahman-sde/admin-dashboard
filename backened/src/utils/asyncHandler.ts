@@ -1,7 +1,7 @@
 import type { NextFunction, Request, Response } from "express";
 
 export const asyncHandler = (
-  fn: (req: Request, res: Response, next: NextFunction) => Promise<any>
+  fn: (req: Request, res: Response, next: NextFunction) => Promise<unknown>
 ) => {
   return async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -11,18 +11,3 @@ export const asyncHandler = (
     }
   };
 };
-
-/* ========================================================================== */
-/* ========================= How it works internally ======================== */
-/* ========================================================================== */
-
-
-/* ========================================================================== */
-/* ======================= Why asyncHandler is required ===================== */
-/* ========================================================================== */
-
-
-/* ========================================================================== */
-/* ======================= Event-handler analogy ============================ */
-/* ========================================================================== */
-

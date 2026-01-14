@@ -146,10 +146,12 @@ export const useAdminProfile = () => {
       }
 
       toast.success("Biography refined successfully");
-    } catch (error: any) {
+    } catch (error) {
       console.error("Biography refinement error:", error);
       toast.error(
-        error?.message || "Failed to refine biography. Please try again."
+        error instanceof Error
+          ? error.message
+          : "Failed to refine biography. Please try again."
       );
     } finally {
       setIsRefiningBio(false);
@@ -163,8 +165,14 @@ export const useAdminProfile = () => {
       toast.success("Profile updated successfully");
       setIsEditMode(false);
       profileForm.reset(data);
-    } catch (error: any) {
-      toast.error(error?.data?.message || "Failed to update profile");
+    } catch (error) {
+      const errorMessage =
+        (error &&
+          typeof error === "object" &&
+          "data" in error &&
+          (error as { data: { message: string } }).data?.message) ||
+        "Failed to update profile";
+      toast.error(errorMessage as string);
     } finally {
       setIsUpdatingProfile(false);
     }
@@ -180,8 +188,14 @@ export const useAdminProfile = () => {
       });
       toast.success("Password changed successfully");
       passwordForm.reset();
-    } catch (error: any) {
-      toast.error(error?.data?.message || "Failed to change password");
+    } catch (error) {
+      const errorMessage =
+        (error &&
+          typeof error === "object" &&
+          "data" in error &&
+          (error as { data: { message: string } }).data?.message) ||
+        "Failed to change password";
+      toast.error(errorMessage as string);
     } finally {
       setIsChangingPassword(false);
     }

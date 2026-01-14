@@ -1,4 +1,5 @@
 import { api } from "../api";
+import type { ApiResponse } from "@/types/shared.types";
 
 export interface Review {
   id: string;
@@ -39,7 +40,7 @@ export const reviewsApi = api.injectEndpoints({
         url: "/reviews",
         params,
       }),
-      providesTags: ["Reviews" as any],
+      providesTags: ["Reviews"],
     }),
     getProductReviews: builder.query<
       ReviewsResponse,
@@ -50,16 +51,16 @@ export const reviewsApi = api.injectEndpoints({
         params,
       }),
       providesTags: (_result, _error, { productId }) => [
-        { type: "Reviews" as any, id: productId },
+        { type: "Reviews", id: productId },
       ],
     }),
-    addReview: builder.mutation<any, Partial<Review>>({
+    addReview: builder.mutation<ApiResponse<Review>, Partial<Review>>({
       query: (body) => ({
         url: "/reviews",
         method: "POST",
         body,
       }),
-      invalidatesTags: ["Reviews" as any, "Products" as any],
+      invalidatesTags: ["Reviews", "Products"],
     }),
   }),
 });

@@ -75,11 +75,13 @@ export const categoriesService = {
       throw new NotFoundError("Category not found");
     }
 
-    if ((category as any)._count && (category as any)._count.products > 0) {
+    const categoryWithCount = category as typeof category & {
+      _count?: { products: number };
+    };
+
+    if (categoryWithCount._count && categoryWithCount._count.products > 0) {
       throw new BadRequestError(
-        `Cannot delete category with ${
-          (category as any)._count.products
-        } products. Please reassign or delete the products first.`
+        `Cannot delete category with ${categoryWithCount._count.products} products. Please reassign or delete the products first.`
       );
     }
 

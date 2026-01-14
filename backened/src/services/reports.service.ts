@@ -2,7 +2,7 @@ import { analyticsRepository } from "../repositories/analytics.repository.js";
 import { monthlyGoalsRepository } from "../repositories/monthly-goals.repository.js";
 import { customerRepository } from "../repositories/customers.repository.js";
 import { productRepository } from "../repositories/products.repository.js";
-import type { DailyMetrics } from "@prisma/client";
+import type { DailyMetrics, Prisma } from "@prisma/client";
 import { prisma } from "../lib/prisma.js";
 import { redis, getSession } from "../utils/redis.utils.js";
 import type { RedisSessionData } from "../types/session.types.js";
@@ -107,7 +107,11 @@ export const reportsService = {
           if (session && session.device) {
             const device = session.device.toLowerCase();
             if (device in deviceBreakdown) {
-              (deviceBreakdown as any)[device]++;
+              if (typeof deviceBreakdown[device] === "number") {
+                deviceBreakdown[device]++;
+              } else {
+                deviceBreakdown[device] = 1;
+              }
             }
           }
         });
@@ -127,7 +131,7 @@ export const reportsService = {
   },
 
   async getDeviceAnalytics(startDate?: string, endDate?: string) {
-    let whereClause: any = {};
+    let whereClause: Prisma.SessionWhereInput = {};
 
     if (startDate && endDate) {
       whereClause = {

@@ -4,6 +4,7 @@ import type {
   StorePaymentMethod,
   PaymentMethodsResponse,
 } from "@/types/payment-method.types";
+import type { ApiResponse } from "@/types/shared.types";
 
 export const paymentMethodsApi = api.injectEndpoints({
   endpoints: (builder) => ({
@@ -11,7 +12,10 @@ export const paymentMethodsApi = api.injectEndpoints({
       query: () => "/payment-methods",
       providesTags: ["PaymentMethods"],
     }),
-    createPaymentMethod: builder.mutation<any, Partial<StorePaymentMethod>>({
+    createPaymentMethod: builder.mutation<
+      ApiResponse<StorePaymentMethod>,
+      Partial<StorePaymentMethod>
+    >({
       query: (body) => ({
         url: "/payment-methods",
         method: "POST",
@@ -20,7 +24,7 @@ export const paymentMethodsApi = api.injectEndpoints({
       invalidatesTags: ["PaymentMethods"],
     }),
     updatePaymentMethod: builder.mutation<
-      any,
+      ApiResponse<StorePaymentMethod>,
       { id: string; body: Partial<StorePaymentMethod> }
     >({
       query: ({ id, body }) => ({
@@ -30,7 +34,7 @@ export const paymentMethodsApi = api.injectEndpoints({
       }),
       invalidatesTags: ["PaymentMethods"],
     }),
-    deletePaymentMethod: builder.mutation<any, string>({
+    deletePaymentMethod: builder.mutation<ApiResponse<null>, string>({
       query: (id) => ({
         url: `/payment-methods/${id}`,
         method: "DELETE",

@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { useForm, type Resolver } from "react-hook-form";
 import { useState, useEffect } from "react";
 import { categorySchema, type CategoryFormValues } from "@/schemas";
 import {
@@ -58,7 +58,7 @@ export const useAddCategory = (categoryId?: string) => {
   const categoryData = existingCategory?.data || null;
 
   const form = useForm<CategoryFormValues>({
-    resolver: zodResolver(categorySchema) as any,
+    resolver: zodResolver(categorySchema) as Resolver<CategoryFormValues>,
     defaultValues: {
       name: "",
       image: "",

@@ -43,14 +43,22 @@ export default function Register() {
 
     try {
       await register(formData);
-    } catch (err: any) {
+    } catch (err) {
+      console.error(err);
     }
   };
 
   const errorMessage =
     localError ||
-    (registerError as any)?.data?.message ||
-    (registerError as any)?.message;
+    localError ||
+    (registerError &&
+      typeof registerError === "object" &&
+      "data" in registerError &&
+      (registerError as { data: { message: string } }).data?.message) ||
+    (registerError &&
+      typeof registerError === "object" &&
+      "message" in registerError &&
+      (registerError as { message: string }).message);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 px-4 py-12">

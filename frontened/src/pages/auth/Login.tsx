@@ -31,14 +31,19 @@ export default function Login() {
 
     try {
       await login({ email, password });
-    } catch (err: any) {
-    }
+    } catch (err) {}
   };
 
   const errorMessage =
     localError ||
-    (loginError as any)?.data?.message ||
-    (loginError as any)?.message;
+    (loginError &&
+      typeof loginError === "object" &&
+      "data" in loginError &&
+      (loginError as { data: { message: string } }).data?.message) ||
+    (loginError &&
+      typeof loginError === "object" &&
+      "message" in loginError &&
+      (loginError as { message: string }).message);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 px-4">

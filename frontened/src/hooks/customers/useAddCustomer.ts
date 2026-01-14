@@ -1,4 +1,4 @@
-import { useForm } from "react-hook-form";
+import { useForm, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate } from "react-router";
 import { toast } from "sonner";
@@ -13,7 +13,7 @@ export const useAddCustomer = () => {
   const [addCustomer, { isLoading }] = useAddCustomerMutation();
 
   const form = useForm<CustomerFormValues>({
-    resolver: zodResolver(customerSchema) as any,
+    resolver: zodResolver(customerSchema) as Resolver<CustomerFormValues>,
     defaultValues: {
       firstName: "",
       lastName: "",

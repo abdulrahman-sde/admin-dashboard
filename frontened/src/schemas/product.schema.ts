@@ -1,6 +1,5 @@
 import { z } from "zod";
 
-
 export const productSchema = z
   .object({
     name: z.string().min(2, "Name must be at least 2 characters"),
@@ -20,7 +19,9 @@ export const productSchema = z
       .regex(/^[0-9a-fA-F]{24}$/, "Invalid Category ID format"),
     tagId: z.string().optional(),
     colors: z.array(z.string()).optional(),
-    images: z.array(z.any()).min(1, "At least one image is required"),
+    images: z
+      .array(z.union([z.string(), z.instanceof(File)]))
+      .min(1, "At least one image is required"),
     isFeatured: z.boolean().default(false),
     expirationStart: z.date().optional(),
     expirationEnd: z.date().optional(),
@@ -63,7 +64,6 @@ export const productSchema = z
   );
 
 export type ProductFormValues = z.infer<typeof productSchema>;
-
 
 export const createProductSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),

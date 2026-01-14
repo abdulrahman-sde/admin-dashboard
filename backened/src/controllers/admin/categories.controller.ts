@@ -1,6 +1,6 @@
 import type { Request, Response } from "express";
 import { categoriesService } from "../../services/categories.service.js";
-import { successResponse, paginatedResponse } from "../../utils/response.js";
+import { successResponse } from "../../utils/response.js";
 
 import {
   createCategorySchema,
@@ -65,7 +65,7 @@ export const updateCategory = async (
   res: Response
 ): Promise<void> => {
   const { id } = req.params;
-  if (!id) throw new Error("ID is required");
+  if (!id) throw new ValidationError("ID is required");
 
   const validatedData = updateCategorySchema.parse(req.body);
 

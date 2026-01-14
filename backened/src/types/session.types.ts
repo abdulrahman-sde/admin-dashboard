@@ -8,19 +8,6 @@ export interface RedisSessionData {
   device?: string;
 }
 
-declare global {
-  namespace Express {
-    interface Request {
-      session?: {
-        sessionId: string;
-        visitorId: string;
-        type: SessionType;
-        customerId?: string;
-      };
-    }
-  }
-}
-
 export interface CreateSessionInput {
   visitorId: string;
   customerId?: string;
@@ -40,5 +27,5 @@ export interface CreateSessionEventInput {
   eventType: string;
   page?: string;
   productId?: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }

@@ -1,4 +1,4 @@
-import type { Prisma } from "@prisma/client";
+import type { Prisma, DailyMetrics } from "@prisma/client";
 import { prisma } from "../lib/prisma.js";
 import { redis } from "../config/redis.js";
 import type {
@@ -593,7 +593,7 @@ export const analyticsRepository = {
 
     while (cursor <= today && cursor <= to) {
       const liveData = await this.getLiveDailyMetricForDate(new Date(cursor));
-      result.push(liveData as any);
+      result.push(liveData as unknown as DailyMetrics);
       cursor.setUTCDate(cursor.getUTCDate() + 1);
     }
 

@@ -6,6 +6,17 @@ import type {
 } from "../utils/validators/product.validator.js";
 import type { ProductStatsResult } from "../types/products.types.js";
 
+interface FacetCount {
+  count: number;
+}
+
+interface FacetResult {
+  total: FacetCount[];
+  featured: FacetCount[];
+  onSale: FacetCount[];
+  outOfStock: FacetCount[];
+}
+
 export type ProductWithCategory = Product & {
   category?: { name: string };
 };
@@ -151,7 +162,7 @@ export const productRepository = {
       ],
     });
 
-    const facetResult = (result as any)[0];
+    const facetResult = (result as unknown as FacetResult[])[0];
 
     return {
       all: facetResult?.total[0]?.count ?? 0,

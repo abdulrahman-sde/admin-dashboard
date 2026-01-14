@@ -79,7 +79,17 @@ export function getTransactionStatusColor(status: string) {
   }
 }
 
-export function getProductImage(item: any): string {
+interface ProductItem {
+  productImage?: string;
+  image?: string;
+  product?: {
+    thumbnail?: string;
+    images?: string[];
+    image?: string;
+  };
+}
+
+export function getProductImage(item: ProductItem | null | undefined): string {
   if (!item) return "https://via.placeholder.com/48?text=No+Img";
   return (
     item.productImage ||

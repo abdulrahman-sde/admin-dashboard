@@ -20,7 +20,7 @@ export const listCoupons = async (req: Request, res: Response) => {
 
 export const getCoupon = async (req: Request, res: Response) => {
   const { id } = req.params;
-  if (!id) throw new ValidationError("ID Required");
+  if (!id) throw new ValidationError("ID is required");
 
   const coupon = await couponsService.getCouponById(id);
   res.json(successResponse(coupon));
@@ -34,7 +34,7 @@ export const createCoupon = async (req: Request, res: Response) => {
 
 export const updateCoupon = async (req: Request, res: Response) => {
   const { id } = req.params;
-  if (!id) throw new ValidationError("ID Required");
+  if (!id) throw new ValidationError("ID is required");
 
   const body = updateCouponSchema.parse(req.body);
   const updated = await couponsService.updateCoupon(id, body);
@@ -43,7 +43,7 @@ export const updateCoupon = async (req: Request, res: Response) => {
 
 export const deleteCoupon = async (req: Request, res: Response) => {
   const { id } = req.params;
-  if (!id) throw new ValidationError("ID Required");
+  if (!id) throw new ValidationError("ID is required");
 
   await couponsService.deleteCoupon(id);
   res.json(successResponse(null, "Coupon deleted"));

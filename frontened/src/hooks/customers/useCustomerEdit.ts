@@ -22,10 +22,10 @@ export const useCustomerEdit = ({
       lastName: customer.lastName || "",
       email: customer.email || "",
       phone: customer.phone || "",
-      role: (customer as any).role || "CUSTOMER",
-      isGuest: (customer as any).isGuest || false,
+      role: customer.role || "CUSTOMER",
+      isGuest: customer.isGuest || false,
       notes: (customer as CustomerDetail).notes || "",
-      status: (customer as any).status || "ACTIVE",
+      status: customer.status || "ACTIVE",
     },
   });
 
@@ -36,10 +36,10 @@ export const useCustomerEdit = ({
         lastName: customer.lastName || "",
         email: customer.email || "",
         phone: customer.phone || "",
-        role: (customer as any).role || "CUSTOMER",
-        isGuest: (customer as any).isGuest || false,
+        role: customer.role || "CUSTOMER",
+        isGuest: customer.isGuest || false,
         notes: (customer as CustomerDetail).notes || "",
-        status: (customer as any).status || "ACTIVE",
+        status: customer.status || "ACTIVE",
       });
     }
   }, [customer, form]);

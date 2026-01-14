@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { useForm, type Resolver } from "react-hook-form";
 import { useState, useEffect } from "react";
 import { productSchema, type ProductFormValues } from "@/schemas";
 import {
@@ -21,7 +21,7 @@ export const useProductForm = (productId?: string) => {
   const [isGeneratingDescription, setIsGeneratingDescription] = useState(false);
 
   const form = useForm<ProductFormValues>({
-    resolver: zodResolver(productSchema) as any,
+    resolver: zodResolver(productSchema) as Resolver<ProductFormValues>,
     defaultValues: {
       name: "",
       description: "",
