@@ -72,21 +72,23 @@ export function SearchInput() {
   return (
     <div
       ref={containerRef}
-      className="relative flex items-center bg-[#F5F6FA] rounded-full overflow-hidden w-full md:w-[220px] lg:w-[380px] h-[45px] border-0 ring-0 focus-within:ring-0 shadow-none transition-all"
+      className="relative w-full md:w-[220px] lg:w-[380px]"
     >
-      <input
-        type="search"
-        value={query}
-        onChange={(e) => setQuery(e.target.value)}
-        placeholder="Search data, users, or reports"
-        className="w-full h-full bg-transparent! border-0! shadow-none! ring-0! outline-none! px-5 pr-12 text-sm placeholder:text-[#A1A7C4] placeholder:text-[14px] placeholder:font-normal appearance-none focus:border-0! focus:shadow-none! focus:ring-0! focus:outline-none! focus-visible:border-0! focus-visible:shadow-none! focus-visible:ring-0! focus-visible:outline-none! focus-visible:ring-offset-0"
-      />
-      <div className="absolute right-4 flex items-center pointer-events-none">
-        {isFetching ? (
-          <Loader2 size={18} className="text-muted-foreground animate-spin" />
-        ) : (
-          <Search size={18} className="text-[#8E92BC]" />
-        )}
+      <div className="relative flex items-center bg-[#F5F6FA] rounded-full overflow-hidden h-[45px] border-0 ring-0 focus-within:ring-0 shadow-none transition-all">
+        <input
+          type="search"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Search data, users, or reports"
+          className="w-full h-full bg-transparent! border-0! shadow-none! ring-0! outline-none! px-5 pr-12 text-sm placeholder:text-[#A1A7C4] placeholder:text-[14px] placeholder:font-normal appearance-none focus:border-0! focus:shadow-none! focus:ring-0! focus:outline-none! focus-visible:border-0! focus-visible:shadow-none! focus-visible:ring-0! focus-visible:outline-none! focus-visible:ring-offset-0"
+        />
+        <div className="absolute right-4 flex items-center pointer-events-none">
+          {isFetching ? (
+            <Loader2 size={18} className="text-muted-foreground animate-spin" />
+          ) : (
+            <Search size={18} className="text-[#8E92BC]" />
+          )}
+        </div>
       </div>
 
       {/* Dropdown Results */}

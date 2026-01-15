@@ -81,19 +81,19 @@ body {
   --sidebar-ring: oklch(0.708 0 0);
 }
 
-h1 {
+h1:not([class]) {
   font-size: 32px;
   font-weight: 700;
 }
 
-h2 {
+h2:not([class]) {
   font-size: 24px;
   font-weight: 600;
   letter-spacing: -0.025em;
   color: #023337;
 }
 
-h3 {
+h3:not([class]) {
   font-size: 18px;
   font-weight: bold;
   letter-spacing: -0.025em;
